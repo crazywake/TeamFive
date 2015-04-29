@@ -1,10 +1,6 @@
 package com.bill.pocket.pocketbill;
 
 import android.app.AlertDialog;
-import android.content.Context;
-import android.content.DialogInterface;
-
-import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
@@ -43,7 +39,6 @@ public class MainActivity extends ActionBarActivity {
     PopupWindow popupWindow = null;
 
     MainActivity this_class;
-    State state = State.MAIN;
 
     ArrayList<Category> main_categories;
 
@@ -67,7 +62,7 @@ public class MainActivity extends ActionBarActivity {
 
         //fill hashmap with subcategories
         main_categories =  loadDummyData();
-        adapter = new ArrayAdapter<Category>(this_class, android.R.layout.simple_list_item_1, android.R.id.text1, main_categories);
+        adapter = new ArrayAdapter<>(this_class, android.R.layout.simple_list_item_1, android.R.id.text1, main_categories);
 
         // Assign adapter to ListView
         categoryView.setAdapter(adapter);
@@ -251,11 +246,11 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public ArrayList<Category> loadDummyData() {
-        ArrayList<Category> maincatlist = new ArrayList<Category>();
+        ArrayList<Category> maincatlist = new ArrayList<>();
 
-        ArrayList<Category> subcat1list = new ArrayList<Category>();
-        ArrayList<Category> subcat2list = new ArrayList<Category>();
-        ArrayList<Category> subcat3list = new ArrayList<Category>();
+        ArrayList<Category> subcat1list = new ArrayList<>();
+        ArrayList<Category> subcat2list = new ArrayList<>();
+        ArrayList<Category> subcat3list = new ArrayList<>();
 
         //---------- main category dummies ----------
         Category maincat1 = new Category(0, "Gas", null, subcat1list, new ArrayList<Value>(), Category.Type.MAIN);
@@ -264,27 +259,27 @@ public class MainActivity extends ActionBarActivity {
         maincatlist.addAll(Arrays.asList(maincat1, maincat2, maincat3));
 
         //---------- subcat 1 category dummies + value arrays ----------
-        ArrayList<Value> val11 = new ArrayList<Value>();
-        ArrayList<Value> val12 = new ArrayList<Value>();
-        ArrayList<Value> val13 = new ArrayList<Value>();
+        ArrayList<Value> val11 = new ArrayList<>();
+        ArrayList<Value> val12 = new ArrayList<>();
+        ArrayList<Value> val13 = new ArrayList<>();
         Category subcat11 = new Category(3, "Shell", maincat1, null, val11, Category.Type.SUB);
         Category subcat12 = new Category(4, "BP", maincat1, null, val12, Category.Type.SUB);
         Category subcat13 = new Category(5, "Jet", maincat1, null, val13, Category.Type.SUB);
         subcat1list.addAll(Arrays.asList(subcat11, subcat12, subcat13));
 
         //---------- subcat 2 category dummies + value arrays ----------
-        ArrayList<Value> val21 = new ArrayList<Value>();
-        ArrayList<Value> val22 = new ArrayList<Value>();
-        ArrayList<Value> val23 = new ArrayList<Value>();
+        ArrayList<Value> val21 = new ArrayList<>();
+        ArrayList<Value> val22 = new ArrayList<>();
+        ArrayList<Value> val23 = new ArrayList<>();
         Category subcat21 = new Category(6, "Spar", maincat2, null, val21, Category.Type.SUB);
         Category subcat22 = new Category(7, "Billa", maincat2, null, val22, Category.Type.SUB);
         Category subcat23 = new Category(8, "Merkur", maincat2, null, val23, Category.Type.SUB);
         subcat2list.addAll(Arrays.asList(subcat21, subcat22, subcat23));
 
         //---------- subcat 3 category dummies + value arrays ----------
-        ArrayList<Value> val31 = new ArrayList<Value>();
-        ArrayList<Value> val32 = new ArrayList<Value>();
-        ArrayList<Value> val33 = new ArrayList<Value>();
+        ArrayList<Value> val31 = new ArrayList<>();
+        ArrayList<Value> val32 = new ArrayList<>();
+        ArrayList<Value> val33 = new ArrayList<>();
         Category subcat31 = new Category(9, "New Yorker", maincat3, null, val31, Category.Type.SUB);
         Category subcat32 = new Category(10, "H&M", maincat3, null, val32, Category.Type.SUB);
         Category subcat33 = new Category(11, "C&A", maincat3, null, val33, Category.Type.SUB);
