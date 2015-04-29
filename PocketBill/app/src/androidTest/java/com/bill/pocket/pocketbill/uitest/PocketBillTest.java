@@ -27,4 +27,15 @@ public class PocketBillTest extends ActivityInstrumentationTestCase2<MainActivit
         mySolo.clickLongOnText("Shell");
         mySolo.clickOnText("Delete");
     }
+
+    public void testAddValueGUI(){
+        int editTextID = 0;
+        String testText = "12345";
+        mySolo.clickOnText("Gas");
+        mySolo.clickOnText("Shell");
+        mySolo.clickOnEditText(editTextID);
+        mySolo.enterText(editTextID,testText);
+        assertEquals(mySolo.getEditText(editTextID).getText().toString(),testText);
+
+    }
 }
