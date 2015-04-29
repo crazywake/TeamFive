@@ -1,28 +1,25 @@
 package com.bill.pocket.pocketbill;
 
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
-import android.view.ViewGroup.LayoutParams;
-import android.view.LayoutInflater;
 import android.text.InputType;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.PopupWindow;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -37,11 +34,10 @@ public class MainActivity extends ActionBarActivity {
     MainActivity this_class;
     State state = State.MAIN;
 
-    ArrayList<String> list = new ArrayList<String> ();
-    ArrayList<String> main_categories = new ArrayList<String>(Arrays.asList("Gas","Groceries","Shopping"));
+    ArrayList<String> main_categories = new ArrayList<>(Arrays.asList("Gas","Groceries","Shopping"));
     ArrayList<String> current_categories = main_categories;
 
-    HashMap<String, ArrayList<String>> categories_hashmap = new HashMap<String, ArrayList<String>>();
+    HashMap<String, ArrayList<String>> categories_hashmap = new HashMap<>();
 
     ListView categoryView;
     ArrayAdapter<String> adapter;
@@ -66,7 +62,7 @@ public class MainActivity extends ActionBarActivity {
         //fill hashmap with subcategories
         createSubcategories();
 
-        adapter = new ArrayAdapter<String>(this_class, android.R.layout.simple_list_item_1, android.R.id.text1, main_categories);
+        adapter = new ArrayAdapter<>(this_class, android.R.layout.simple_list_item_1, android.R.id.text1, main_categories);
 
         // Assign adapter to ListView
         categoryView.setAdapter(adapter);
@@ -77,7 +73,6 @@ public class MainActivity extends ActionBarActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
-                int itemPosition = position;
 
                 // ListView Clicked item value
                 String itemValue = (String) categoryView.getItemAtPosition(position);
@@ -95,7 +90,8 @@ public class MainActivity extends ActionBarActivity {
 
                     alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int whichButton) {
-                            String value = input.getText().toString();
+                            //String value = input.getText().toString();
+
                             // Do something with value!
                         }
                     });
@@ -111,24 +107,14 @@ public class MainActivity extends ActionBarActivity {
 
 
                     ArrayList<String> sublist = categories_hashmap.get(itemValue);
-                    if(sublist == null) {
-                        Toast.makeText(getApplicationContext(),
-                                "No subcategory in " + itemValue, Toast.LENGTH_SHORT)
-                                .show();
+                    if(sublist == null)
                         return;
-                    }
 
-                    if(sublist == null) {
-                        Toast.makeText(getApplicationContext(),
-                                "No subcategory in " + itemValue, Toast.LENGTH_SHORT)
-                                .show();
-                        return;
-                    }
                     current_categories = sublist;
                     loadAdapter(current_categories);
 
                     //reload adapter
-                    adapter = new ArrayAdapter<String>(this_class, android.R.layout.simple_list_item_1, android.R.id.text1, sublist);
+                    adapter = new ArrayAdapter<>(this_class, android.R.layout.simple_list_item_1, android.R.id.text1, sublist);
 
                     categoryView.setAdapter(adapter);
                     state = State.SUB;
@@ -202,17 +188,14 @@ public class MainActivity extends ActionBarActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement.
-        if (id == R.id.action_settings) {
-            return true;
-        }
+        return id == R.id.action_settings || super.onOptionsItemSelected(item);
 
-        return super.onOptionsItemSelected(item);
     }
 
     public void createSubcategories() {
-        ArrayList<String> subtest1 = new ArrayList<String> (Arrays.asList("Shell","BP","Jet","OMV","Turmöl","Roth","Grünburg"));
-        ArrayList<String> subtest2 = new ArrayList<String> (Arrays.asList("Spar","Billa","Merkur","Hofer","Lidl"));
-        ArrayList<String> subtest3 = new ArrayList<String> (Arrays.asList("New Yorker","H&M","C&A"));
+        ArrayList<String> subtest1 = new ArrayList<> (Arrays.asList("Shell","BP","Jet","OMV","Turmöl","Roth","Grünburg"));
+        ArrayList<String> subtest2 = new ArrayList<> (Arrays.asList("Spar","Billa","Merkur","Hofer","Lidl"));
+        ArrayList<String> subtest3 = new ArrayList<> (Arrays.asList("New Yorker","H&M","C&A"));
 
         categories_hashmap.put("Gas", subtest1);
         categories_hashmap.put("Groceries", subtest2);
@@ -221,34 +204,7 @@ public class MainActivity extends ActionBarActivity {
 
     public void loadAdapter(ArrayList<String> category_list) {
         //reload adapter
-        adapter = new ArrayAdapter<String>(this_class, android.R.layout.simple_list_item_1, android.R.id.text1, category_list);
+        adapter = new ArrayAdapter<>(this_class, android.R.layout.simple_list_item_1, android.R.id.text1, category_list);
         categoryView.setAdapter(adapter);
     }
-
-    private class StableArrayAdapter extends ArrayAdapter<String> {
-
-        HashMap<String, Integer> mIdMap = new HashMap<>();
-
-        public StableArrayAdapter(Context context, int textViewResourceId,
-                                  List<String> objects) {
-            super(context, textViewResourceId, objects);
-            for (int i = 0; i < objects.size(); ++i) {
-                mIdMap.put(objects.get(i), i);
-            }
-        }
-
-        @Override
-        public long getItemId(int position) {
-            String item = getItem(position);
-            return mIdMap.get(item);
-        }
-
-        @Override
-        public boolean hasStableIds() {
-            return true;
-        }
-
-    }
-
-
 }
