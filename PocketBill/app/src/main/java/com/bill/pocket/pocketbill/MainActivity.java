@@ -33,6 +33,8 @@ public class MainActivity extends ActionBarActivity {
         POPUP
     }
 
+
+
     public State pre_popup_state = State.MAIN;
     public State cur_state = State.MAIN;
 
@@ -41,6 +43,8 @@ public class MainActivity extends ActionBarActivity {
     MainActivity this_class;
 
     ArrayList<Category> main_categories;
+
+    Category current_main_category = null;
 
     ListView categoryView;
     ArrayAdapter<Category> adapter;
@@ -69,7 +73,6 @@ public class MainActivity extends ActionBarActivity {
 
         // ListView Item Click Listener
         categoryView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
             @Override
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
@@ -101,8 +104,10 @@ public class MainActivity extends ActionBarActivity {
                     });
 
                     alert.show();
-
                     return;
+                }
+                if(cur_state == State.MAIN) {
+                    current_main_category = clickedItem;
                 }
                 loadAdapter(new_category_list);
                 cur_state = State.SUB;
@@ -187,6 +192,7 @@ public class MainActivity extends ActionBarActivity {
             case SUB: {
                 //switch to main
                 loadAdapter(main_categories);
+                current_main_category = null;
                 cur_state = State.MAIN;
                 break;
             }

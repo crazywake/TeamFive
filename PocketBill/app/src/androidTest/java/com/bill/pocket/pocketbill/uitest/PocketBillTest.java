@@ -28,10 +28,25 @@ public class PocketBillTest extends ActivityInstrumentationTestCase2<MainActivit
        //mySolo.clickOnButton("Cancel");
 
     }
-    public void testCategoryList(){
+    public void testCategoryListSelect(){
+        mySolo.clickOnText("Gas");
+        mySolo.clickOnText("Shell");
+        mySolo.sleep(2000);
+    }
+
+    public void testCategoryDelete(){
         mySolo.clickOnText("Gas");
         mySolo.clickLongOnText("Shell");
         mySolo.clickOnText("Delete");
+        mySolo.sleep(2000);
+    }
+
+    public void testCategoryBack(){
+        mySolo.clickOnText("Gas");
+        mySolo.clickLongOnText("Shell");
+        mySolo.goBack();
+        mySolo.goBack();
+        mySolo.sleep(2000);
     }
 
     public void testAddValueGUI(){
