@@ -5,33 +5,84 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
 
 public class MainActivity extends ActionBarActivity {
 
-    String[] categories = new String[] {"Gas","Groceries","Shopping"};
-    final ArrayList<String> list = new ArrayList<>();
+    MainActivity this_class;
 
+    String[] main_categories = new String[] {"Gas","Groceries","Shopping"};
+
+    HashMap<String, String[]> categories_hashmap = new HashMap<String, String[]>();
+
+    ListView categoryView;
+    ArrayAdapter<String> adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        this_class = this;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        final ListView categoryView = (ListView) findViewById(R.id.CategoryView);
+        categoryView = (ListView) findViewById(R.id.CategoryView);
 
-        list.addAll(Arrays.asList(categories));
+        // Define a new Adapter
+        // First parameter - Context
+        // Second parameter - Layout for the row
+        // Third parameter - ID of the TextView to which the data is written
+        // Fourth - the Array of data
 
-        final StableArrayAdapter adapter = new StableArrayAdapter(this,
-                android.R.layout.simple_list_item_1, list);
+        //fill hashmap with subcategories
+        createSubcategories();
+
+        adapter = new ArrayAdapter<String>(this_class, android.R.layout.simple_list_item_1, android.R.id.text1, main_categories);
+        //subadapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, android.R.id.text1, subcategories);
+
+        // Assign adapter to ListView
         categoryView.setAdapter(adapter);
+
+        // ListView Item Click Listener
+        categoryView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view,
+                                    int position, long id) {
+
+                // ListView Clicked item index
+                int itemPosition = position;
+
+                // ListView Clicked item value
+                String itemValue = (String) categoryView.getItemAtPosition(position);
+
+                String[] sublist = categories_hashmap.get(itemValue);
+                if(sublist == null) {
+                    Toast.makeText(getApplicationContext(),
+                            "No subcategory in " + itemValue, Toast.LENGTH_SHORT)
+                            .show();
+                    return;
+                }
+
+                //reload adapter
+                adapter = new ArrayAdapter<String>(this_class, android.R.layout.simple_list_item_1, android.R.id.text1, sublist);
+
+                categoryView.setAdapter(adapter);
+
+                // Show Alert
+                Toast.makeText(getApplicationContext(),
+                        "Position :" + itemPosition + "  ListItem : " + itemValue, Toast.LENGTH_LONG)
+                        .show();
+
+            }
+
+        });
 
 
     }
@@ -59,6 +110,16 @@ public class MainActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    public void createSubcategories() {
+        String[] subtest1 = new String[] {"Shell","BP","Jet","OMV","Turmöl","Roth","Grünburg"};
+        String[] subtest2 = new String[] {"Spar","Billa","Merkur","Hofer","Lidl"};
+        String[] subtest3 = new String[] {"New Yorker","H&M","C&A"};
+
+        categories_hashmap.put("Gas", subtest1);
+        categories_hashmap.put("Groceries", subtest2);
+        categories_hashmap.put("Shopping", subtest3);
+    }
+
     private class StableArrayAdapter extends ArrayAdapter<String> {
 
         HashMap<String, Integer> mIdMap = new HashMap<>();
@@ -83,4 +144,6 @@ public class MainActivity extends ActionBarActivity {
         }
 
     }
+
+
 }
