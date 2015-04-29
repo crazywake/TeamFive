@@ -22,6 +22,8 @@ import java.util.HashMap;
 import java.util.List;
 
 
+@SuppressWarnings("deprecation")
+
 public class MainActivity extends ActionBarActivity {
 
     public enum State {
