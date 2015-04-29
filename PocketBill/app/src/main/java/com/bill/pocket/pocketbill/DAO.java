@@ -44,34 +44,7 @@ public class DAO {
         my_db.close();
     }
 
-    public boolean insertMainCat(String newCat)
-    {
-        newCat = newCat.toUpperCase();
-        Cursor checkNameCursor = my_db.query(
-            SqlLiteHelper.MAIN_CAT,  // Table to Query
-            new String[] { SqlLiteHelper.NAME_MAIN_CAT }, // leaving "columns" null just returns all the columns.
-            null, // cols for "where" clause
-            null, // values for "where" clause
-            null, // columns to group by
-            null, // columns to filter by row groups
-            null
-        );
-        checkNameCursor.moveToFirst();
-        while (!checkNameCursor.isAfterLast())
-        {
-            if (checkNameCursor.getString(0).equals(newCat))
-            {
-                return false;
-            }
-            checkNameCursor.moveToNext();
-        }
 
-        ContentValues new_cont = new ContentValues();
-        new_cont.put(SqlLiteHelper.NAME_MAIN_CAT,newCat);
-
-        my_db.insert(SqlLiteHelper.MAIN_CAT,null,new_cont);
-        return true;
-    }
 
     public ArrayList<Category> getMainData()
     {
@@ -153,8 +126,97 @@ public class DAO {
         return return_value;
     }
 
-    public boolean deleteMainCat(String name) {
-        name = name.toUpperCase();
-        return (my_db.delete(SqlLiteHelper.MAIN_CAT, SqlLiteHelper.NAME_MAIN_CAT + " = '" + name + "'", null) > 0);
+    public boolean deleteSubCat(String name){
+
+        return (my_db.delete(SqlLiteHelper.SUB_CAT, SqlLiteHelper.NAME_SUB_CAT + " = '" + name + "'", null) > 0);
+    }
+
+    public ArrayList<String> getSubCats()
+    {
+        ArrayList<String> sub_cats = new ArrayList<String>();
+
+        Cursor get_subs = my_db.query(
+                SqlLiteHelper.SUB_CAT,  // Table to Query
+                new String[] { SqlLiteHelper.NAME_SUB_CAT }, // leaving "columns" null just returns all the columns.
+                null, // cols for "where" clause
+                null, // values for "where" clause
+                null, // columns to group by
+                null, // columns to filter by row groups
+                null
+        );
+
+
+        get_subs.moveToFirst();
+
+        while (!get_subs.isAfterLast())
+        {
+            sub_cats.add(get_subs.getString(0));
+            get_subs.moveToNext();
+        }
+
+
+        return sub_cats;
+    }
+
+    public long insertMainCat(String newCat)
+    {
+        Cursor checkNameCursor = my_db.query(
+                SqlLiteHelper.MAIN_CAT,  // Table to Query
+                new String[] { SqlLiteHelper.NAME_MAIN_CAT }, // leaving "columns" null just returns all the columns.
+                null, // cols for "where" clause
+                null, // values for "where" clause
+                null, // columns to group by
+                null, // columns to filter by row groups
+                null
+        );
+        checkNameCursor.moveToFirst();
+        while (!checkNameCursor.isAfterLast())
+        {
+            checkNameCursor.moveToNext();
+        }
+
+        ContentValues new_cont = new ContentValues();
+        new_cont.put(SqlLiteHelper.NAME_MAIN_CAT,newCat);
+
+        return my_db.insert(SqlLiteHelper.MAIN_CAT,null,new_cont);
+    }
+
+    public long insertSubCat(String newSubCat,Integer MainCatId)
+    {
+        Cursor checkNameCursor = my_db.query(
+                SqlLiteHelper.SUB_CAT,  // Table to Query
+                new String[] { SqlLiteHelper.NAME_SUB_CAT }, // leaving "columns" null just returns all the columns.
+                null, // cols for "where" clause
+                null, // values for "where" clause
+                null, // columns to group by
+                null, // columns to filter by row groups
+                null
+        );
+
+        checkNameCursor.moveToFirst();
+        while(!checkNameCursor.isAfterLast())
+        {
+            checkNameCursor.moveToNext();
+        }
+
+        ContentValues new_name = new  ContentValues();
+        new_name.put(SqlLiteHelper.NAME_SUB_CAT,newSubCat);
+        new_name.put(SqlLiteHelper.MAIN_CAT_ID,MainCatId);
+
+        return my_db.insert(SqlLiteHelper.SUB_CAT,null,new_name);
+    }
+
+    public boolean insertPayment(Integer new_value,Integer main_cat,Integer sub_cat)
+    {
+        long unixTime = System.currentTimeMillis() / 1000L;
+
+        ContentValues new_cont = new ContentValues();
+        new_cont.put(SqlLiteHelper.VALUE_PAYMENT,new_value);
+        new_cont.put(SqlLiteHelper.DATE_PAYMENT,unixTime);
+        new_cont.put(SqlLiteHelper.MAIN_CAT_PAYMENT,main_cat);
+        new_cont.put(SqlLiteHelper.SUB_CAT_PAYMENT,sub_cat);
+
+        my_db.insert(SqlLiteHelper.PAYMENT,null,new_cont);
+        return true;
     }
 }
