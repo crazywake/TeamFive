@@ -25,8 +25,13 @@ public class MainActivity extends ActionBarActivity {
 
     public enum State {
         MAIN,
-        SUB
+        SUB,
+        POPUP
     }
+
+
+    public State pre_popup_state = State.MAIN;
+    public State cur_state = State.MAIN;
 
     PopupWindow popupWindow = null;
 
@@ -86,6 +91,7 @@ public class MainActivity extends ActionBarActivity {
                 }
                 current_categories = sublist;
                 loadAdapter(current_categories);
+                cur_state = State.SUB;
 
                 // Show Alert
                 Toast.makeText(getApplicationContext(),
@@ -100,6 +106,9 @@ public class MainActivity extends ActionBarActivity {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view,
                                         final int position, long id) {
+
+                pre_popup_state = cur_state;
+                cur_state = State.POPUP;
 
                 if(popupWindow != null && popupWindow.isShowing()) {
                     popupWindow.dismiss();
@@ -145,6 +154,28 @@ public class MainActivity extends ActionBarActivity {
 
     }
 
+    @Override
+    public void onBackPressed() {
+        switch(cur_state) {
+            case MAIN: {
+                super.onDestroy();
+                //UIHelper.killApp(true);
+                break;
+            }
+            case SUB: {
+                //switch to main
+                loadAdapter(main_categories);
+                cur_state = State.MAIN;
+                break;
+            }
+            case POPUP: {
+                //close popup
+                popupWindow.dismiss();
+                cur_state = pre_popup_state;
+                break;
+            }
+        }
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
