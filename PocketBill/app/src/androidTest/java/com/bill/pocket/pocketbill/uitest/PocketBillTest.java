@@ -26,4 +26,8 @@ public class PocketBillTest extends ActivityInstrumentationTestCase2<MainActivit
         mySolo.clickOnText("Gas");
         mySolo.clickOnText("Shell");
     }
+
+    public void testAddValueGUI(){
+        
+    }
 }
