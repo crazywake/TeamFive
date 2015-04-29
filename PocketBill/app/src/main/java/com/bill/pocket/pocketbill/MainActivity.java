@@ -19,6 +19,17 @@ public class MainActivity extends ActionBarActivity {
     String[] categories = new String[] {"Gas","Groceries","Shopping"};
     final ArrayList<String> list = new ArrayList<>();
 
+    //Object for communication with the database
+    //(Call instance in every context,because singleton)
+    //Look in DAO for using this Object
+    DAO my_dao_ = null;
+
+    @Override
+    protected void onDestroy()
+    {
+        //Always close the Database!
+        if (my_dao_ != null) my_dao_.close();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,9 +44,8 @@ public class MainActivity extends ActionBarActivity {
                 android.R.layout.simple_list_item_1, list);
         categoryView.setAdapter(adapter);
 
-
+        my_dao_ = DAO.instance(this);
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -83,4 +93,5 @@ public class MainActivity extends ActionBarActivity {
         }
 
     }
+
 }
