@@ -1,16 +1,20 @@
 package com.bill.pocket.pocketbill;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.ViewGroup.LayoutParams;
 import android.view.LayoutInflater;
+import android.text.InputType;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.Toast;
@@ -31,6 +35,7 @@ public class MainActivity extends ActionBarActivity {
     PopupWindow popupWindow = null;
 
     MainActivity this_class;
+    State state = State.MAIN;
 
     ArrayList<String> list = new ArrayList<String> ();
     ArrayList<String> main_categories = new ArrayList<String>(Arrays.asList("Gas","Groceries","Shopping"));
@@ -72,28 +77,62 @@ public class MainActivity extends ActionBarActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
-
-                // ListView Clicked item index
                 int itemPosition = position;
 
                 // ListView Clicked item value
                 String itemValue = (String) categoryView.getItemAtPosition(position);
 
-                ArrayList<String> sublist = categories_hashmap.get(itemValue);
-                if(sublist == null) {
-                    Toast.makeText(getApplicationContext(),
-                            "No subcategory in " + itemValue, Toast.LENGTH_SHORT)
-                            .show();
-                    return;
+
+
+                if(state == State.SUB)
+                {
+                    AlertDialog.Builder alert = new AlertDialog.Builder(MainActivity.this);
+
+                    alert.setTitle("Add Value");
+                    final EditText input = new EditText(MainActivity.this);
+                    input.setInputType(InputType.TYPE_CLASS_NUMBER);
+                    alert.setView(input);
+
+                    alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int whichButton) {
+                            String value = input.getText().toString();
+                            // Do something with value!
+                        }
+                    });
+
+                    alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int whichButton) {
+                            // Canceled.
+                        }
+                    });
+
+                    alert.show();
+                }else{
+
+
+                    ArrayList<String> sublist = categories_hashmap.get(itemValue);
+                    if(sublist == null) {
+                        Toast.makeText(getApplicationContext(),
+                                "No subcategory in " + itemValue, Toast.LENGTH_SHORT)
+                                .show();
+                        return;
+                    }
+
+                    if(sublist == null) {
+                        Toast.makeText(getApplicationContext(),
+                                "No subcategory in " + itemValue, Toast.LENGTH_SHORT)
+                                .show();
+                        return;
+                    }
+                    current_categories = sublist;
+                    loadAdapter(current_categories);
+
+                    //reload adapter
+                    adapter = new ArrayAdapter<String>(this_class, android.R.layout.simple_list_item_1, android.R.id.text1, sublist);
+
+                    categoryView.setAdapter(adapter);
+                    state = State.SUB;
                 }
-                current_categories = sublist;
-                loadAdapter(current_categories);
-
-                // Show Alert
-                Toast.makeText(getApplicationContext(),
-                        "Position :" + itemPosition + "  ListItem : " + itemValue, Toast.LENGTH_LONG)
-                        .show();
-
             }
 
         });
