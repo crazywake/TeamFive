@@ -28,6 +28,11 @@ public class PocketBillTest extends ActivityInstrumentationTestCase2<MainActivit
     }
 
     public void testAddValueGUI(){
-        
+        int editTextID = 0;
+        String testText = "TestText1";
+        mySolo.clickOnEditText(editTextID);
+        mySolo.enterText(editTextID,testText);
+        assertEquals(mySolo.getEditText(editTextID),testText);
+
     }
 }

@@ -1,13 +1,17 @@
 package com.bill.pocket.pocketbill;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.text.InputType;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -18,6 +22,7 @@ import java.util.List;
 public class MainActivity extends ActionBarActivity {
 
     MainActivity this_class;
+    boolean isSubCategory = false;
 
     String[] main_categories = new String[] {"Gas","Groceries","Shopping"};
 
@@ -55,31 +60,50 @@ public class MainActivity extends ActionBarActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
-
-                // ListView Clicked item index
                 int itemPosition = position;
 
                 // ListView Clicked item value
                 String itemValue = (String) categoryView.getItemAtPosition(position);
 
-                String[] sublist = categories_hashmap.get(itemValue);
-                if(sublist == null) {
-                    Toast.makeText(getApplicationContext(),
-                            "No subcategory in " + itemValue, Toast.LENGTH_SHORT)
-                            .show();
-                    return;
+
+                if(isSubCategory)
+                {
+                    AlertDialog.Builder alert = new AlertDialog.Builder(MainActivity.this);
+
+                    alert.setTitle("Add Value");
+                    final EditText input = new EditText(MainActivity.this);
+                    input.setInputType(InputType.TYPE_CLASS_NUMBER);
+                    alert.setView(input);
+
+                    alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int whichButton) {
+                            String value = input.getText().toString();
+                            // Do something with value!
+                        }
+                    });
+
+                    alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int whichButton) {
+                            // Canceled.
+                        }
+                    });
+
+                    alert.show();
+                }else{
+                    String[] sublist = categories_hashmap.get(itemValue);
+                    isSubCategory=true;
+                    if(sublist == null) {
+                        Toast.makeText(getApplicationContext(),
+                                "No subcategory in " + itemValue, Toast.LENGTH_SHORT)
+                                .show();
+                        return;
+                    }
+
+                    //reload adapter
+                    adapter = new ArrayAdapter<String>(this_class, android.R.layout.simple_list_item_1, android.R.id.text1, sublist);
+
+                    categoryView.setAdapter(adapter);
                 }
-
-                //reload adapter
-                adapter = new ArrayAdapter<String>(this_class, android.R.layout.simple_list_item_1, android.R.id.text1, sublist);
-
-                categoryView.setAdapter(adapter);
-
-                // Show Alert
-                Toast.makeText(getApplicationContext(),
-                        "Position :" + itemPosition + "  ListItem : " + itemValue, Toast.LENGTH_LONG)
-                        .show();
-
             }
 
         });
