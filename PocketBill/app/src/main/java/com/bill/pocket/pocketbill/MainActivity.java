@@ -3,10 +3,17 @@ package com.bill.pocket.pocketbill;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.view.ViewGroup.LayoutParams;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
+import android.widget.PopupWindow;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,13 +23,32 @@ import java.util.List;
 
 public class MainActivity extends ActionBarActivity {
 
-    String[] categories = new String[] {"Gas","Groceries","Shopping"};
-    final ArrayList<String> list = new ArrayList<>();
+    public enum State {
+        MAIN,
+        SUB,
+        POPUP
+    }
 
     //Object for communication with the database
     //(Call instance in every context,because singleton)
     //Look in DAO for using this Object
     DAO my_dao_ = null;
+
+    public State pre_popup_state = State.MAIN;
+    public State cur_state = State.MAIN;
+
+    PopupWindow popupWindow = null;
+
+    MainActivity this_class;
+
+    ArrayList<String> list = new ArrayList<String> ();
+    ArrayList<String> main_categories = new ArrayList<String>(Arrays.asList("Gas","Groceries","Shopping"));
+    ArrayList<String> current_categories = main_categories;
+
+    HashMap<String, ArrayList<String>> categories_hashmap = new HashMap<String, ArrayList<String>>();
+
+    ListView categoryView;
+    ArrayAdapter<String> adapter;
 
     @Override
     protected void onDestroy()
@@ -33,23 +59,139 @@ public class MainActivity extends ActionBarActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        this_class = this;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        final ListView categoryView = (ListView) findViewById(R.id.CategoryView);
+        categoryView = (ListView) findViewById(R.id.CategoryView);
+        categoryView.setLongClickable(true);
 
-        list.addAll(Arrays.asList(categories));
+        // Define a new Adapter
+        // First parameter - Context
+        // Second parameter - Layout for the row
+        // Third parameter - ID of the TextView to which the data is written
+        // Fourth - the Array of data
 
-        final StableArrayAdapter adapter = new StableArrayAdapter(this,
-                android.R.layout.simple_list_item_1, list);
+        //fill hashmap with subcategories
+        createSubcategories();
+
+        adapter = new ArrayAdapter<String>(this_class, android.R.layout.simple_list_item_1, android.R.id.text1, main_categories);
+
+        // Assign adapter to ListView
         categoryView.setAdapter(adapter);
+
+        // ListView Item Click Listener
+        categoryView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view,
+                                    int position, long id) {
+
+                // ListView Clicked item index
+                int itemPosition = position;
+
+                // ListView Clicked item value
+                String itemValue = (String) categoryView.getItemAtPosition(position);
+
+                ArrayList<String> sublist = categories_hashmap.get(itemValue);
+                if(sublist == null) {
+                    Toast.makeText(getApplicationContext(),
+                            "No subcategory in " + itemValue, Toast.LENGTH_SHORT)
+                            .show();
+                    return;
+                }
+                current_categories = sublist;
+                loadAdapter(current_categories);
+                cur_state = State.SUB;
+
+                // Show Alert
+                Toast.makeText(getApplicationContext(),
+                        "Position :" + itemPosition + "  ListItem : " + itemValue, Toast.LENGTH_LONG)
+                        .show();
+
+            }
+
+        });
+
+        categoryView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view,
+                                        final int position, long id) {
+
+                pre_popup_state = cur_state;
+                cur_state = State.POPUP;
+
+                if(popupWindow != null && popupWindow.isShowing()) {
+                    popupWindow.dismiss();
+                }
+
+                LayoutInflater layoutInflater
+                        = (LayoutInflater)getBaseContext()
+                        .getSystemService(LAYOUT_INFLATER_SERVICE);
+
+                View popupView = layoutInflater.inflate(R.layout.category_popup, null);
+                popupWindow = new PopupWindow(
+                        popupView,
+                        LayoutParams.WRAP_CONTENT,
+                        LayoutParams.WRAP_CONTENT);
+
+                Button btnEdit = (Button) popupView.findViewById(R.id.edit);
+                btnEdit.setOnClickListener(new Button.OnClickListener() {
+
+                    @Override
+                    public void onClick(View v) {
+                        // edit button clicked
+
+                    }
+                });
+
+                Button btnDelete = (Button) popupView.findViewById(R.id.delete);
+                btnDelete.setOnClickListener(new Button.OnClickListener() {
+
+                    @Override
+                    public void onClick(View v) {
+                        // delete
+                        current_categories.remove(position);
+                        loadAdapter(current_categories);
+                        popupWindow.dismiss();
+                    }
+                });
+
+                popupWindow.showAsDropDown(view);
+
+                return true;
+            }
+        });
 
         my_dao_ = DAO.instance(this);
     }
 
     @Override
+    public void onBackPressed() {
+        switch(cur_state) {
+            case MAIN: {
+                super.onDestroy();
+                //UIHelper.killApp(true);
+                break;
+            }
+            case SUB: {
+                //switch to main
+                loadAdapter(main_categories);
+                cur_state = State.MAIN;
+                break;
+            }
+            case POPUP: {
+                //close popup
+                popupWindow.dismiss();
+                cur_state = pre_popup_state;
+                break;
+            }
+        }
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // I nflate the menu; this adds items to the action bar if it is present.
+        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
@@ -61,12 +203,28 @@ public class MainActivity extends ActionBarActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
+        //noinspection SimplifiableIfStatement.
         if (id == R.id.action_settings) {
             return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void createSubcategories() {
+        ArrayList<String> subtest1 = new ArrayList<String> (Arrays.asList("Shell","BP","Jet","OMV","Turmöl","Roth","Grünburg"));
+        ArrayList<String> subtest2 = new ArrayList<String> (Arrays.asList("Spar","Billa","Merkur","Hofer","Lidl"));
+        ArrayList<String> subtest3 = new ArrayList<String> (Arrays.asList("New Yorker","H&M","C&A"));
+
+        categories_hashmap.put("Gas", subtest1);
+        categories_hashmap.put("Groceries", subtest2);
+        categories_hashmap.put("Shopping", subtest3);
+    }
+
+    public void loadAdapter(ArrayList<String> category_list) {
+        //reload adapter
+        adapter = new ArrayAdapter<String>(this_class, android.R.layout.simple_list_item_1, android.R.id.text1, category_list);
+        categoryView.setAdapter(adapter);
     }
 
     private class StableArrayAdapter extends ArrayAdapter<String> {
@@ -93,5 +251,7 @@ public class MainActivity extends ActionBarActivity {
         }
 
     }
+
+
 
 }

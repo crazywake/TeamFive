@@ -24,7 +24,7 @@ public class PocketBillTest extends ActivityInstrumentationTestCase2<MainActivit
 
     public void testCategoryList(){
         mySolo.clickOnText("Gas");
-        mySolo.clickOnText("Groceries");
-        mySolo.clickOnText("Shopping");
+        mySolo.clickLongOnText("Shell");
+        mySolo.clickOnText("Delete");
     }
 }
