@@ -66,6 +66,7 @@ public class MainActivity extends ActionBarActivity {
         //fill hashmap with subcategories
         dataAccessObject = DAO.instance(this);
 
+
         insertDummyData();
         main_categories = dataAccessObject.getMainData();
 
@@ -260,15 +261,15 @@ public class MainActivity extends ActionBarActivity {
         int dummy2main = (int) dataAccessObject.insertMainCat("Groceries");
         int dummy3main = (int) dataAccessObject.insertMainCat("Shopping");
 
-        int dummy1sub = (int) dataAccessObject.insertSubCat("Shell", dummy1main);
-        int dummy2sub = (int) dataAccessObject.insertSubCat("BP", dummy1main);
-        int dummy3sub = (int) dataAccessObject.insertSubCat("Jet", dummy1main);
-        int dummy4sub = (int) dataAccessObject.insertSubCat("Spar", dummy2main);
-        int dummy5sub = (int) dataAccessObject.insertSubCat("Billa", dummy2main);
-        int dummy6sub = (int) dataAccessObject.insertSubCat("Merkur", dummy2main);
-        int dummy7sub = (int) dataAccessObject.insertSubCat("New Yorker", dummy3main);
-        int dummy8sub = (int) dataAccessObject.insertSubCat("H&M", dummy3main);
-        int dummy9sub = (int) dataAccessObject.insertSubCat("C&A", dummy3main);
+        /*int dummy1sub = (int) */dataAccessObject.insertSubCat("Shell", dummy1main);
+        /*int dummy2sub = (int) */dataAccessObject.insertSubCat("BP", dummy1main);
+        /*int dummy3sub = (int) */dataAccessObject.insertSubCat("Jet", dummy1main);
+        /*int dummy4sub = (int) */dataAccessObject.insertSubCat("Spar", dummy2main);
+        /*int dummy5sub = (int) */dataAccessObject.insertSubCat("Billa", dummy2main);
+        /*int dummy6sub = (int) */dataAccessObject.insertSubCat("Merkur", dummy2main);
+        /*int dummy7sub = (int) */dataAccessObject.insertSubCat("New Yorker", dummy3main);
+        /*int dummy8sub = (int) */dataAccessObject.insertSubCat("H&M", dummy3main);
+        /*int dummy9sub = (int) */dataAccessObject.insertSubCat("C&A", dummy3main);
 
         /*
 
