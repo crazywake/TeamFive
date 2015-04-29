@@ -22,11 +22,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.PopupWindow;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 
 
 @SuppressWarnings("deprecation")
@@ -39,7 +37,6 @@ public class MainActivity extends ActionBarActivity {
         POPUP
     }
 
-
     public State pre_popup_state = State.MAIN;
     public State cur_state = State.MAIN;
 
@@ -48,13 +45,10 @@ public class MainActivity extends ActionBarActivity {
     MainActivity this_class;
     State state = State.MAIN;
 
-    ArrayList<String> main_categories = new ArrayList<>(Arrays.asList("Gas","Groceries","Shopping"));
-    ArrayList<String> current_categories = main_categories;
-
-    HashMap<String, ArrayList<String>> categories_hashmap = new HashMap<>();
+    ArrayList<Category> main_categories;
 
     ListView categoryView;
-    ArrayAdapter<String> adapter;
+    ArrayAdapter<Category> adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,9 +66,8 @@ public class MainActivity extends ActionBarActivity {
         // Fourth - the Array of data
 
         //fill hashmap with subcategories
-        createSubcategories();
-
-        adapter = new ArrayAdapter<>(this_class, android.R.layout.simple_list_item_1, android.R.id.text1, main_categories);
+        main_categories =  loadDummyData();
+        adapter = new ArrayAdapter<Category>(this_class, android.R.layout.simple_list_item_1, android.R.id.text1, main_categories);
 
         // Assign adapter to ListView
         categoryView.setAdapter(adapter);
@@ -87,22 +80,10 @@ public class MainActivity extends ActionBarActivity {
                                     int position, long id) {
 
                 // ListView Clicked item value
-                String itemValue = (String) categoryView.getItemAtPosition(position);
+                Category clickedItem = (Category) categoryView.getItemAtPosition(position);
 
-                ArrayList<String> sublist = categories_hashmap.get(itemValue);
-                if(sublist == null) {
-                    Toast.makeText(getApplicationContext(),
-                            "No subcategory in " + itemValue, Toast.LENGTH_SHORT)
-                            .show();
-                    return;
-                }
-                current_categories = sublist;
-                loadAdapter(current_categories);
-                cur_state = State.SUB;
-
-
-                if(state == State.SUB)
-                {
+                ArrayList<Category> new_category_list = clickedItem.getSubcategories();
+                if(new_category_list == null) {
                     AlertDialog.Builder alert = new AlertDialog.Builder(MainActivity.this);
 
                     alert.setTitle("Add Value");
@@ -125,22 +106,11 @@ public class MainActivity extends ActionBarActivity {
                     });
 
                     alert.show();
-                }else{
 
-
-                    sublist = categories_hashmap.get(itemValue);
-                    if(sublist == null)
-                        return;
-
-                    current_categories = sublist;
-                    loadAdapter(current_categories);
-
-                    //reload adapter
-                    adapter = new ArrayAdapter<>(this_class, android.R.layout.simple_list_item_1, android.R.id.text1, sublist);
-
-                    categoryView.setAdapter(adapter);
-                    state = State.SUB;
+                    return;
                 }
+                loadAdapter(new_category_list);
+                cur_state = State.SUB;
             }
 
         });
@@ -187,10 +157,20 @@ public class MainActivity extends ActionBarActivity {
                     @Override
                     public void onClick(View v) {
                         // delete
-                        current_categories.remove(position);
-                        loadAdapter(current_categories);
+                        Category clickedItem = (Category) categoryView.getItemAtPosition(position);
+                        Category parent = clickedItem.getParent();
+                        if(parent == null) {
+                            main_categories.remove(position);
+                            //TODO: remove items (children) from clickedItem category, remove clickedItem from database
+                            loadAdapter(main_categories);
+                            cur_state = State.MAIN;
+                        } else {
+                            parent.getSubcategories().remove(clickedItem);
+                            //TODO: remove items (children) from clickedItem category, remove clickedItem from database
+                            loadAdapter(parent.getSubcategories());
+                            cur_state = State.SUB;
+                        }
                         popupWindow.dismiss();
-                        //TODO: DELETE RECURSIVELY FROM DATABASE!!!!
                     }
                 });
 
@@ -270,17 +250,81 @@ public class MainActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void createSubcategories() {
-        ArrayList<String> subtest1 = new ArrayList<> (Arrays.asList("Shell","BP","Jet","OMV","Turmöl","Roth","Grünburg"));
-        ArrayList<String> subtest2 = new ArrayList<> (Arrays.asList("Spar","Billa","Merkur","Hofer","Lidl"));
-        ArrayList<String> subtest3 = new ArrayList<> (Arrays.asList("New Yorker","H&M","C&A"));
+    public ArrayList<Category> loadDummyData() {
+        ArrayList<Category> maincatlist = new ArrayList<Category>();
 
-        categories_hashmap.put("Gas", subtest1);
-        categories_hashmap.put("Groceries", subtest2);
-        categories_hashmap.put("Shopping", subtest3);
+        ArrayList<Category> subcat1list = new ArrayList<Category>();
+        ArrayList<Category> subcat2list = new ArrayList<Category>();
+        ArrayList<Category> subcat3list = new ArrayList<Category>();
+
+        //---------- main category dummies ----------
+        Category maincat1 = new Category(0, "Gas", null, subcat1list, new ArrayList<Value>(), Category.Type.MAIN);
+        Category maincat2 = new Category(1, "Groceries", null, subcat2list, new ArrayList<Value>(), Category.Type.MAIN);
+        Category maincat3 = new Category(2, "Shopping", null, subcat3list, new ArrayList<Value>(), Category.Type.MAIN);
+        maincatlist.addAll(Arrays.asList(maincat1, maincat2, maincat3));
+
+        //---------- subcat 1 category dummies + value arrays ----------
+        ArrayList<Value> val11 = new ArrayList<Value>();
+        ArrayList<Value> val12 = new ArrayList<Value>();
+        ArrayList<Value> val13 = new ArrayList<Value>();
+        Category subcat11 = new Category(3, "Shell", maincat1, null, val11, Category.Type.SUB);
+        Category subcat12 = new Category(4, "BP", maincat1, null, val12, Category.Type.SUB);
+        Category subcat13 = new Category(5, "Jet", maincat1, null, val13, Category.Type.SUB);
+        subcat1list.addAll(Arrays.asList(subcat11, subcat12, subcat13));
+
+        //---------- subcat 2 category dummies + value arrays ----------
+        ArrayList<Value> val21 = new ArrayList<Value>();
+        ArrayList<Value> val22 = new ArrayList<Value>();
+        ArrayList<Value> val23 = new ArrayList<Value>();
+        Category subcat21 = new Category(6, "Spar", maincat2, null, val21, Category.Type.SUB);
+        Category subcat22 = new Category(7, "Billa", maincat2, null, val22, Category.Type.SUB);
+        Category subcat23 = new Category(8, "Merkur", maincat2, null, val23, Category.Type.SUB);
+        subcat2list.addAll(Arrays.asList(subcat21, subcat22, subcat23));
+
+        //---------- subcat 3 category dummies + value arrays ----------
+        ArrayList<Value> val31 = new ArrayList<Value>();
+        ArrayList<Value> val32 = new ArrayList<Value>();
+        ArrayList<Value> val33 = new ArrayList<Value>();
+        Category subcat31 = new Category(9, "New Yorker", maincat3, null, val31, Category.Type.SUB);
+        Category subcat32 = new Category(10, "H&M", maincat3, null, val32, Category.Type.SUB);
+        Category subcat33 = new Category(11, "C&A", maincat3, null, val33, Category.Type.SUB);
+        subcat3list.addAll(Arrays.asList(subcat31, subcat32, subcat33));
+
+        //---------- dummy values ----------
+        val11.addAll(Arrays.asList(new Value(0, 100, 10000000, subcat11),
+                                   new Value(1, 200, 11000000, subcat11),
+                                   new Value(2, 300, 11100000, subcat11)));
+        val12.addAll(Arrays.asList(new Value(3, 400, 11110000, subcat12),
+                                   new Value(4, 500, 11111000, subcat12),
+                                   new Value(5, 600, 11111100, subcat12)));
+        val13.addAll(Arrays.asList(new Value(6, 700, 11111110, subcat13),
+                                   new Value(7, 800, 11111111, subcat13),
+                                   new Value(8, 900, 20000000, subcat13)));
+
+        val21.addAll(Arrays.asList(new Value(9, 1000, 22000000, subcat21),
+                                   new Value(10, 1100, 22200000, subcat21),
+                                   new Value(11, 1200, 22220000, subcat21)));
+        val22.addAll(Arrays.asList(new Value(12, 1300, 22222000, subcat22),
+                                   new Value(13, 1400, 22222200, subcat22),
+                                   new Value(14, 1500, 22222220, subcat22)));
+        val23.addAll(Arrays.asList(new Value(15, 1600, 22222222, subcat23),
+                                   new Value(16, 1700, 30000000, subcat23),
+                                   new Value(17, 1800, 33000000, subcat23)));
+
+        val31.addAll(Arrays.asList(new Value(18, 1900, 33300000, subcat31),
+                                   new Value(19, 2000, 33330000, subcat31),
+                                   new Value(20, 2100, 33333000, subcat31)));
+        val32.addAll(Arrays.asList(new Value(21, 2200, 33333300, subcat32),
+                                   new Value(22, 2300, 33333330, subcat32),
+                                   new Value(23, 2400, 33333333, subcat32)));
+        val33.addAll(Arrays.asList(new Value(24, 2500, 40000000, subcat33),
+                                   new Value(25, 2600, 44000000, subcat33),
+                                   new Value(26, 2700, 44400000, subcat33)));
+
+        return maincatlist;
     }
 
-    public void loadAdapter(ArrayList<String> category_list) {
+    public void loadAdapter(ArrayList<Category> category_list) {
         //reload adapter
         adapter = new ArrayAdapter<>(this_class, android.R.layout.simple_list_item_1, android.R.id.text1, category_list);
         categoryView.setAdapter(adapter);
