@@ -21,14 +21,17 @@ public class PocketBillTest extends ActivityInstrumentationTestCase2<MainActivit
     public void tearDown() throws Exception {
 
     }
+    public void testActionBar(){
+        //mySolo.click
+       // mySolo.clickOnActionBarItem(R.id.addCategory);
+        //mySolo.sleep(2000);
+       //mySolo.clickOnButton("Cancel");
 
+    }
     public void testCategoryList(){
         mySolo.clickOnText("Gas");
         mySolo.clickOnText("Groceries");
         mySolo.clickOnText("Shopping");
     }
 
-    public void testActionBar(){
-        mySolo.clickOnActionBarItem(addCategory);
-    }
 }

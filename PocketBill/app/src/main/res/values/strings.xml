@@ -4,4 +4,6 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="action_addCategory">addCategory</string>
+    <string name="action_test">test</string>
+
 </resources>
