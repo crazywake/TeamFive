@@ -33,12 +33,12 @@ public class MainActivity extends ActionBarActivity {
         POPUP
     }
 
-
+    private DAO dataAccessObject;
 
     public State pre_popup_state = State.MAIN;
     public State cur_state = State.MAIN;
 
-    PopupWindow popupWindow = null;
+    private PopupWindow popupWindow = null;
 
     MainActivity this_class;
 
@@ -65,7 +65,10 @@ public class MainActivity extends ActionBarActivity {
         // Fourth - the Array of data
 
         //fill hashmap with subcategories
-        main_categories =  loadDummyData();
+        //main_categories =  loadDummyData();
+        dataAccessObject = DAO.instance(this);
+        main_categories = dataAccessObject.getMainData();
+
         adapter = new ArrayAdapter<>(this_class, android.R.layout.simple_list_item_1, android.R.id.text1, main_categories);
 
         // Assign adapter to ListView
