@@ -21,7 +21,13 @@ public class PocketBillTest extends ActivityInstrumentationTestCase2<MainActivit
     public void tearDown() throws Exception {
 
     }
+    public void testActionBar(){
+        //mySolo.click
+       // mySolo.clickOnActionBarItem(R.id.addCategory);
+        //mySolo.sleep(2000);
+       //mySolo.clickOnButton("Cancel");
 
+    }
     public void testCategoryList(){
         mySolo.clickOnText("Gas");
         mySolo.clickLongOnText("Shell");
@@ -38,4 +44,5 @@ public class PocketBillTest extends ActivityInstrumentationTestCase2<MainActivit
         assertEquals(mySolo.getEditText(editTextID).getText().toString(),testText);
 
     }
+
 }

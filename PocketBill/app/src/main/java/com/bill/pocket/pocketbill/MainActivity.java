@@ -1,5 +1,8 @@
 package com.bill.pocket.pocketbill;
 
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -9,6 +12,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
@@ -223,8 +227,9 @@ public class MainActivity extends ActionBarActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_main, menu);
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
@@ -235,8 +240,34 @@ public class MainActivity extends ActionBarActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement.
-        return id == R.id.action_settings || super.onOptionsItemSelected(item);
+        if(id == R.id.addCategory)
+        {
+            AlertDialog.Builder alert = new AlertDialog.Builder(this);
 
+            alert.setTitle("New Category");
+            alert.setMessage("Please enter the name of the new Category");
+
+// Set an EditText view to get user input
+            final EditText input = new EditText(this);
+
+            alert.setView(input);
+
+            alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int whichButton) {
+
+                    // Do something with value!
+                }
+            });
+
+            alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int whichButton) {
+                    // Canceled.
+                }
+            });
+
+            alert.show();
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     public void createSubcategories() {

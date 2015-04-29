@@ -6,4 +6,6 @@
     <string name="Save">Save</string>
     <string name="Cancel">Cancel</string>
     <string name="Value">Value</string>
+    <string name="action_addCategory">addCategory</string>
+
 </resources>
