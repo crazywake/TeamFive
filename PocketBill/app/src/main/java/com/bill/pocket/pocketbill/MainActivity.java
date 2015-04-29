@@ -1,13 +1,14 @@
 package com.bill.pocket.pocketbill;
 
 import android.content.Context;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
-import android.view.ViewGroup.LayoutParams;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -124,13 +125,17 @@ public class MainActivity extends ActionBarActivity {
                         LayoutParams.WRAP_CONTENT,
                         LayoutParams.WRAP_CONTENT);
 
+                popupWindow.setBackgroundDrawable(new BitmapDrawable());
+                popupWindow.setOutsideTouchable(true);
+
                 Button btnEdit = (Button) popupView.findViewById(R.id.edit);
                 btnEdit.setOnClickListener(new Button.OnClickListener() {
 
                     @Override
                     public void onClick(View v) {
                         // edit button clicked
-
+                        
+                        //TODO: EDIT IN DATABASE!!!!
                     }
                 });
 
@@ -143,6 +148,7 @@ public class MainActivity extends ActionBarActivity {
                         current_categories.remove(position);
                         loadAdapter(current_categories);
                         popupWindow.dismiss();
+                        //TODO: DELETE RECURSIVELY FROM DATABASE!!!!
                     }
                 });
 
@@ -156,10 +162,9 @@ public class MainActivity extends ActionBarActivity {
 
     @Override
     public void onBackPressed() {
-        switch(cur_state) {
+         switch(cur_state) {
             case MAIN: {
-                super.onDestroy();
-                //UIHelper.killApp(true);
+                finish();
                 break;
             }
             case SUB: {
