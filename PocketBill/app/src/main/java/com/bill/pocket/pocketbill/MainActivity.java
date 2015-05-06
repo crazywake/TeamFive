@@ -1,6 +1,8 @@
 package com.bill.pocket.pocketbill;
 
 import android.app.AlertDialog;
+import android.app.Application;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.Configuration;
 import android.graphics.drawable.BitmapDrawable;
@@ -21,6 +23,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.PopupWindow;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -170,6 +173,9 @@ public class MainActivity extends ActionBarActivity {
                     public void onClick(View v) {
                         // edit button clicked
 
+                        Toast.makeText(getApplicationContext(), dataAccessObject.getPayments().get(0).toString() ,Toast.LENGTH_LONG).show();
+                        //dataAccessObject.updatePayment(99, 1);
+                       // Toast.makeText(getApplicationContext(), dataAccessObject.getPayments().get(0).toString() ,Toast.LENGTH_LONG).show();
                         //TODO: EDIT IN DATABASE!!!!
                     }
                 });

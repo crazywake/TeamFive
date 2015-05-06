@@ -1,8 +1,8 @@
 package com.bill.pocket.pocketbill.uitest;
 
 import android.test.ActivityInstrumentationTestCase2;
-import android.view.Display;
 
+import android.view.Display;
 import com.bill.pocket.pocketbill.MainActivity;
 import com.robotium.solo.Solo;
 
@@ -59,22 +59,6 @@ public class PocketBillTest extends ActivityInstrumentationTestCase2<MainActivit
         mySolo.enterText(editTextID,testText);
         assertEquals(mySolo.getEditText(editTextID).getText().toString(),testText);
 
-    }
-
-    public void testNavigationDrawer(){
-        mySolo.clickOnText("Gas");
-        swipeToRight();
-        mySolo.clickOnText("Pocket");
-        mySolo.clickOnText("Gas");
-    }
-
-    private void swipeToRight() {
-        Display display = mySolo.getCurrentActivity().getWindowManager().getDefaultDisplay();
-        int width = display.getWidth();
-        int height = display.getHeight();
-        float xStart = 0 ;
-        float xEnd = width / 2;
-        mySolo.drag(xStart, xEnd, height / 2, height / 2, 1);
     }
 
 }

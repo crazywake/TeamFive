@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 
 public class DAO {
@@ -158,6 +159,37 @@ public class DAO {
         return sub_cats;
     }
 
+    public ArrayList<String> getPayments()
+    {
+        ArrayList<String> payments = new ArrayList<String>();
+
+        Cursor get_payments = my_db.query(
+                SqlLiteHelper.PAYMENT,  // Table to Query
+                new String[] { SqlLiteHelper.VALUE_PAYMENT }, // leaving "columns" null just returns all the columns.
+                null, // cols for "where" clause
+                null, // values for "where" clause
+                null, // columns to group by
+                null, // columns to filter by row groups
+                null
+        );
+
+
+        get_payments.moveToFirst();
+
+        while (!get_payments.isAfterLast())
+        {
+            payments.add(get_payments.getString(0));
+            get_payments.moveToNext();
+        }
+
+        if(payments.size() == 0)
+        {
+            payments.add("No Payment found");
+        }
+
+        return payments;
+    }
+
     public long insertMainCat(String newCat)
     {
         Cursor checkNameCursor = my_db.query(
@@ -208,7 +240,7 @@ public class DAO {
 
     public boolean insertPayment(Integer new_value,Integer main_cat,Integer sub_cat)
     {
-        long unixTime = System.currentTimeMillis() / 1000L;
+        long unixTime = System.currentTimeMillis();
 
         ContentValues new_cont = new ContentValues();
         new_cont.put(SqlLiteHelper.VALUE_PAYMENT,new_value);
@@ -218,5 +250,39 @@ public class DAO {
 
         my_db.insert(SqlLiteHelper.PAYMENT,null,new_cont);
         return true;
+    }
+
+    public boolean updatePayment(Integer new_value,Integer id)
+    {
+        ContentValues new_cont = new ContentValues();
+        new_cont.put(SqlLiteHelper.VALUE_PAYMENT, new_value);
+
+        return (my_db.update(SqlLiteHelper.PAYMENT, new_cont, "id =" + id, null) > 0);
+    }
+
+    public boolean updateTime(Date new_value,Integer id)
+    {
+        long unixTime = new_value.getTime();
+
+        ContentValues new_cont = new ContentValues();
+        new_cont.put(SqlLiteHelper.DATE_PAYMENT, unixTime);
+
+        return (my_db.update(SqlLiteHelper.PAYMENT, new_cont, "id =" + id, null) > 0);
+    }
+
+    public boolean updateMainCategory(String new_value, Integer main_cat_id)
+    {
+        ContentValues new_cont = new ContentValues();
+        new_cont.put(SqlLiteHelper.NAME_MAIN_CAT, new_value);
+
+        return (my_db.update(SqlLiteHelper.MAIN_CAT, new_cont, "id =" + main_cat_id, null) > 0);
+    }
+
+    public boolean updateSubCategory(String new_value, Integer sub_cat_id)
+    {
+        ContentValues new_cont = new ContentValues();
+        new_cont.put(SqlLiteHelper.NAME_SUB_CAT, new_value);
+
+        return (my_db.update(SqlLiteHelper.SUB_CAT, new_cont, "id =" + sub_cat_id, null) > 0);
     }
 }
