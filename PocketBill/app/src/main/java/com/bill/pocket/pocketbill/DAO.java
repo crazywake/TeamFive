@@ -19,7 +19,7 @@ public class DAO {
     private DAO()
     {}
 
-    public static DAO instance(PocketBillTest context)
+    public static DAO instance(Context context)
     {
         if (my_dao == null)
         {
@@ -159,6 +159,37 @@ public class DAO {
         return sub_cats;
     }
 
+    public ArrayList<String> getPayments()
+    {
+        ArrayList<String> payments = new ArrayList<String>();
+
+        Cursor get_payments = my_db.query(
+                SqlLiteHelper.PAYMENT,  // Table to Query
+                new String[] { SqlLiteHelper.VALUE_PAYMENT }, // leaving "columns" null just returns all the columns.
+                null, // cols for "where" clause
+                null, // values for "where" clause
+                null, // columns to group by
+                null, // columns to filter by row groups
+                null
+        );
+
+
+        get_payments.moveToFirst();
+
+        while (!get_payments.isAfterLast())
+        {
+            payments.add(get_payments.getString(0));
+            get_payments.moveToNext();
+        }
+
+        if(payments.size() == 0)
+        {
+            payments.add("No Payment found");
+        }
+
+        return payments;
+    }
+
     public long insertMainCat(String newCat)
     {
         Cursor checkNameCursor = my_db.query(
@@ -239,19 +270,19 @@ public class DAO {
         return (my_db.update(SqlLiteHelper.PAYMENT, new_cont, "id =" + id, null) > 0);
     }
 
-    public boolean updateMainCategory(String new_value, Integer main_cat)
+    public boolean updateMainCategory(String new_value, Integer main_cat_id)
     {
         ContentValues new_cont = new ContentValues();
         new_cont.put(SqlLiteHelper.NAME_MAIN_CAT, new_value);
 
-        return (my_db.update(SqlLiteHelper.MAIN_CAT, new_cont, "id =" + id, null) > 0);
+        return (my_db.update(SqlLiteHelper.MAIN_CAT, new_cont, "id =" + main_cat_id, null) > 0);
     }
 
-    public boolean updateSubCategory(String new_value, Integer sub_cat)
+    public boolean updateSubCategory(String new_value, Integer sub_cat_id)
     {
         ContentValues new_cont = new ContentValues();
         new_cont.put(SqlLiteHelper.NAME_SUB_CAT, new_value);
 
-        return (my_db.update(SqlLiteHelper.SUB_CAT, new_cont, "id =" + id, null) > 0);
+        return (my_db.update(SqlLiteHelper.SUB_CAT, new_cont, "id =" + sub_cat_id, null) > 0);
     }
 }
