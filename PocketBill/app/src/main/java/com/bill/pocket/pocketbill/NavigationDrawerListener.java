@@ -1,7 +1,9 @@
 package com.bill.pocket.pocketbill;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.support.v4.widget.DrawerLayout;
+import android.text.Html;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -44,7 +46,15 @@ public class NavigationDrawerListener implements AdapterView.OnItemClickListener
             Log.d(mcont.getPackageName(),"mmain_categories Size = "+mmain_categories.size());
             madapter = new ArrayAdapter<>(mcont, android.R.layout.simple_list_item_1, android.R.id.text1, mmain_categories);
             mcategoryView.setAdapter(madapter);
+        }else if(mcont.getResources().getStringArray(R.array.navigationDrawerContent)[position].equals("About"))
+        {
+            AlertDialog.Builder alert = new AlertDialog.Builder(mcont);
+            alert.setTitle("PocketBill");
+            alert.setMessage(Html.fromHtml(mcont.getResources().getString(R.string.about_text).concat(" <a href=\"http:\\www.google.com\">www.google.com</a>")));
+            alert.show();
+
         }
+
 
     }
 

@@ -18,6 +18,6 @@
     </string-array>
     <string name="drawer_open">Open Drawer</string>
     <string name="drawer_close">Close Drawer</string>
-
+    <string name="about_text">PocketBill is a simple Application to manage your expenses. For further details and How-To\'s see our online Tutorial </string>
 
 </resources>
