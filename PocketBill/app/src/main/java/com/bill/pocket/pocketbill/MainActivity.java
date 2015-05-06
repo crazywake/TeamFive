@@ -2,8 +2,11 @@ package com.bill.pocket.pocketbill;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.res.Configuration;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
+import android.support.v4.app.ActionBarDrawerToggle;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.text.InputType;
 import android.view.LayoutInflater;
@@ -32,14 +35,18 @@ public class MainActivity extends ActionBarActivity {
         POPUP
     }
 
+    //Navigation Drawer
+    private ActionBarDrawerToggle mDrawerToggle;
+    private DrawerLayout mDrawerLayout;
+    private String mActivityTitle = "PocketBill";
+
+    //Database
     private DAO dataAccessObject;
 
     public State pre_popup_state = State.MAIN;
     public State cur_state = State.MAIN;
 
     private PopupWindow popupWindow = null;
-
-    MainActivity this_class;
 
     ArrayList<Category> main_categories;
 
@@ -50,12 +57,31 @@ public class MainActivity extends ActionBarActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        this_class = this;
+        String[] mnavDrawerContent;
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        ListView mDrawerList;
         categoryView = (ListView) findViewById(R.id.CategoryView);
         categoryView.setLongClickable(true);
+        //fill hashmap with subcategories
+        dataAccessObject = DAO.instance(this);
+        insertDummyData();
+        main_categories = dataAccessObject.getMainData();
+
+        //Navigation Drawer
+        mnavDrawerContent = getResources().getStringArray(R.array.navigationDrawerContent);
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mDrawerList = (ListView) findViewById(R.id.left_drawer);
+        // Set the adapter for the list view
+        mDrawerList.setAdapter(new ArrayAdapter<>(this,android.R.layout.simple_list_item_1,mnavDrawerContent));
+        mDrawerList.setSelector(android.R.color.holo_blue_dark);
+        mDrawerList.setOnItemClickListener(new NavigationDrawerListener(this,mDrawerLayout,adapter,categoryView,main_categories));
+
+        setupDrawer();
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
 
         // Define a new Adapter
         // First parameter - Context
@@ -63,13 +89,7 @@ public class MainActivity extends ActionBarActivity {
         // Third parameter - ID of the TextView to which the data is written
         // Fourth - the Array of data
 
-        //fill hashmap with subcategories
-        dataAccessObject = DAO.instance(this);
-
-        insertDummyData();
-        main_categories = dataAccessObject.getMainData();
-
-        adapter = new ArrayAdapter<>(this_class, android.R.layout.simple_list_item_1, android.R.id.text1, main_categories);
+        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, android.R.id.text1, main_categories);
 
         // Assign adapter to ListView
         categoryView.setAdapter(adapter);
@@ -186,6 +206,41 @@ public class MainActivity extends ActionBarActivity {
     }
 
     @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        mDrawerToggle.syncState();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        mDrawerToggle.onConfigurationChanged(newConfig);
+    }
+
+    private void setupDrawer() {
+        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,R.drawable.ic_drawer , R.string.drawer_open, R.string.drawer_close) {
+
+
+            /** Called when a drawer has settled in a completely open state. */
+            public void onDrawerOpened(View drawerView) {
+                super.onDrawerOpened(drawerView);
+                getSupportActionBar().setTitle("Navigation");
+                invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+            }
+
+            /** Called when a drawer has settled in a completely closed state. */
+            public void onDrawerClosed(View view) {
+                super.onDrawerClosed(view);
+                getSupportActionBar().setTitle(mActivityTitle);
+                invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+            }
+        };
+
+        mDrawerToggle.setDrawerIndicatorEnabled(true);
+        mDrawerLayout.setDrawerListener(mDrawerToggle);
+    }
+
+    @Override
     public void onBackPressed() {
          switch(cur_state) {
             case MAIN: {
@@ -224,6 +279,10 @@ public class MainActivity extends ActionBarActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement.
+        if (mDrawerToggle.onOptionsItemSelected(item)) {
+            return true;
+        }
+
         if(id == R.id.addCategory)
         {
             AlertDialog.Builder alert = new AlertDialog.Builder(this);
@@ -345,7 +404,7 @@ public class MainActivity extends ActionBarActivity {
 
     public void loadAdapter(ArrayList<Category> category_list) {
         //reload adapter
-        adapter = new ArrayAdapter<>(this_class, android.R.layout.simple_list_item_1, android.R.id.text1, category_list);
+        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, android.R.id.text1, category_list);
         categoryView.setAdapter(adapter);
     }
 }
