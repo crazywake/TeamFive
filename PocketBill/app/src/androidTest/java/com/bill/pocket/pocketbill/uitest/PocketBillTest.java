@@ -1,8 +1,10 @@
 package com.bill.pocket.pocketbill.uitest;
 
 import android.test.ActivityInstrumentationTestCase2;
+import android.widget.ListView;
 
 import com.bill.pocket.pocketbill.MainActivity;
+import com.bill.pocket.pocketbill.R;
 import com.robotium.solo.Solo;
 
 public class PocketBillTest extends ActivityInstrumentationTestCase2<MainActivity> {
@@ -58,6 +60,34 @@ public class PocketBillTest extends ActivityInstrumentationTestCase2<MainActivit
         mySolo.enterText(editTextID,testText);
         assertEquals(mySolo.getEditText(editTextID).getText().toString(),testText);
 
+    }
+
+    public void testMainCategoryDelete() {
+        ListView myList = (ListView) mySolo.getView(R.id.CategoryView);
+        int count = myList.getAdapter().getCount();
+        if (count < 1) return;
+
+        mySolo.clickLongInList(0);
+        mySolo.clickOnText("Delete");
+        mySolo.sleep(2000);
+
+        assertEquals(myList.getAdapter().getCount() + 1, count);
+    }
+
+    public void testSubCategoryDelete() {
+        ListView myList = (ListView) mySolo.getView(R.id.CategoryView);
+        if (myList.getAdapter().getCount() < 1) return;
+
+        mySolo.clickInList(0);
+        mySolo.sleep(2000);
+        int count = myList.getAdapter().getCount();
+        if (count < 1) return;
+        mySolo.clickLongInList(0);
+
+        mySolo.clickOnText("Delete");
+        mySolo.sleep(2000);
+
+        assertEquals(myList.getAdapter().getCount() + 1, count);
     }
 
 }

@@ -66,7 +66,7 @@ public class MainActivity extends ActionBarActivity {
         //fill hashmap with subcategories
         dataAccessObject = DAO.instance(this);
 
-        insertDummyData();
+        //insertDummyData();
         main_categories = dataAccessObject.getMainData();
 
         adapter = new ArrayAdapter<>(this_class, android.R.layout.simple_list_item_1, android.R.id.text1, main_categories);
@@ -164,11 +164,14 @@ public class MainActivity extends ActionBarActivity {
                         Category parent = clickedItem.getParent();
                         if(parent == null) {
                             main_categories.remove(position);
-                            //TODO: remove items (children) from clickedItem category, remove clickedItem from database
+                            dataAccessObject.deleteMainCategory(clickedItem.getId());
+
                             loadAdapter(main_categories);
                             cur_state = State.MAIN;
                         } else {
                             parent.getSubcategories().remove(clickedItem);
+                            dataAccessObject.deleteSubCategory(clickedItem.getId());
+
                             //TODO: remove items (children) from clickedItem category, remove clickedItem from database
                             loadAdapter(parent.getSubcategories());
                             cur_state = State.SUB;
