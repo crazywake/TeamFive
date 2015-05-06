@@ -2,6 +2,7 @@ package com.bill.pocket.pocketbill.uitest;
 
 import android.test.ActivityInstrumentationTestCase2;
 
+import com.bill.pocket.pocketbill.DAO;
 import com.bill.pocket.pocketbill.MainActivity;
 import com.robotium.solo.Solo;
 
@@ -59,5 +60,4 @@ public class PocketBillTest extends ActivityInstrumentationTestCase2<MainActivit
         assertEquals(mySolo.getEditText(editTextID).getText().toString(),testText);
 
     }
-
 }

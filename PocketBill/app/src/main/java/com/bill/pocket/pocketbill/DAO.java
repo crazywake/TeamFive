@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 
 public class DAO {
@@ -18,7 +19,7 @@ public class DAO {
     private DAO()
     {}
 
-    public static DAO instance(Context context)
+    public static DAO instance(PocketBillTest context)
     {
         if (my_dao == null)
         {
@@ -208,7 +209,7 @@ public class DAO {
 
     public boolean insertPayment(Integer new_value,Integer main_cat,Integer sub_cat)
     {
-        long unixTime = System.currentTimeMillis() / 1000L;
+        long unixTime = System.currentTimeMillis();
 
         ContentValues new_cont = new ContentValues();
         new_cont.put(SqlLiteHelper.VALUE_PAYMENT,new_value);
@@ -218,5 +219,39 @@ public class DAO {
 
         my_db.insert(SqlLiteHelper.PAYMENT,null,new_cont);
         return true;
+    }
+
+    public boolean updatePayment(Integer new_value,Integer id)
+    {
+        ContentValues new_cont = new ContentValues();
+        new_cont.put(SqlLiteHelper.VALUE_PAYMENT, new_value);
+
+        return (my_db.update(SqlLiteHelper.PAYMENT, new_cont, "id =" + id, null) > 0);
+    }
+
+    public boolean updateTime(Date new_value,Integer id)
+    {
+        long unixTime = new_value.getTime();
+
+        ContentValues new_cont = new ContentValues();
+        new_cont.put(SqlLiteHelper.DATE_PAYMENT, unixTime);
+
+        return (my_db.update(SqlLiteHelper.PAYMENT, new_cont, "id =" + id, null) > 0);
+    }
+
+    public boolean updateMainCategory(String new_value, Integer main_cat)
+    {
+        ContentValues new_cont = new ContentValues();
+        new_cont.put(SqlLiteHelper.NAME_MAIN_CAT, new_value);
+
+        return (my_db.update(SqlLiteHelper.MAIN_CAT, new_cont, "id =" + id, null) > 0);
+    }
+
+    public boolean updateSubCategory(String new_value, Integer sub_cat)
+    {
+        ContentValues new_cont = new ContentValues();
+        new_cont.put(SqlLiteHelper.NAME_SUB_CAT, new_value);
+
+        return (my_db.update(SqlLiteHelper.SUB_CAT, new_cont, "id =" + id, null) > 0);
     }
 }
