@@ -210,21 +210,6 @@ public class DAO {
 
     public long insertSubCat(String newSubCat,int MainCatId)
     {
-        Cursor checkNameCursor = my_db.query(
-                SqlLiteHelper.TBL_SUB_CAT,  // Table to Query
-                new String[] { SqlLiteHelper.COL_NAME_SUB_CAT}, // leaving "columns" null just returns all the columns.
-                null, // cols for "where" clause
-                null, // values for "where" clause
-                null, // columns to group by
-                null, // columns to filter by row groups
-                null
-        );
-
-        checkNameCursor.moveToFirst();
-        while(!checkNameCursor.isAfterLast())
-        {
-            checkNameCursor.moveToNext();
-        }
         ContentValues new_name = new  ContentValues();
         new_name.put(SqlLiteHelper.COL_NAME_SUB_CAT,newSubCat);
         new_name.put(SqlLiteHelper.COL_FK_MAIN_CAT_ID,MainCatId);
@@ -253,9 +238,9 @@ public class DAO {
 
     public void deleteMainCategory(int main_cat_id) {
         String query = String.format(
-            "delete from " +
-            SqlLiteHelper.TBL_MAIN_CAT + " where " +
-            SqlLiteHelper.COL_ID_MAIN_CAT + " = '%d'",
+                "delete from " +
+                        SqlLiteHelper.TBL_MAIN_CAT + " where " +
+                        SqlLiteHelper.COL_ID_MAIN_CAT + " = '%d'",
                 main_cat_id);
 
         my_db.execSQL(query);
@@ -264,8 +249,8 @@ public class DAO {
     public void deleteSubCategory(int sub_cat_id) {
         String query = String.format(
                 "delete from " +
-                SqlLiteHelper.TBL_SUB_CAT + " where " +
-                SqlLiteHelper.COL_ID_SUB_CAT + " = '%d'",
+                        SqlLiteHelper.TBL_SUB_CAT + " where " +
+                        SqlLiteHelper.COL_ID_SUB_CAT + " = '%d'",
                 sub_cat_id);
 
         my_db.execSQL(query);
@@ -304,5 +289,21 @@ public class DAO {
         new_cont.put(SqlLiteHelper.COL_NAME_SUB_CAT, new_value);
 
         return (my_db.update(SqlLiteHelper.TBL_SUB_CAT, new_cont, "id =" + sub_cat_id, null) > 0);
+    }
+
+    public void changeSubToMainCat(int sub_cat_id, String name_sub_cat)
+    {
+        ContentValues new_main = new ContentValues();
+        new_main.put(SqlLiteHelper.COL_NAME_MAIN_CAT, name_sub_cat);
+        long new_main_id = my_db.insert(SqlLiteHelper.TBL_MAIN_CAT, null, new_main);
+
+        my_db.execSQL("UPDATE " + SqlLiteHelper.TBL_PAYMENT + " SET "
+                + SqlLiteHelper.COL_FK_SUB_CAT_PAYMENT + " = null,"
+                + SqlLiteHelper.COL_FK_MAIN_CAT_PAYMENT + " = " + new_main_id
+                + " WHERE " + SqlLiteHelper.COL_ID_SUB_CAT + " = " + sub_cat_id);
+
+        my_db.execSQL("DELETE FROM " + SqlLiteHelper.TBL_MAIN_CAT + " WHERE "
+                      + SqlLiteHelper.COL_ID_SUB_CAT + " = " + sub_cat_id);
+
     }
 }
