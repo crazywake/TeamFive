@@ -12,7 +12,6 @@ public class Category {
         SUB,
     }
 
-
     private int id;
     private String name;
     private Category parent;

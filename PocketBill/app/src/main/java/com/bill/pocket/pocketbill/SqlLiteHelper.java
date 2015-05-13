@@ -62,11 +62,4 @@ public class SqlLiteHelper extends SQLiteOpenHelper {
         onCreate(mySQL);
     }
 
-
-
-
-
-
-
-
 }

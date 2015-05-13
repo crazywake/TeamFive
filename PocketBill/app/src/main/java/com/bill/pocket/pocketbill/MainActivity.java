@@ -36,6 +36,8 @@ public class MainActivity extends ActionBarActivity {
         POPUP
     }
 
+    private MainActivity this_activity = this;
+
     //Navigation Drawer
     private ActionBarDrawerToggle mDrawerToggle;
     private DrawerLayout mDrawerLayout;
@@ -44,17 +46,20 @@ public class MainActivity extends ActionBarActivity {
     //Database
     private DAO dataAccessObject;
 
-    public State pre_popup_state = State.MAIN;
-    public State cur_state = State.MAIN;
+    private State pre_popup_state = State.MAIN;
+
+
+
+    private State cur_state = State.MAIN;
 
     private PopupWindow popupWindow = null;
 
-    ArrayList<Category> main_categories;
+    private ArrayList<Category> main_categories;
 
-    Category current_main_category = null;
+    private Category current_main_category = null;
 
-    ListView categoryView;
-    ArrayAdapter<Category> adapter;
+    private ListView categoryView;
+    private ArrayAdapter<Category> adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,7 +73,7 @@ public class MainActivity extends ActionBarActivity {
         categoryView.setLongClickable(true);
         //fill hashmap with subcategories
         dataAccessObject = DAO.instance(this);
-        insertDummyData();
+        //insertDummyData();
         main_categories = dataAccessObject.getMainData();
 
         //Navigation Drawer
@@ -164,16 +169,20 @@ public class MainActivity extends ActionBarActivity {
                 popupWindow.setBackgroundDrawable(new BitmapDrawable());
                 popupWindow.setOutsideTouchable(true);
 
+
+
                 Button btnEdit = (Button) popupView.findViewById(R.id.edit);
                 btnEdit.setOnClickListener(new Button.OnClickListener() {
 
                     @Override
                     public void onClick(View v) {
                         // edit button clicked
-
-                        Toast.makeText(getApplicationContext(), dataAccessObject.getPayments().get(0).toString() ,Toast.LENGTH_LONG).show();
-                        //dataAccessObject.updatePayment(99, 1);
-                       // Toast.makeText(getApplicationContext(), dataAccessObject.getPayments().get(0).toString() ,Toast.LENGTH_LONG).show();
+                        popupWindow.dismiss();
+                        Category clickedItem = (Category) categoryView.getItemAtPosition(position);
+                        CategoryEditor catedit = new CategoryEditor(CategoryEditor.Type.EDIT, clickedItem, MainActivity.this, main_categories, clickedItem.getParent());
+                        popupWindow = catedit.display();
+                        pre_popup_state = cur_state;
+                        cur_state = State.POPUP;
                         //TODO: EDIT IN DATABASE!!!!
                     }
                 });
@@ -223,8 +232,6 @@ public class MainActivity extends ActionBarActivity {
 
     private void setupDrawer() {
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,R.drawable.ic_drawer , R.string.drawer_open, R.string.drawer_close) {
-
-
             /** Called when a drawer has settled in a completely open state. */
             public void onDrawerOpened(View drawerView) {
                 super.onDrawerOpened(drawerView);
@@ -290,7 +297,9 @@ public class MainActivity extends ActionBarActivity {
         if(id == R.id.addEditCategory)
         {
             CategoryEditor catedit = new CategoryEditor(CategoryEditor.Type.ADD, null, this, main_categories, current_main_category);
-            catedit.display();
+            popupWindow = catedit.display();
+            pre_popup_state = cur_state;
+            cur_state = State.POPUP;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -389,5 +398,83 @@ public class MainActivity extends ActionBarActivity {
         //reload adapter
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, android.R.id.text1, category_list);
         categoryView.setAdapter(adapter);
+    }
+
+    public void updateLists(int parent_id) { //parent id = -1 if no parent (man category view)
+        main_categories = dataAccessObject.getMainData();
+
+        if(parent_id != -1) {
+            Category parent = getCategoryFromID(parent_id);
+            if(parent != null) {
+                loadAdapter(parent.getSubcategories());
+                cur_state = State.SUB;
+                pre_popup_state = cur_state;
+            }
+            else {
+                Toast.makeText(this, "Fatal Error is fatal! Database refused to cooperate and was executed! " +
+                        "Restart the app or contact support. Good Luck.", Toast.LENGTH_LONG).show();
+                finish();
+            }
+
+        } else {
+            loadAdapter(main_categories);
+            cur_state = State.MAIN;
+            pre_popup_state = cur_state;
+        }
+
+    }
+
+    public Category getCategoryFromID(int ID) {
+        for(Category cat : main_categories) {
+            if(cat.getId() == ID)
+                return cat;
+        }
+
+        return null;
+    }
+
+
+
+
+    public DAO getDAO() { return dataAccessObject; }
+
+    public State getPre_popup_state() {
+        return pre_popup_state;
+    }
+
+    public void setPre_popup_state(State pre_popup_state) {
+        this.pre_popup_state = pre_popup_state;
+    }
+
+    public State getCur_state() {
+        return cur_state;
+    }
+
+    public void setCur_state(State cur_state) {
+        this.cur_state = cur_state;
+    }
+
+    public ArrayList<Category> getMain_categories() {
+        return main_categories;
+    }
+
+    public void setMain_categories(ArrayList<Category> main_categories) {
+        this.main_categories = main_categories;
+    }
+
+    public Category getCurrent_main_category() {
+        return current_main_category;
+    }
+
+    public void setCurrent_main_category(Category current_main_category) {
+        this.current_main_category = current_main_category;
+    }
+
+    public ArrayAdapter<Category> getAdapter() {
+        return adapter;
+    }
+
+    public void setAdapter(ArrayAdapter<Category> adapter) {
+        this.adapter = adapter;
     }
 }

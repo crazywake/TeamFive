@@ -46,7 +46,6 @@ public class DAO {
     }
 
 
-
     public ArrayList<Category> getMainData()
     {
         ArrayList<Category> return_value = new ArrayList<>();
@@ -127,7 +126,40 @@ public class DAO {
         return return_value;
     }
 
-    public boolean deleteSubCat(String name){
+    public boolean deleteValue(Value value) {
+        return (my_db.delete(SqlLiteHelper.PAYMENT, SqlLiteHelper.ID_PAYMENT + " = " + value.getId(), null) > 0);
+    }
+
+    public boolean deleteCategory(Category category, boolean recursive) {
+        if(recursive) {
+            //delete values
+            ArrayList<Value> values = new ArrayList<>();
+            for(Category cat : category.getSubcategories()) {
+                values.addAll(cat.getValues());
+            }
+            for(Value val : values) {
+                deleteValue(val);
+            }
+
+            //delete subcategories
+            for(Category cat : category.getSubcategories()) {
+                deleteCategory(cat, false);
+            }
+        }
+
+        for(Value val : category.getValues()) {
+            deleteValue(val);
+        }
+
+        if(category.getType() == Category.Type.SUB) {
+            return (my_db.delete(SqlLiteHelper.SUB_CAT, SqlLiteHelper.ID_SUB_CAT + " = " + category.getId(), null) > 0);
+        }
+        else {
+            return (my_db.delete(SqlLiteHelper.MAIN_CAT, SqlLiteHelper.ID_MAIN_CAT + " = " + category.getId(), null) > 0);
+        }
+    }
+
+    public boolean deleteSubCat(String name){ //depricated!
 
         return (my_db.delete(SqlLiteHelper.SUB_CAT, SqlLiteHelper.NAME_SUB_CAT + " = '" + name + "'", null) > 0);
     }
@@ -238,7 +270,7 @@ public class DAO {
         return my_db.insert(SqlLiteHelper.SUB_CAT,null,new_name);
     }
 
-    public boolean insertPayment(Integer new_value,Integer main_cat,Integer sub_cat)
+    public boolean insertPayment(Integer new_value, Integer main_cat,Integer sub_cat)
     {
         long unixTime = System.currentTimeMillis();
 
@@ -252,13 +284,24 @@ public class DAO {
         return true;
     }
 
-    public boolean updatePayment(Integer new_value,Integer id)
+    public boolean updatePayment(Integer new_value, Integer id)
     {
         ContentValues new_cont = new ContentValues();
         new_cont.put(SqlLiteHelper.VALUE_PAYMENT, new_value);
 
         return (my_db.update(SqlLiteHelper.PAYMENT, new_cont, "id =" + id, null) > 0);
     }
+
+    public boolean changePaymentCategory(Integer main_cat, Integer sub_cat, Integer id)
+    {
+        ContentValues new_cont = new ContentValues();
+        new_cont.put(SqlLiteHelper.MAIN_CAT_PAYMENT, main_cat);
+        new_cont.put(SqlLiteHelper.SUB_CAT_PAYMENT, sub_cat);
+
+        return (my_db.update(SqlLiteHelper.PAYMENT, new_cont, "id =" + id, null) > 0);
+    }
+
+
 
     public boolean updateTime(Date new_value,Integer id)
     {
@@ -270,12 +313,76 @@ public class DAO {
         return (my_db.update(SqlLiteHelper.PAYMENT, new_cont, "id =" + id, null) > 0);
     }
 
-    public boolean updateMainCategory(String new_value, Integer main_cat_id)
+    public void updateMainCategory(Category old_category, Category new_category)
     {
-        ContentValues new_cont = new ContentValues();
-        new_cont.put(SqlLiteHelper.NAME_MAIN_CAT, new_value);
+        if(old_category.getType() == new_category.getType()) {
+            //category stays the same type
 
-        return (my_db.update(SqlLiteHelper.MAIN_CAT, new_cont, "id =" + main_cat_id, null) > 0);
+            String new_value = new_category.getName();
+            Integer main_cat_id = new_category.getId();
+
+            ContentValues new_cont = new ContentValues();
+            new_cont.put(SqlLiteHelper.NAME_MAIN_CAT, new_value);
+
+            my_db.update(SqlLiteHelper.MAIN_CAT, new_cont, "id = " + main_cat_id, null);
+        } else {
+            //main category changed to sub_category
+
+            //step 1: get all values in main category and all subcategories:
+            ArrayList<Value> values = new ArrayList<>();
+            values.addAll(old_category.getValues());
+            for(Category cat : old_category.getSubcategories()) {
+                values.addAll(cat.getValues());
+            }
+            //step 2: create new subcategory
+            int new_id = (int) insertSubCat(new_category.getName(), new_category.getParent().getId());
+
+            //step 3: change value categories
+            for(Value val : values) {
+                changePaymentCategory(null, new_id, val.getId());
+            }
+
+            //step 4: delete subcategories non-recursively (keep values)
+            for(Category subcat : old_category.getSubcategories()) {
+                deleteCategory(subcat, false);
+            }
+
+            //step 5: delete main category non-recursively (because of reasons)
+            deleteCategory(old_category, false);
+        }
+    }
+
+    public void updateSubCategory(Category old_category, Category new_category)
+    {
+        if(old_category.getType() == new_category.getType()) {
+            //category stays the same type
+            String new_value = new_category.getName();
+            Integer sub_cat_id = new_category.getId();
+
+            ContentValues new_cont = new ContentValues();
+            new_cont.put(SqlLiteHelper.NAME_SUB_CAT, new_value);
+            new_cont.put(SqlLiteHelper.MAIN_CAT_ID, new_category.getParent().getId());
+
+            my_db.update(SqlLiteHelper.SUB_CAT, new_cont, "id = " + sub_cat_id, null);
+        } else {
+
+            //sub category changed to main_category
+
+            //step 1: get all values in sub category:
+            ArrayList<Value> values = new ArrayList<>();
+            values.addAll(old_category.getValues());
+
+            //step 2: create new main category
+            int new_id = (int) insertMainCat(new_category.getName());
+
+            //step 3: change value categories
+            for(Value val : values) {
+                changePaymentCategory(new_id, null, val.getId());
+            }
+
+            //step 4: delete sub category non-recursively (because of reasons)
+            deleteCategory(old_category, false);
+        }
     }
 
     public boolean updateSubCategory(String new_value, Integer sub_cat_id)
