@@ -1,6 +1,8 @@
 package com.bill.pocket.pocketbill;
 
 import android.app.AlertDialog;
+import android.app.Application;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.Configuration;
 import android.graphics.drawable.BitmapDrawable;
@@ -38,7 +40,7 @@ public class MainActivity extends ActionBarActivity {
 
     //Navigation Drawer
     private ActionBarDrawerToggle mDrawerToggle;
-    private DrawerLayout mDrawerLayout;
+    private DrawerLayout mDrawerLayout, mDrawerLayout2;
     private String mActivityTitle = "PocketBill";
 
     //Database
@@ -58,6 +60,9 @@ public class MainActivity extends ActionBarActivity {
     ListView categoryView;
     ArrayAdapter<Category> adapter;
 
+    ListView mDrawerList;
+    ListView mDrawerList2;
+
     @Override
     protected void onDestroy()
     {
@@ -72,7 +77,6 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        ListView mDrawerList;
         categoryView = (ListView) findViewById(R.id.CategoryView);
         categoryView.setLongClickable(true);
         //fill hashmap with subcategories
@@ -85,11 +89,18 @@ public class MainActivity extends ActionBarActivity {
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.left_drawer);
         // Set the adapter for the list view
-        mDrawerList.setAdapter(new ArrayAdapter<>(this,android.R.layout.simple_list_item_1,mnavDrawerContent));
+        mDrawerList.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, mnavDrawerContent));
         mDrawerList.setSelector(android.R.color.holo_blue_dark);
-        mDrawerList.setOnItemClickListener(new NavigationDrawerListener(this,mDrawerLayout,adapter,categoryView,main_categories));
+        mDrawerList.setOnItemClickListener(new NavigationDrawerListener(this, mDrawerLayout, adapter, categoryView, main_categories));
 
-        setupDrawer();
+        mDrawerList2 = (ListView) findViewById(R.id.right_drawer);
+        // Set the adapter for the list view
+        //mDrawerList2.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, {""}));
+        //mDrawerList2.setSelector(android.R.color.holo_blue_dark);
+        //mDrawerList2.setOnItemClickListener(new NavigationDrawerListener(this,mDrawerLayout2,adapter,categoryView,main_categories));
+
+
+        setupDrawer(this);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
 
@@ -113,7 +124,7 @@ public class MainActivity extends ActionBarActivity {
         categoryView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view,
-                                    int position, long id) {
+                                    final int position, long id) {
 
                 // ListView Clicked item value
                 Category clickedItem = (Category) categoryView.getItemAtPosition(position);
@@ -129,9 +140,11 @@ public class MainActivity extends ActionBarActivity {
 
                     alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int whichButton) {
-                            //String value = input.getText().toString();
+                            String value = input.getText().toString();
 
                             // Do something with value!
+                            // TODO: main and sub categories
+                            dataAccessObject.insertPayment(Integer.parseInt(value), current_main_category.getId(), 0);
                         }
                     });
 
@@ -238,14 +251,26 @@ public class MainActivity extends ActionBarActivity {
         mDrawerToggle.onConfigurationChanged(newConfig);
     }
 
-    private void setupDrawer() {
+    private void setupDrawer(Context cnt) {
+        final Context cnt2 = cnt;
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,R.drawable.ic_drawer , R.string.drawer_open, R.string.drawer_close) {
-
 
             /** Called when a drawer has settled in a completely open state. */
             public void onDrawerOpened(View drawerView) {
                 super.onDrawerOpened(drawerView);
-                getSupportActionBar().setTitle("Navigation");
+
+                if (drawerView.getTag().toString().equals("left_drawer"))
+                    getSupportActionBar().setTitle("Navigation");
+
+                if (drawerView.getTag().toString().equals("right_drawer")) {
+                    getSupportActionBar().setTitle("MAIN_CATEGORY");
+
+                    ArrayList<String> mnavDrawerContent2 = dataAccessObject.getPayments();
+                    // TODO: Get Values from DB
+
+                    mDrawerList2.setAdapter(new ArrayAdapter<>(cnt2, android.R.layout.simple_list_item_1, mnavDrawerContent2));
+
+                }
                 invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
             }
 
@@ -306,8 +331,30 @@ public class MainActivity extends ActionBarActivity {
 
         if(id == R.id.addEditCategory)
         {
-            CategoryEditor catedit = new CategoryEditor(CategoryEditor.Type.ADD, null, this, main_categories, current_main_category);
-            catedit.display();
+            AlertDialog.Builder alert = new AlertDialog.Builder(this);
+
+            alert.setTitle("New Category");
+            alert.setMessage("Please enter the name of the new Category");
+
+// Set an EditText view to get user input
+            final EditText input = new EditText(this);
+
+            alert.setView(input);
+
+            alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int whichButton) {
+
+                    // Do something with value!
+                }
+            });
+
+            alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int whichButton) {
+                    // Canceled.
+                }
+            });
+
+            alert.show();
         }
         return super.onOptionsItemSelected(item);
     }

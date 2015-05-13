@@ -5,7 +5,9 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 
 
@@ -79,7 +81,7 @@ public class DAO {
             while (!sub_cat_cursor.isAfterLast())
             {
                 ArrayList<Value> sub_value_set = new ArrayList<>();
-                Category newSubCategory = new Category(sub_cat_cursor.getInt(0), sub_cat_cursor.getString(1),newCategory, null,null, Type.SUB);
+                Category newSubCategory = new Category(sub_cat_cursor.getInt(0), sub_cat_cursor.getString(1),newCategory, null,null, Category.Type.SUB);
                 sub_set.add(newSubCategory);
                 sub_cat_cursor.moveToNext();
 
@@ -163,7 +165,7 @@ public class DAO {
                 new String[] { SqlLiteHelper.COL_VALUE_PAYMENT }, // leaving "columns" null just returns all the columns.
                 null, // cols for "where" clause
                 null, // values for "where" clause
-                null, // columns to group by
+                SqlLiteHelper.COL_DATE_PAYMENT, // columns to group by
                 null, // columns to filter by row groups
                 null
         );
@@ -173,7 +175,11 @@ public class DAO {
 
         while (!get_payments.isAfterLast())
         {
-            payments.add(get_payments.getString(0));
+            DateFormat formats = DateFormat.getDateInstance();
+            long time = Long.parseLong(get_payments.getString(1));
+            Date my_date = new Date(time);
+
+            payments.add(formats.format(my_date)  + "                   " + get_payments.getString(0) + " Euro");
             get_payments.moveToNext();
         }
 
