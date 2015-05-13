@@ -7,7 +7,6 @@ import android.database.sqlite.SQLiteDatabase;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 
 
@@ -392,10 +391,10 @@ public class DAO {
             Integer sub_cat_id = new_category.getId();
 
             ContentValues new_cont = new ContentValues();
-            new_cont.put(SqlLiteHelper.NAME_SUB_CAT, new_value);
-            new_cont.put(SqlLiteHelper.MAIN_CAT_ID, new_category.getParent().getId());
+            new_cont.put(SqlLiteHelper.COL_NAME_SUB_CAT, new_value);
+            new_cont.put(SqlLiteHelper.COL_FK_MAIN_CAT_ID, new_category.getParent().getId());
 
-            my_db.update(SqlLiteHelper.SUB_CAT, new_cont, "id = " + sub_cat_id, null);
+            my_db.update(SqlLiteHelper.COL_ID_SUB_CAT, new_cont, "id = " + sub_cat_id, null);
         } else {
 
             //sub category changed to main_category

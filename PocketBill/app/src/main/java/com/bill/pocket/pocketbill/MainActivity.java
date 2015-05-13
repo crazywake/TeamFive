@@ -1,7 +1,6 @@
 package com.bill.pocket.pocketbill;
 
 import android.app.AlertDialog;
-import android.app.Application;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.Configuration;
@@ -138,7 +137,7 @@ public class MainActivity extends ActionBarActivity {
 
                             // Do something with value!
                             // TODO: main and sub categories
-                              dataAccessObject.insertPayment(Integer.parseInt(value), current_main_category.getId(), 1);
+                            //  dataAccessObject.insertPayment(Integer.parseInt(value), current_main_category.getId(), 1);
                         }
                     });
 
