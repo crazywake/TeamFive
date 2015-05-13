@@ -1,8 +1,6 @@
 package com.bill.pocket.pocketbill;
 
 import android.app.AlertDialog;
-import android.app.Application;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.Configuration;
 import android.graphics.drawable.BitmapDrawable;
@@ -289,32 +287,10 @@ public class MainActivity extends ActionBarActivity {
             return true;
         }
 
-        if(id == R.id.addCategory)
+        if(id == R.id.addEditCategory)
         {
-            AlertDialog.Builder alert = new AlertDialog.Builder(this);
-
-            alert.setTitle("New Category");
-            alert.setMessage("Please enter the name of the new Category");
-
-// Set an EditText view to get user input
-            final EditText input = new EditText(this);
-
-            alert.setView(input);
-
-            alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int whichButton) {
-
-                    // Do something with value!
-                }
-            });
-
-            alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int whichButton) {
-                    // Canceled.
-                }
-            });
-
-            alert.show();
+            CategoryEditor catedit = new CategoryEditor(CategoryEditor.Type.ADD, null, this, main_categories, current_main_category);
+            catedit.display();
         }
         return super.onOptionsItemSelected(item);
     }
