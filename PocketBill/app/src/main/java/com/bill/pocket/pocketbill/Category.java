@@ -7,6 +7,10 @@ import java.util.ArrayList;
  */
 public class Category {
 
+    public enum Type {
+        MAIN,
+        SUB,
+    }
 
     private int id;
     private String name;

@@ -42,6 +42,8 @@
                     android:layout_height="wrap_content"
                     android:layout_weight=".5"
                     android:textSize="16dp"
+                    android:lines="1"
+                    android:singleLine="true"
                     android:textStyle="bold"
                     android:maxLength="20" />
             </LinearLayout> <!-- first row, category name -->

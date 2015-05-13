@@ -23,35 +23,27 @@ public class SqlLiteHelper extends SQLiteOpenHelper {
     public static final String COL_FK_MAIN_CAT_ID = "COL_FK_MAIN_CAT_ID";
 
 
-    private static final String CREATE_MAIN_CAT = "CREATE TABLE " + TBL_MAIN_CAT + " ( " +
-            COL_ID_MAIN_CAT + " integer primary key, " +
-            COL_NAME_MAIN_CAT + " text not NULL" + " );" ;
+    private static final String CREATE_MAIN_CAT = "CREATE TABLE " + MAIN_CAT + " ( " +
+            ID_MAIN_CAT + " integer primary key, " +
+            NAME_MAIN_CAT + " text not NULL" + " );" ;
 
-    private static final String CREATE_PAYMENT = "CREATE TABLE " + TBL_PAYMENT + " ( " +
-            COL_ID_PAYMENT + " integer primary key , " +
-            COL_VALUE_PAYMENT + " integer, " +
-            COL_DATE_PAYMENT + " integer, " +
-            COL_FK_MAIN_CAT_PAYMENT + " integer NOT NULL REFERENCES " + TBL_MAIN_CAT + "(" + COL_ID_MAIN_CAT + ") ON DELETE CASCADE, " +
-            COL_FK_SUB_CAT_PAYMENT + " integer REFERENCES "+ TBL_SUB_CAT + "(" + COL_ID_SUB_CAT + ") ON DELETE CASCADE);" ;
+    private static final String CREATE_PAYMENT = "CREATE TABLE " + PAYMENT + " ( " +
+    ID_PAYMENT + " integer primary key , " +
+    VALUE_PAYMENT + " integer, " +
+    DATE_PAYMENT + " integer, " +
+    MAIN_CAT_PAYMENT + " integer, " +
+    SUB_CAT_PAYMENT + " integer " + ");" ;
 
-    private static final String CREATE_SUB_CAT = "CREATE TABLE " + TBL_SUB_CAT + " ( " +
-            COL_ID_SUB_CAT + " integer primary key , " +
-            COL_NAME_SUB_CAT + " text NOT NULL, " +
-            COL_FK_MAIN_CAT_ID + " integer REFERENCES " + TBL_MAIN_CAT + "(" + COL_ID_MAIN_CAT + ") ON DELETE CASCADE);" ;
+    private static final String CREATE_SUB_CAT = "CREATE TABLE " + SUB_CAT + " ( " +
+            ID_SUB_CAT + " integer primary key , " +
+            NAME_SUB_CAT + " text not NULL, " +
+            MAIN_CAT_ID + " integer " + ");" ;
 
 
 
     public SqlLiteHelper(Context context)
     {
         super(context, SQL_NAME,null,1);
-    }
-
-    public void onOpen(SQLiteDatabase mySQL)
-    {
-        super.onOpen(mySQL);
-        if (!mySQL.isReadOnly()) {
-            mySQL.execSQL("PRAGMA foreign_keys=ON;");
-        }
     }
 
     @Override
@@ -69,4 +61,5 @@ public class SqlLiteHelper extends SQLiteOpenHelper {
         mySQL.execSQL("DROP TABLE IF EXISTS ");
         onCreate(mySQL);
     }
+
 }
