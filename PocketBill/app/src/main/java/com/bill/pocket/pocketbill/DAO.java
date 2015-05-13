@@ -225,7 +225,7 @@ public class DAO {
         {
             checkNameCursor.moveToNext();
         }
-
+        //Test
         ContentValues new_name = new  ContentValues();
         new_name.put(SqlLiteHelper.COL_NAME_SUB_CAT,newSubCat);
         new_name.put(SqlLiteHelper.COL_FK_MAIN_CAT_ID,MainCatId);
