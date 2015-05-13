@@ -144,7 +144,7 @@ public class MainActivity extends ActionBarActivity {
 
                             // Do something with value!
                             // TODO: main and sub categories
-                            dataAccessObject.insertPayment(Integer.parseInt(value), current_main_category.getId(), 0);
+                              dataAccessObject.insertPayment(Integer.parseInt(value), current_main_category.getId(), 1);
                         }
                     });
 

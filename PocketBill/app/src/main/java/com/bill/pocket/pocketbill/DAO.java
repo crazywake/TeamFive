@@ -81,7 +81,7 @@ public class DAO {
             while (!sub_cat_cursor.isAfterLast())
             {
                 ArrayList<Value> sub_value_set = new ArrayList<>();
-                Category newSubCategory = new Category(sub_cat_cursor.getInt(0), sub_cat_cursor.getString(1),newCategory, null,null, Category.Type.SUB);
+                Category newSubCategory = new Category(sub_cat_cursor.getInt(0), sub_cat_cursor.getString(1),newCategory, null,null, Type.SUB);
                 sub_set.add(newSubCategory);
                 sub_cat_cursor.moveToNext();
 
@@ -162,7 +162,7 @@ public class DAO {
 
         Cursor get_payments = my_db.query(
                 SqlLiteHelper.TBL_PAYMENT,  // Table to Query
-                new String[] { SqlLiteHelper.COL_VALUE_PAYMENT }, // leaving "columns" null just returns all the columns.
+                new String[] { SqlLiteHelper.COL_VALUE_PAYMENT, SqlLiteHelper.COL_DATE_PAYMENT }, // leaving "columns" null just returns all the columns.
                 null, // cols for "where" clause
                 null, // values for "where" clause
                 SqlLiteHelper.COL_DATE_PAYMENT, // columns to group by
