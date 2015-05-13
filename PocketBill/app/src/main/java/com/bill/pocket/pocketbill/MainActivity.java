@@ -51,6 +51,8 @@ public class MainActivity extends ActionBarActivity {
 
     private PopupWindow popupWindow = null;
 
+    MainActivity this_class;
+
     ArrayList<Category> main_categories;
 
     Category current_main_category = null;
@@ -59,9 +61,16 @@ public class MainActivity extends ActionBarActivity {
     ArrayAdapter<Category> adapter;
 
     @Override
+    protected void onDestroy()
+    {
+        dataAccessObject.close();
+        super.onDestroy();
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         String[] mnavDrawerContent;
-
+        this_class = this;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -93,6 +102,11 @@ public class MainActivity extends ActionBarActivity {
         // Fourth - the Array of data
 
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, android.R.id.text1, main_categories);
+
+        insertDummyData();
+        main_categories = dataAccessObject.getMainData();
+
+        adapter = new ArrayAdapter<>(this_class, android.R.layout.simple_list_item_1, android.R.id.text1, main_categories);
 
         // Assign adapter to ListView
         categoryView.setAdapter(adapter);
@@ -190,11 +204,14 @@ public class MainActivity extends ActionBarActivity {
                         Category parent = clickedItem.getParent();
                         if(parent == null) {
                             main_categories.remove(position);
-                            //TODO: remove items (children) from clickedItem category, remove clickedItem from database
+                            dataAccessObject.deleteMainCategory(clickedItem.getId());
+
                             loadAdapter(main_categories);
                             cur_state = State.MAIN;
                         } else {
                             parent.getSubcategories().remove(clickedItem);
+                            dataAccessObject.deleteSubCategory(clickedItem.getId());
+
                             //TODO: remove items (children) from clickedItem category, remove clickedItem from database
                             loadAdapter(parent.getSubcategories());
                             cur_state = State.SUB;
