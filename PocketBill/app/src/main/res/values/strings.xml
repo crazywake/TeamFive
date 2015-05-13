@@ -6,7 +6,7 @@
     <string name="Save">Save</string>
     <string name="Cancel">Cancel</string>
     <string name="Value">Value</string>
-    <string name="action_addCategory">addCategory</string>
+    <string name="addEditCategory">addEditCategory</string>
     <string name="drawer_button">drawerButton</string>
     <string-array
         name="navigationDrawerContent">

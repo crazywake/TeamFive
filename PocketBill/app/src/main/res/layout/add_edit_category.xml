@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/outerContainer"
+    android:orientation="horizontal">
+
+    <RelativeLayout
+        android:layout_width="0dip"
+        android:layout_height="fill_parent"
+        android:layout_weight="0.10">
+    </RelativeLayout>
+    <RelativeLayout
+        android:layout_width="0dip"
+        android:layout_height="fill_parent"
+        android:layout_weight="0.8">
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:orientation="vertical"
+            android:background="#cccccc">
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="4dp"
+                android:layout_marginLeft="4dp"
+                android:orientation="horizontal">
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight=".17"
+                    android:text="name:"
+                    android:textColor="#555555"
+                    android:textStyle="normal"
+                    android:textSize="16dp" />
+                <EditText
+                    android:id="@+id/categoryEditName"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight=".5"
+                    android:textSize="16dp"
+                    android:textStyle="bold"
+                    android:maxLength="20" />
+            </LinearLayout> <!-- first row, category name -->
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="4dp"
+                android:layout_marginLeft="4dp"
+                android:orientation="horizontal">
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight=".17"
+                    android:text="category:"
+                    android:textSize="16dp"
+                    android:textColor="#555555"
+                    android:textStyle="normal"
+                    android:singleLine="true"
+                    android:editable="false" />
+                <Spinner
+                    android:id="@+id/categoryParentSpinner"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight=".5"
+                    android:textSize="16dp"
+                    android:spinnerMode="dialog"
+                    android:clickable="true" />
+            </LinearLayout> <!-- second row, category spinner -->
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginRight="4dp"
+                android:layout_marginLeft="4dp"
+                android:background="#666666" /> <!-- divider -->
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="4dp"
+                android:layout_marginLeft="4dp"
+                android:layout_gravity="center"
+                android:orientation="horizontal">
+
+                <CheckBox
+                    android:id="@+id/categoryCheckbox"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:textSize="16dp"
+                    android:textColor="#555555"
+                    android:textStyle="normal"
+                    android:text="main category:"
+                    android:button="@null"
+                    android:drawableRight="?android:attr/listChoiceIndicatorMultiple"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="4dp"
+                android:layout_marginLeft="4dp"
+                android:orientation="horizontal">
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight=".17"
+                    android:text="color:"
+                    android:textSize="16dp"
+                    android:textColor="#555555"
+                    android:textStyle="normal"
+                    android:singleLine="true"
+                    android:editable="false" />
+                <Button
+                    android:id="@+id/categoryColorButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight=".5"
+                    android:text="rainbow inc" />
+            </LinearLayout> <!-- second row, category spinner -->
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginRight="4dp"
+                android:layout_marginLeft="4dp"
+                android:background="#666666" /> <!-- divider -->
+
+            <RelativeLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="4dp"
+                android:layout_marginLeft="4dp"
+                android:orientation="horizontal">
+                <Button
+                    android:id="@+id/categoryEditorCancel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:text="kenzel washington" />
+                <Button
+                    android:id="@+id/categoryEditorOK"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:text="OK" />
+            </RelativeLayout> <!-- second row, category spinner -->
+
+
+        </LinearLayout>
+
+    </RelativeLayout>
+    <RelativeLayout
+        android:layout_width="0dip"
+        android:layout_height="fill_parent"
+        android:layout_weight="0.10">
+    </RelativeLayout>
+</LinearLayout>
