@@ -5,7 +5,9 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 
 
@@ -165,10 +167,10 @@ public class DAO {
 
         Cursor get_payments = my_db.query(
                 SqlLiteHelper.PAYMENT,  // Table to Query
-                new String[] { SqlLiteHelper.VALUE_PAYMENT }, // leaving "columns" null just returns all the columns.
+                new String[] { SqlLiteHelper.VALUE_PAYMENT, SqlLiteHelper.DATE_PAYMENT }, // leaving "columns" null just returns all the columns.
                 null, // cols for "where" clause
                 null, // values for "where" clause
-                null, // columns to group by
+                SqlLiteHelper.DATE_PAYMENT, // columns to group by
                 null, // columns to filter by row groups
                 null
         );
@@ -178,7 +180,11 @@ public class DAO {
 
         while (!get_payments.isAfterLast())
         {
-            payments.add(get_payments.getString(0));
+            DateFormat formats = DateFormat.getDateInstance();
+            long time = Long.parseLong(get_payments.getString(1));
+            Date my_date = new Date(time);
+
+            payments.add(formats.format(my_date)  + "                   " + get_payments.getString(0) + " Euro");
             get_payments.moveToNext();
         }
 
