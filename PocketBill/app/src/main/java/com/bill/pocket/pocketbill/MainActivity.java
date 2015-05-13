@@ -310,8 +310,6 @@ public class MainActivity extends ActionBarActivity {
         int dummy7sub = (int) dataAccessObject.insertSubCat("New Yorker", dummy3main);
         int dummy8sub = (int) dataAccessObject.insertSubCat("H&M", dummy3main);
         int dummy9sub = (int) dataAccessObject.insertSubCat("C&A", dummy3main);
-
-        //test comment delete!
         /*
 
         ArrayList<Category> subcat1list = new ArrayList<>();
