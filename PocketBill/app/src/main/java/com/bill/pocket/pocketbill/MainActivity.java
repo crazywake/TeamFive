@@ -1,9 +1,13 @@
 package com.bill.pocket.pocketbill;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.res.Configuration;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
+import android.support.v4.app.ActionBarDrawerToggle;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.text.InputType;
 import android.view.LayoutInflater;
@@ -18,6 +22,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.PopupWindow;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -32,6 +37,14 @@ public class MainActivity extends ActionBarActivity {
         POPUP
     }
 
+    private MainActivity this_activity = this;
+
+    //Navigation Drawer
+    private ActionBarDrawerToggle mDrawerToggle;
+    private DrawerLayout mDrawerLayout, mDrawerLayout2;
+    private String mActivityTitle = "PocketBill";
+
+    //Database
     private DAO dataAccessObject;
 
     public State pre_popup_state = State.MAIN;
@@ -39,23 +52,56 @@ public class MainActivity extends ActionBarActivity {
 
     private PopupWindow popupWindow = null;
 
-    MainActivity this_class;
-
     ArrayList<Category> main_categories;
 
-    Category current_main_category = null;
+    private Category current_main_category = null;
 
-    ListView categoryView;
-    ArrayAdapter<Category> adapter;
+    private ListView categoryView;
+    private ArrayAdapter<Category> adapter;
+
+    ListView mDrawerList;
+    ListView mDrawerList2;
+
+    @Override
+    protected void onDestroy()
+    {
+        dataAccessObject.close();
+        super.onDestroy();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        this_class = this;
+        String[] mnavDrawerContent;
+        this_activity = this;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         categoryView = (ListView) findViewById(R.id.CategoryView);
         categoryView.setLongClickable(true);
+        //fill hashmap with subcategories
+        dataAccessObject = DAO.instance(this);
+        //insertDummyData();
+        main_categories = dataAccessObject.getMainData();
+
+        //Navigation Drawer
+        mnavDrawerContent = getResources().getStringArray(R.array.navigationDrawerContent);
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mDrawerList = (ListView) findViewById(R.id.left_drawer);
+        // Set the adapter for the list view
+        mDrawerList.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, mnavDrawerContent));
+        mDrawerList.setSelector(android.R.color.holo_blue_dark);
+        mDrawerList.setOnItemClickListener(new NavigationDrawerListener(this, mDrawerLayout, adapter, categoryView, main_categories));
+
+        mDrawerList2 = (ListView) findViewById(R.id.right_drawer);
+        // Set the adapter for the list view
+        //mDrawerList2.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, {""}));
+        //mDrawerList2.setSelector(android.R.color.holo_blue_dark);
+        //mDrawerList2.setOnItemClickListener(new NavigationDrawerListener(this,mDrawerLayout2,adapter,categoryView,main_categories));
+
+
+        setupDrawer(this);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
 
         // Define a new Adapter
         // First parameter - Context
@@ -63,15 +109,7 @@ public class MainActivity extends ActionBarActivity {
         // Third parameter - ID of the TextView to which the data is written
         // Fourth - the Array of data
 
-        //fill hashmap with subcategories
-        dataAccessObject = DAO.instance(this);
-
-
-        insertDummyData();
-        main_categories = dataAccessObject.getMainData();
-
-        adapter = new ArrayAdapter<>(this_class, android.R.layout.simple_list_item_1, android.R.id.text1, main_categories);
-
+        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, android.R.id.text1, main_categories);
         // Assign adapter to ListView
         categoryView.setAdapter(adapter);
 
@@ -79,7 +117,7 @@ public class MainActivity extends ActionBarActivity {
         categoryView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view,
-                                    int position, long id) {
+                                    final int position, long id) {
 
                 // ListView Clicked item value
                 Category clickedItem = (Category) categoryView.getItemAtPosition(position);
@@ -95,9 +133,11 @@ public class MainActivity extends ActionBarActivity {
 
                     alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int whichButton) {
-                            //String value = input.getText().toString();
+                            String value = input.getText().toString();
 
                             // Do something with value!
+                            // TODO: main and sub categories
+                            //  dataAccessObject.insertPayment(Integer.parseInt(value), current_main_category.getId(), 1);
                         }
                     });
 
@@ -150,7 +190,12 @@ public class MainActivity extends ActionBarActivity {
                     @Override
                     public void onClick(View v) {
                         // edit button clicked
-
+                        popupWindow.dismiss();
+                        Category clickedItem = (Category) categoryView.getItemAtPosition(position);
+                        CategoryEditor catedit = new CategoryEditor(CategoryEditor.Type.EDIT, clickedItem, MainActivity.this, main_categories, clickedItem.getParent());
+                        popupWindow = catedit.display();
+                        pre_popup_state = cur_state;
+                        cur_state = State.POPUP;
                         //TODO: EDIT IN DATABASE!!!!
                     }
                 });
@@ -165,11 +210,14 @@ public class MainActivity extends ActionBarActivity {
                         Category parent = clickedItem.getParent();
                         if(parent == null) {
                             main_categories.remove(position);
-                            //TODO: remove items (children) from clickedItem category, remove clickedItem from database
+                            dataAccessObject.deleteMainCategory(clickedItem.getId());
+
                             loadAdapter(main_categories);
                             cur_state = State.MAIN;
                         } else {
                             parent.getSubcategories().remove(clickedItem);
+                            dataAccessObject.deleteSubCategory(clickedItem.getId());
+
                             //TODO: remove items (children) from clickedItem category, remove clickedItem from database
                             loadAdapter(parent.getSubcategories());
                             cur_state = State.SUB;
@@ -184,6 +232,53 @@ public class MainActivity extends ActionBarActivity {
             }
         });
 
+    }
+
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        mDrawerToggle.syncState();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        mDrawerToggle.onConfigurationChanged(newConfig);
+    }
+
+    private void setupDrawer(Context cnt) {
+        final Context cnt2 = cnt;
+        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,R.drawable.ic_drawer , R.string.drawer_open, R.string.drawer_close) {
+
+            /** Called when a drawer has settled in a completely open state. */
+            public void onDrawerOpened(View drawerView) {
+                super.onDrawerOpened(drawerView);
+
+                if (drawerView.getTag().toString().equals("left_drawer"))
+                    getSupportActionBar().setTitle("Navigation");
+
+                if (drawerView.getTag().toString().equals("right_drawer")) {
+                    getSupportActionBar().setTitle("MAIN_CATEGORY");
+
+                    ArrayList<String> mnavDrawerContent2 = dataAccessObject.getPayments();
+                    // TODO: Get Values from DB
+
+                    mDrawerList2.setAdapter(new ArrayAdapter<>(cnt2, android.R.layout.simple_list_item_1, mnavDrawerContent2));
+
+                }
+                invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+            }
+
+            /** Called when a drawer has settled in a completely closed state. */
+            public void onDrawerClosed(View view) {
+                super.onDrawerClosed(view);
+                getSupportActionBar().setTitle(mActivityTitle);
+                invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+            }
+        };
+
+        mDrawerToggle.setDrawerIndicatorEnabled(true);
+        mDrawerLayout.setDrawerListener(mDrawerToggle);
     }
 
     @Override
@@ -225,32 +320,16 @@ public class MainActivity extends ActionBarActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement.
-        if(id == R.id.addCategory)
+        if (mDrawerToggle.onOptionsItemSelected(item)) {
+            return true;
+        }
+
+        if(id == R.id.addEditCategory)
         {
-            AlertDialog.Builder alert = new AlertDialog.Builder(this);
-
-            alert.setTitle("New Category");
-            alert.setMessage("Please enter the name of the new Category");
-
-// Set an EditText view to get user input
-            final EditText input = new EditText(this);
-
-            alert.setView(input);
-
-            alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int whichButton) {
-
-                    // Do something with value!
-                }
-            });
-
-            alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int whichButton) {
-                    // Canceled.
-                }
-            });
-
-            alert.show();
+            CategoryEditor catedit = new CategoryEditor(CategoryEditor.Type.ADD, null, this, main_categories, current_main_category);
+            popupWindow = catedit.display();
+            pre_popup_state = cur_state;
+            cur_state = State.POPUP;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -261,16 +340,17 @@ public class MainActivity extends ActionBarActivity {
         int dummy2main = (int) dataAccessObject.insertMainCat("Groceries");
         int dummy3main = (int) dataAccessObject.insertMainCat("Shopping");
 
-        /*int dummy1sub = (int) */dataAccessObject.insertSubCat("Shell", dummy1main);
-        /*int dummy2sub = (int) */dataAccessObject.insertSubCat("BP", dummy1main);
-        /*int dummy3sub = (int) */dataAccessObject.insertSubCat("Jet", dummy1main);
-        /*int dummy4sub = (int) */dataAccessObject.insertSubCat("Spar", dummy2main);
-        /*int dummy5sub = (int) */dataAccessObject.insertSubCat("Billa", dummy2main);
-        /*int dummy6sub = (int) */dataAccessObject.insertSubCat("Merkur", dummy2main);
-        /*int dummy7sub = (int) */dataAccessObject.insertSubCat("New Yorker", dummy3main);
-        /*int dummy8sub = (int) */dataAccessObject.insertSubCat("H&M", dummy3main);
-        /*int dummy9sub = (int) */dataAccessObject.insertSubCat("C&A", dummy3main);
+        int dummy1sub = (int) dataAccessObject.insertSubCat("Shell", dummy1main);
+        int dummy2sub = (int) dataAccessObject.insertSubCat("BP", dummy1main);
+        int dummy3sub = (int) dataAccessObject.insertSubCat("Jet", dummy1main);
+        int dummy4sub = (int) dataAccessObject.insertSubCat("Spar", dummy2main);
+        int dummy5sub = (int) dataAccessObject.insertSubCat("Billa", dummy2main);
+        int dummy6sub = (int) dataAccessObject.insertSubCat("Merkur", dummy2main);
+        int dummy7sub = (int) dataAccessObject.insertSubCat("New Yorker", dummy3main);
+        int dummy8sub = (int) dataAccessObject.insertSubCat("H&M", dummy3main);
+        int dummy9sub = (int) dataAccessObject.insertSubCat("C&A", dummy3main);
 
+        //test comment delete!
         /*
 
         ArrayList<Category> subcat1list = new ArrayList<>();
@@ -346,7 +426,85 @@ public class MainActivity extends ActionBarActivity {
 
     public void loadAdapter(ArrayList<Category> category_list) {
         //reload adapter
-        adapter = new ArrayAdapter<>(this_class, android.R.layout.simple_list_item_1, android.R.id.text1, category_list);
+        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, android.R.id.text1, category_list);
         categoryView.setAdapter(adapter);
+    }
+
+    public void updateLists(int parent_id) { //parent id = -1 if no parent (man category view)
+        main_categories = dataAccessObject.getMainData();
+
+        if(parent_id != -1) {
+            Category parent = getCategoryFromID(parent_id);
+            if(parent != null) {
+                loadAdapter(parent.getSubcategories());
+                cur_state = State.SUB;
+                pre_popup_state = cur_state;
+            }
+            else {
+                Toast.makeText(this, "Fatal Error is fatal! Database refused to cooperate and was executed! " +
+                        "Restart the app or contact support. Good Luck.", Toast.LENGTH_LONG).show();
+                finish();
+            }
+
+        } else {
+            loadAdapter(main_categories);
+            cur_state = State.MAIN;
+            pre_popup_state = cur_state;
+        }
+
+    }
+
+    public Category getCategoryFromID(int ID) {
+        for(Category cat : main_categories) {
+            if(cat.getId() == ID)
+                return cat;
+        }
+
+        return null;
+    }
+
+
+
+
+    public DAO getDAO() { return dataAccessObject; }
+
+    public State getPre_popup_state() {
+        return pre_popup_state;
+    }
+
+    public void setPre_popup_state(State pre_popup_state) {
+        this.pre_popup_state = pre_popup_state;
+    }
+
+    public State getCur_state() {
+        return cur_state;
+    }
+
+    public void setCur_state(State cur_state) {
+        this.cur_state = cur_state;
+    }
+
+    public ArrayList<Category> getMain_categories() {
+        return main_categories;
+    }
+
+    public void setMain_categories(ArrayList<Category> main_categories) {
+        this.main_categories = main_categories;
+    }
+
+    public Category getCurrent_main_category() {
+        return current_main_category;
+    }
+
+    public void setCurrent_main_category(Category current_main_category) {
+        this.current_main_category = current_main_category;
+    }
+
+    public ArrayAdapter<Category> getAdapter() {
+        return adapter;
+    }
+
+    public void setAdapter(ArrayAdapter<Category> adapter) {
+        this.adapter = adapter;
     }
 }

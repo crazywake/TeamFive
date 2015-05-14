@@ -8,36 +8,36 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class SqlLiteHelper extends SQLiteOpenHelper {
 
     private static final String SQL_NAME = "Pocket.db";
-    public static final String MAIN_CAT = "MAIN_CAT";
-    public static final String ID_MAIN_CAT = "ID";
-    public static final String NAME_MAIN_CAT = "NAME";
-    public static final String PAYMENT = "PAYMENT";
-    public static final String ID_PAYMENT = "ID";
-    public static final String VALUE_PAYMENT = "VALUE";
-    public static final String DATE_PAYMENT = "DATE";
-    public static final String MAIN_CAT_PAYMENT = "MAIN_CAT_ID";
-    public static final String SUB_CAT_PAYMENT = "SUB_CAT_ID";
-    public static final String NAME_SUB_CAT = "NAME";
-    public static final String ID_SUB_CAT = "ID";
-    public static final String SUB_CAT = "SUB_CAT";
-    public static final String MAIN_CAT_ID = "MAIN_CAT_ID";
+    public static final String TBL_MAIN_CAT = "TBL_MAIN_CAT";
+    public static final String COL_ID_MAIN_CAT = "ID_MAIN";
+    public static final String COL_NAME_MAIN_CAT = "NAME";
+    public static final String TBL_PAYMENT = "TBL_PAYMENT";
+    public static final String COL_ID_PAYMENT = "COL_ID_PAYMENT";
+    public static final String COL_VALUE_PAYMENT = "VALUE";
+    public static final String COL_DATE_PAYMENT = "DATE";
+    public static final String COL_FK_MAIN_CAT_PAYMENT = "COL_FK_MAIN_CAT_ID";
+    public static final String COL_FK_SUB_CAT_PAYMENT = "SUB_CAT_ID";
+    public static final String COL_NAME_SUB_CAT = "NAME";
+    public static final String COL_ID_SUB_CAT = "ID_SUB";
+    public static final String TBL_SUB_CAT = "TBL_SUB_CAT";
+    public static final String COL_FK_MAIN_CAT_ID = "COL_FK_MAIN_CAT_ID";
 
 
-    private static final String CREATE_MAIN_CAT = "CREATE TABLE " + MAIN_CAT + " ( " +
-            ID_MAIN_CAT + " integer primary key, " +
-            NAME_MAIN_CAT + " text not NULL" + " );" ;
+    private static final String CREATE_MAIN_CAT = "CREATE TABLE " + TBL_MAIN_CAT + " ( " +
+            COL_ID_MAIN_CAT + " integer primary key, " +
+            COL_NAME_MAIN_CAT + " text not NULL" + " );" ;
 
-    private static final String CREATE_PAYMENT = "CREATE TABLE " + PAYMENT + " ( " +
-    ID_PAYMENT + " integer primary key , " +
-    VALUE_PAYMENT + " integer, " +
-    DATE_PAYMENT + " integer, " +
-    MAIN_CAT_PAYMENT + " integer, " +
-    SUB_CAT_PAYMENT + " integer " + ");" ;
+    private static final String CREATE_PAYMENT = "CREATE TABLE " + TBL_PAYMENT + " ( " +
+    COL_ID_PAYMENT + " integer primary key , " +
+    COL_VALUE_PAYMENT + " integer, " +
+    COL_DATE_PAYMENT + " integer, " +
+    COL_FK_MAIN_CAT_PAYMENT + " integer, " +
+    COL_FK_SUB_CAT_PAYMENT + " integer " + ");" ;
 
-    private static final String CREATE_SUB_CAT = "CREATE TABLE " + SUB_CAT + " ( " +
-            ID_SUB_CAT + " integer primary key , " +
-            NAME_SUB_CAT + " text not NULL, " +
-            MAIN_CAT_ID + " integer " + ");" ;
+    private static final String CREATE_SUB_CAT = "CREATE TABLE " + TBL_SUB_CAT + " ( " +
+            COL_ID_SUB_CAT + " integer primary key , " +
+            COL_NAME_SUB_CAT + " text not NULL, " +
+            COL_FK_MAIN_CAT_ID + " integer " + ");" ;
 
 
 
@@ -57,16 +57,9 @@ public class SqlLiteHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase mySQL, int oldversion, int newversion)
     {
-        assert (false); //Should not happen at this time! This method is invoke if we Update the app!
+        assert(false);
         mySQL.execSQL("DROP TABLE IF EXISTS ");
         onCreate(mySQL);
     }
-
-
-
-
-
-
-
 
 }

@@ -1,8 +1,14 @@
 package com.bill.pocket.pocketbill.uitest;
 
+import android.graphics.Point;
 import android.test.ActivityInstrumentationTestCase2;
+import android.widget.ListView;
+
+import android.view.Display;
+import android.view.MotionEvent;
 
 import com.bill.pocket.pocketbill.MainActivity;
+import com.bill.pocket.pocketbill.R;
 import com.robotium.solo.Solo;
 
 public class PocketBillTest extends ActivityInstrumentationTestCase2<MainActivity> {
@@ -55,9 +61,54 @@ public class PocketBillTest extends ActivityInstrumentationTestCase2<MainActivit
         mySolo.clickOnText("Gas");
         mySolo.clickOnText("Shell");
         mySolo.clickOnEditText(editTextID);
-        mySolo.enterText(editTextID,testText);
-        assertEquals(mySolo.getEditText(editTextID).getText().toString(),testText);
+        mySolo.enterText(editTextID, testText);
+        assertEquals(mySolo.getEditText(editTextID).getText().toString(), testText);
+    }
 
+    public void testDisplayValues(){
+        mySolo.clickOnText("Gas");
+
+        int screenWidth = getActivity().getWindowManager().getDefaultDisplay().getWidth();
+        int screenHeight = getActivity().getWindowManager().getDefaultDisplay().getHeight();
+        int fromX, toX, fromY, toY = 0;
+        fromX = screenWidth -5;
+        toX = 0;
+        fromY = (screenHeight/2);
+        toY = (screenHeight/2);
+
+        mySolo.sleep(2000);
+        
+        mySolo.drag(fromX, toX, fromY, toY, 50);
+
+        mySolo.sleep(2000);
+    }
+
+    public void testMainCategoryDelete() {
+        ListView myList = (ListView) mySolo.getView(R.id.CategoryView);
+        int count = myList.getAdapter().getCount();
+        if (count < 1) return;
+
+        mySolo.clickLongInList(0);
+        mySolo.clickOnText("Delete");
+        mySolo.sleep(2000);
+
+        assertEquals(myList.getAdapter().getCount() + 1, count);
+    }
+
+    public void testSubCategoryDelete() {
+        ListView myList = (ListView) mySolo.getView(R.id.CategoryView);
+        if (myList.getAdapter().getCount() < 1) return;
+
+        mySolo.clickInList(0);
+        mySolo.sleep(2000);
+        int count = myList.getAdapter().getCount();
+        if (count < 1) return;
+        mySolo.clickLongInList(0);
+
+        mySolo.clickOnText("Delete");
+        mySolo.sleep(2000);
+
+        assertEquals(myList.getAdapter().getCount() + 1, count);
     }
 
 }
