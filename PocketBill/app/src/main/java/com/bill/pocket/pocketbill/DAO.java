@@ -252,7 +252,8 @@ public class DAO {
 
     public long insertSubCat(String newSubCat,int MainCatId)
     {
-        Cursor checkNameCursor = my_db.query(
+        Cursor checkNameCursor;
+        checkNameCursor = my_db.query(
                 SqlLiteHelper.TBL_SUB_CAT,  // Table to Query
                 new String[] { SqlLiteHelper.COL_NAME_SUB_CAT}, // leaving "columns" null just returns all the columns.
                 null, // cols for "where" clause
