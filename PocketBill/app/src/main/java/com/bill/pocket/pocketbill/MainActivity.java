@@ -133,8 +133,6 @@ public class MainActivity extends ActionBarActivity {
                     cur_state = State.SUB;
                 }
 
-
-
             } });
                 // ListView Clicked item value
 /*                Category clickedItem = (Category) categoryView.getItemAtPosition(position);
