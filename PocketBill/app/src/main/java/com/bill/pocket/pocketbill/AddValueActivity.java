@@ -115,6 +115,13 @@ public class AddValueActivity extends ActionBarActivity {
 
             //String value = (String) getString(R.id.addValue);
             EditText value = (EditText) findViewById(R.id.editTextAddValue);
+
+            if(value.getText().toString().equals(null) || value.getText().toString().equals("") ||
+                    value.getText().toString().length() == 0) {
+                Toast.makeText(getApplicationContext(), "No value added", Toast.LENGTH_SHORT).show();
+                return false;
+            }
+
             String val = value.getText().toString();
             double endval = Double.parseDouble(val)*100;
             long longvalue = (long) Math.round(endval);
