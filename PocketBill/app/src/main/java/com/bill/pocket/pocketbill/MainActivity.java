@@ -252,9 +252,9 @@ public class MainActivity extends ActionBarActivity {
             }
 
             );
-
-        }
  
+        }
+
         @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
