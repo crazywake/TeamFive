@@ -1,9 +1,14 @@
 package com.bill.pocket.pocketbill;
 
+import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.EditText;
+import android.widget.Toast;
+
+import static java.lang.Math.*;
 
 
 public class AddValueActivity extends ActionBarActivity {
@@ -12,6 +17,8 @@ public class AddValueActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_value);
+
+        Toast.makeText(getApplicationContext(), "AddValue Activity opened", Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -29,7 +36,23 @@ public class AddValueActivity extends ActionBarActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.addValue) {
+            Intent tmp = getIntent();
+
+            int main_id = tmp.getIntExtra("Main", 0);
+            int sub_id = tmp.getIntExtra("Sub", 0);
+
+            //String value = (String) getString(R.id.addValue);
+            EditText value = (EditText) findViewById(R.id.editTextAddValue);
+            String val = value.getText().toString();
+            double endval = Double.parseDouble(val)*100;
+            int intval = (int) Math.round(endval);
+
+            DAO DataAccessObject = DAO.instance(this);
+
+            DataAccessObject.insertPayment(intval, main_id, sub_id);
+
+            super.onBackPressed();
             return true;
         }
 
