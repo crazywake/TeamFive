@@ -3,6 +3,7 @@ package com.bill.pocket.pocketbill;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
@@ -119,8 +120,28 @@ public class MainActivity extends ActionBarActivity {
             public void onItemClick(AdapterView<?> parent, View view,
                                     final int position, long id) {
 
-                // ListView Clicked item value
                 Category clickedItem = (Category) categoryView.getItemAtPosition(position);
+                ArrayList<Category> new_category_list = clickedItem.getSubcategories();
+
+                if (cur_state == State.SUB) {
+                    System.out.println("in sub");
+                    Intent my_intent = new Intent(getApplicationContext(), AddValueActivity.class);
+                    startActivity(my_intent);
+                    //cur_state = State.MAIN;
+                }
+
+                if(cur_state == State.MAIN) {
+                    System.out.println("back in main");
+                    current_main_category = clickedItem;
+                    loadAdapter(new_category_list);
+                    cur_state = State.SUB;
+                }
+
+
+
+            } });
+                // ListView Clicked item value
+/*                Category clickedItem = (Category) categoryView.getItemAtPosition(position);
 
                 ArrayList<Category> new_category_list = clickedItem.getSubcategories();
                 if(new_category_list == null) {
@@ -137,7 +158,7 @@ public class MainActivity extends ActionBarActivity {
 
                             // Do something with value!
                             // TODO: main and sub categories
-                            //  dataAccessObject.insertPayment(Integer.parseInt(value), current_main_category.getId(), 1);
+                            dataAccessObject.insertPayment(Integer.parseInt(value), current_main_category.getId(), 1);
                         }
                     });
 
@@ -158,21 +179,23 @@ public class MainActivity extends ActionBarActivity {
             }
 
         });
+*/
+            categoryView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener()
 
-        categoryView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view,
-                                        final int position, long id) {
+            {
+                @Override
+                public boolean onItemLongClick (AdapterView < ? > parent, View view,
+                final int position, long id){
 
                 pre_popup_state = cur_state;
                 cur_state = State.POPUP;
 
-                if(popupWindow != null && popupWindow.isShowing()) {
+                if (popupWindow != null && popupWindow.isShowing()) {
                     popupWindow.dismiss();
                 }
 
                 LayoutInflater layoutInflater
-                        = (LayoutInflater)getBaseContext()
+                        = (LayoutInflater) getBaseContext()
                         .getSystemService(LAYOUT_INFLATER_SERVICE);
 
                 View popupView = layoutInflater.inflate(R.layout.category_popup, null);
@@ -208,7 +231,7 @@ public class MainActivity extends ActionBarActivity {
                         // delete
                         Category clickedItem = (Category) categoryView.getItemAtPosition(position);
                         Category parent = clickedItem.getParent();
-                        if(parent == null) {
+                        if (parent == null) {
                             main_categories.remove(position);
                             dataAccessObject.deleteMainCategory(clickedItem.getId());
 
@@ -230,11 +253,13 @@ public class MainActivity extends ActionBarActivity {
 
                 return true;
             }
-        });
+            }
 
-    }
+            );
 
-    @Override
+        }
+
+        @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
         mDrawerToggle.syncState();
