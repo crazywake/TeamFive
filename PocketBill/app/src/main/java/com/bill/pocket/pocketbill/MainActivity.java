@@ -52,6 +52,7 @@ public class MainActivity extends ActionBarActivity {
     ArrayList<Category> main_categories;
 
     private Category current_main_category = null;
+    private Category current_sub_category = null;
 
     private ListView categoryView;
     private ArrayAdapter<Category> adapter;
@@ -121,7 +122,12 @@ public class MainActivity extends ActionBarActivity {
 
                 if (cur_state == State.SUB) {
                     System.out.println("in sub");
+                    current_sub_category = clickedItem;
+
                     Intent my_intent = new Intent(getApplicationContext(), AddValueActivity.class);
+
+                    my_intent.putExtra("Main", current_main_category.getId());
+                    my_intent.putExtra("Sub", current_sub_category.getId());
                     startActivity(my_intent);
                     //cur_state = State.MAIN;
                 }
@@ -132,8 +138,6 @@ public class MainActivity extends ActionBarActivity {
                     loadAdapter(new_category_list);
                     cur_state = State.SUB;
                 }
-
-
 
             } });
                 // ListView Clicked item value
@@ -304,6 +308,10 @@ public class MainActivity extends ActionBarActivity {
 
     @Override
     public void onBackPressed() {
+        System.out.println(cur_state);
+        System.out.println(current_main_category.getId());
+        System.out.println(current_sub_category != null ? current_sub_category.getId() : "0");
+
          switch(cur_state) {
             case MAIN: {
                 finish();
@@ -312,7 +320,7 @@ public class MainActivity extends ActionBarActivity {
             case SUB: {
                 //switch to main
                 loadAdapter(main_categories);
-                current_main_category = null;
+                current_sub_category = null;
                 cur_state = State.MAIN;
                 break;
             }
