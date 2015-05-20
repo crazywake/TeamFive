@@ -80,8 +80,8 @@ public class MainActivity extends ActionBarActivity {
         categoryView.setLongClickable(true);
         //fill hashmap with subcategories
         dataAccessObject = DAO.instance(this);
-        //insertDummyData();
-        main_categories = dataAccessObject.getMainData();
+        insertDummyData();
+        main_categories = dataAccessObject.getCategories(Category.ROOT_CATEGORY);
 
         //Navigation Drawer
         mnavDrawerContent = getResources().getStringArray(R.array.navigationDrawerContent);
@@ -210,13 +210,13 @@ public class MainActivity extends ActionBarActivity {
                         Category parent = clickedItem.getParent();
                         if(parent == null) {
                             main_categories.remove(position);
-                            dataAccessObject.deleteMainCategory(clickedItem.getId());
+                            dataAccessObject.deleteCategory(clickedItem);
 
                             loadAdapter(main_categories);
                             cur_state = State.MAIN;
                         } else {
                             parent.getSubcategories().remove(clickedItem);
-                            dataAccessObject.deleteSubCategory(clickedItem.getId());
+                            dataAccessObject.deleteCategory(clickedItem);
 
                             //TODO: remove items (children) from clickedItem category, remove clickedItem from database
                             loadAdapter(parent.getSubcategories());
@@ -260,10 +260,10 @@ public class MainActivity extends ActionBarActivity {
                 if (drawerView.getTag().toString().equals("right_drawer")) {
                     getSupportActionBar().setTitle("MAIN_CATEGORY");
 
-                    ArrayList<String> mnavDrawerContent2 = dataAccessObject.getPayments();
+                    //ArrayList<String> mnavDrawerContent2 = dataAccessObject.getValues();
                     // TODO: Get Values from DB
 
-                    mDrawerList2.setAdapter(new ArrayAdapter<>(cnt2, android.R.layout.simple_list_item_1, mnavDrawerContent2));
+                    //mDrawerList2.setAdapter(new ArrayAdapter<>(cnt2, android.R.layout.simple_list_item_1, mnavDrawerContent2));
 
                 }
                 invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
@@ -335,93 +335,23 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public void insertDummyData() {
+        Category dummy1main = new Category(-1, "Gas", Category.ROOT_CATEGORY, null, null, Category.Type.MAIN, Category.DEFAULT_COLOR);
+        Category dummy2main = new Category(-1, "Groceries", Category.ROOT_CATEGORY, null, null, Category.Type.MAIN, Category.DEFAULT_COLOR);
+        Category dummy3main = new Category(-1, "Shopping", Category.ROOT_CATEGORY, null, null, Category.Type.MAIN, Category.DEFAULT_COLOR);
 
-        int dummy1main = (int) dataAccessObject.insertMainCat("Gas");
-        int dummy2main = (int) dataAccessObject.insertMainCat("Groceries");
-        int dummy3main = (int) dataAccessObject.insertMainCat("Shopping");
+        dataAccessObject.insertCategory(dummy1main);
+        dataAccessObject.insertCategory(dummy2main);
+        dataAccessObject.insertCategory(dummy3main);
 
-        int dummy1sub = (int) dataAccessObject.insertSubCat("Shell", dummy1main);
-        int dummy2sub = (int) dataAccessObject.insertSubCat("BP", dummy1main);
-        int dummy3sub = (int) dataAccessObject.insertSubCat("Jet", dummy1main);
-        int dummy4sub = (int) dataAccessObject.insertSubCat("Spar", dummy2main);
-        int dummy5sub = (int) dataAccessObject.insertSubCat("Billa", dummy2main);
-        int dummy6sub = (int) dataAccessObject.insertSubCat("Merkur", dummy2main);
-        int dummy7sub = (int) dataAccessObject.insertSubCat("New Yorker", dummy3main);
-        int dummy8sub = (int) dataAccessObject.insertSubCat("H&M", dummy3main);
-        int dummy9sub = (int) dataAccessObject.insertSubCat("C&A", dummy3main);
-
-        //test comment delete!
-        /*
-
-        ArrayList<Category> subcat1list = new ArrayList<>();
-        ArrayList<Category> subcat2list = new ArrayList<>();
-        ArrayList<Category> subcat3list = new ArrayList<>();
-
-        //---------- main category dummies ----------
-        Category maincat1 = new Category(0, "Gas", null, subcat1list, new ArrayList<Value>(), Category.Type.MAIN);
-        Category maincat2 = new Category(1, "Groceries", null, subcat2list, new ArrayList<Value>(), Category.Type.MAIN);
-        Category maincat3 = new Category(2, "Shopping", null, subcat3list, new ArrayList<Value>(), Category.Type.MAIN);
-        maincatlist.addAll(Arrays.asList(maincat1, maincat2, maincat3));
-
-        //---------- subcat 1 category dummies + value arrays ----------
-        ArrayList<Value> val11 = new ArrayList<>();
-        ArrayList<Value> val12 = new ArrayList<>();
-        ArrayList<Value> val13 = new ArrayList<>();
-        Category subcat11 = new Category(3, "Shell", maincat1, null, val11, Category.Type.SUB);
-        Category subcat12 = new Category(4, "BP", maincat1, null, val12, Category.Type.SUB);
-        Category subcat13 = new Category(5, "Jet", maincat1, null, val13, Category.Type.SUB);
-        subcat1list.addAll(Arrays.asList(subcat11, subcat12, subcat13));
-
-        //---------- subcat 2 category dummies + value arrays ----------
-        ArrayList<Value> val21 = new ArrayList<>();
-        ArrayList<Value> val22 = new ArrayList<>();
-        ArrayList<Value> val23 = new ArrayList<>();
-        Category subcat21 = new Category(6, "Spar", maincat2, null, val21, Category.Type.SUB);
-        Category subcat22 = new Category(7, "Billa", maincat2, null, val22, Category.Type.SUB);
-        Category subcat23 = new Category(8, "Merkur", maincat2, null, val23, Category.Type.SUB);
-        subcat2list.addAll(Arrays.asList(subcat21, subcat22, subcat23));
-
-        //---------- subcat 3 category dummies + value arrays ----------
-        ArrayList<Value> val31 = new ArrayList<>();
-        ArrayList<Value> val32 = new ArrayList<>();
-        ArrayList<Value> val33 = new ArrayList<>();
-        Category subcat31 = new Category(9, "New Yorker", maincat3, null, val31, Category.Type.SUB);
-        Category subcat32 = new Category(10, "H&M", maincat3, null, val32, Category.Type.SUB);
-        Category subcat33 = new Category(11, "C&A", maincat3, null, val33, Category.Type.SUB);
-        subcat3list.addAll(Arrays.asList(subcat31, subcat32, subcat33));
-
-        //---------- dummy values ----------
-        val11.addAll(Arrays.asList(new Value(0, 100, 10000000, subcat11),
-                                   new Value(1, 200, 11000000, subcat11),
-                                   new Value(2, 300, 11100000, subcat11)));
-        val12.addAll(Arrays.asList(new Value(3, 400, 11110000, subcat12),
-                                   new Value(4, 500, 11111000, subcat12),
-                                   new Value(5, 600, 11111100, subcat12)));
-        val13.addAll(Arrays.asList(new Value(6, 700, 11111110, subcat13),
-                                   new Value(7, 800, 11111111, subcat13),
-                                   new Value(8, 900, 20000000, subcat13)));
-
-        val21.addAll(Arrays.asList(new Value(9, 1000, 22000000, subcat21),
-                                   new Value(10, 1100, 22200000, subcat21),
-                                   new Value(11, 1200, 22220000, subcat21)));
-        val22.addAll(Arrays.asList(new Value(12, 1300, 22222000, subcat22),
-                                   new Value(13, 1400, 22222200, subcat22),
-                                   new Value(14, 1500, 22222220, subcat22)));
-        val23.addAll(Arrays.asList(new Value(15, 1600, 22222222, subcat23),
-                                   new Value(16, 1700, 30000000, subcat23),
-                                   new Value(17, 1800, 33000000, subcat23)));
-
-        val31.addAll(Arrays.asList(new Value(18, 1900, 33300000, subcat31),
-                                   new Value(19, 2000, 33330000, subcat31),
-                                   new Value(20, 2100, 33333000, subcat31)));
-        val32.addAll(Arrays.asList(new Value(21, 2200, 33333300, subcat32),
-                                   new Value(22, 2300, 33333330, subcat32),
-                                   new Value(23, 2400, 33333333, subcat32)));
-        val33.addAll(Arrays.asList(new Value(24, 2500, 40000000, subcat33),
-                                   new Value(25, 2600, 44000000, subcat33),
-                                   new Value(26, 2700, 44400000, subcat33)));
-
-        return maincatlist;*/
+        dataAccessObject.insertCategory(new Category(-1, "Shell", dummy1main, null, null, Category.Type.SUB, Category.DEFAULT_COLOR));
+        dataAccessObject.insertCategory(new Category(-1, "BP", dummy1main, null, null, Category.Type.SUB, Category.DEFAULT_COLOR));
+        dataAccessObject.insertCategory(new Category(-1, "Jet", dummy1main, null, null, Category.Type.SUB, Category.DEFAULT_COLOR));
+        dataAccessObject.insertCategory(new Category(-1, "Spar", dummy2main, null, null, Category.Type.SUB, Category.DEFAULT_COLOR));
+        dataAccessObject.insertCategory(new Category(-1, "Billa", dummy2main, null, null, Category.Type.SUB, Category.DEFAULT_COLOR));
+        dataAccessObject.insertCategory(new Category(-1, "Merkur", dummy2main, null, null, Category.Type.SUB, Category.DEFAULT_COLOR));
+        dataAccessObject.insertCategory(new Category(-1, "New Yorker", dummy3main, null, null, Category.Type.SUB, Category.DEFAULT_COLOR));
+        dataAccessObject.insertCategory(new Category(-1, "H&M", dummy3main, null, null, Category.Type.SUB, Category.DEFAULT_COLOR));
+        dataAccessObject.insertCategory(new Category(-1, "C&A", dummy3main, null, null, Category.Type.SUB, Category.DEFAULT_COLOR));
     }
 
     public void loadAdapter(ArrayList<Category> category_list) {
@@ -431,7 +361,7 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public void updateLists(int parent_id) { //parent id = -1 if no parent (man category view)
-        main_categories = dataAccessObject.getMainData();
+        main_categories = dataAccessObject.getCategories(Category.ROOT_CATEGORY);
 
         if(parent_id != -1) {
             Category parent = getCategoryFromID(parent_id);
@@ -462,9 +392,6 @@ public class MainActivity extends ActionBarActivity {
 
         return null;
     }
-
-
-
 
     public DAO getDAO() { return dataAccessObject; }
 
@@ -498,6 +425,20 @@ public class MainActivity extends ActionBarActivity {
 
     public void setCurrent_main_category(Category current_main_category) {
         this.current_main_category = current_main_category;
+    }
+
+    public ArrayList<Value> getAllValues() {
+        ArrayList<Value> values = new ArrayList<>();
+
+        for(Category cat : main_categories) {
+            values.addAll(cat.getValues());
+
+            for(Category subcat : cat.getSubcategories()) {
+                values.addAll(subcat.getValues());
+            }
+        }
+
+        return values;
     }
 
     public ArrayAdapter<Category> getAdapter() {
