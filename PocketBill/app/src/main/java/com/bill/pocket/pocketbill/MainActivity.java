@@ -78,6 +78,7 @@ public class MainActivity extends ActionBarActivity {
         categoryView.setLongClickable(true);
         //fill hashmap with subcategories
         dataAccessObject = DAO.instance(this);
+        dataAccessObject.open();
         //insertDummyData();
         main_categories = dataAccessObject.getMainData();
 
@@ -88,7 +89,7 @@ public class MainActivity extends ActionBarActivity {
         // Set the adapter for the list view
         mDrawerList.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, mnavDrawerContent));
         mDrawerList.setSelector(android.R.color.holo_blue_dark);
-        mDrawerList.setOnItemClickListener(new NavigationDrawerListener(this, mDrawerLayout, adapter, categoryView, main_categories));
+        mDrawerList.setOnItemClickListener(new NavigationDrawerListener(this_activity, this, mDrawerLayout, adapter, categoryView, main_categories));
 
         mDrawerList2 = (ListView) findViewById(R.id.right_drawer);
         // Set the adapter for the list view
@@ -283,10 +284,17 @@ public class MainActivity extends ActionBarActivity {
                     getSupportActionBar().setTitle("Navigation");
 
                 if (drawerView.getTag().toString().equals("right_drawer")) {
-                    getSupportActionBar().setTitle("MAIN_CATEGORY");
 
-                    ArrayList<String> mnavDrawerContent2 = dataAccessObject.getPayments();
-                    // TODO: Get Values from DB
+                    ArrayList<String> mnavDrawerContent2 = null;
+
+                    if(cur_state == State.MAIN) {
+                        getSupportActionBar().setTitle("All Receipts");
+                         mnavDrawerContent2 = dataAccessObject.getPayments();
+                    }
+                    else {
+                        getSupportActionBar().setTitle(current_main_category.getName());
+                        mnavDrawerContent2 = dataAccessObject.getSpecificPayments(current_main_category.getId());
+                    }
 
                     mDrawerList2.setAdapter(new ArrayAdapter<>(cnt2, android.R.layout.simple_list_item_1, mnavDrawerContent2));
 
@@ -309,12 +317,12 @@ public class MainActivity extends ActionBarActivity {
     @Override
     public void onBackPressed() {
         System.out.println(cur_state);
-        System.out.println(current_main_category.getId());
+        System.out.println(current_main_category != null ? current_main_category.getId() : "0");
         System.out.println(current_sub_category != null ? current_sub_category.getId() : "0");
 
          switch(cur_state) {
             case MAIN: {
-                finish();
+                moveTaskToBack(true);
                 break;
             }
             case SUB: {

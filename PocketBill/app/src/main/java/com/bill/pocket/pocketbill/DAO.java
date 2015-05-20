@@ -214,8 +214,45 @@ public class DAO {
             DateFormat formats = DateFormat.getDateInstance();
             long time = Long.parseLong(get_payments.getString(1));
             Date my_date = new Date(time);
+            double val = Double.parseDouble(get_payments.getString(0)) / 100;
 
-            payments.add(formats.format(my_date)  + "                   " + get_payments.getString(0) + " Euro");
+            payments.add(formats.format(my_date)  + "                   " + Double.toString(val) + " Euro");
+            get_payments.moveToNext();
+        }
+
+        if(payments.size() == 0)
+        {
+            payments.add("No Payment found");
+        }
+
+        return payments;
+    }
+
+    public ArrayList<String> getSpecificPayments(int id)
+    {
+        ArrayList<String> payments = new ArrayList<String>();
+
+        Cursor get_payments = my_db.query(
+                SqlLiteHelper.TBL_PAYMENT,  // Table to Query
+                new String[] { SqlLiteHelper.COL_VALUE_PAYMENT, SqlLiteHelper.COL_DATE_PAYMENT }, // leaving "columns" null just returns all the columns.
+                SqlLiteHelper.COL_FK_MAIN_CAT_PAYMENT + "=?", // cols for "where" clause
+                new String[] { Integer.toString(id) }, // values for "where" clause
+                SqlLiteHelper.COL_DATE_PAYMENT, // columns to group by
+                null, // columns to filter by row groups
+                null
+        );
+
+
+        get_payments.moveToFirst();
+
+        while (!get_payments.isAfterLast())
+        {
+            DateFormat formats = DateFormat.getDateInstance();
+            long time = Long.parseLong(get_payments.getString(1));
+            Date my_date = new Date(time);
+            double val = Double.parseDouble(get_payments.getString(0)) / 100;
+
+            payments.add(formats.format(my_date)  + "                   " + Double.toString(val) + " Euro");
             get_payments.moveToNext();
         }
 
