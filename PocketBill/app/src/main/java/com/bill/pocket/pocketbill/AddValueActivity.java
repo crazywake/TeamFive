@@ -49,6 +49,7 @@ public class AddValueActivity extends ActionBarActivity {
         my_base_text_view.setAdapter(my_adapter);
         my_base_text_view.setHintTextColor(Color.LTGRAY);
 
+        
          my_base_text_view.setOnEditorActionListener(new TextView.OnEditorActionListener() {
            @Override
            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
