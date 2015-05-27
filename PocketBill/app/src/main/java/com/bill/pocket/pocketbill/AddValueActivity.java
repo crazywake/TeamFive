@@ -1,14 +1,15 @@
 package com.bill.pocket.pocketbill;
 
 import android.content.Intent;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import static java.lang.Math.*;
+import java.util.ArrayList;
+import java.util.Date;
 
 
 public class AddValueActivity extends ActionBarActivity {
@@ -37,20 +38,24 @@ public class AddValueActivity extends ActionBarActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.addValue) {
-            Intent tmp = getIntent();
+            Intent my_intent = getIntent();
 
-            int main_id = tmp.getIntExtra("Main", 0);
-            int sub_id = tmp.getIntExtra("Sub", 0);
+            int category_id = my_intent.getIntExtra("parent", -2);
+            //TODO: handle -2 error!
+            Category parent = new Category(category_id, null, null, null, null, null, null);
+            ArrayList<String> tags = my_intent.getStringArrayListExtra("tags");
 
             //String value = (String) getString(R.id.addValue);
             EditText value = (EditText) findViewById(R.id.editTextAddValue);
             String val = value.getText().toString();
             double endval = Double.parseDouble(val)*100;
-            int intval = (int) Math.round(endval);
+            long longvalue = (long) Math.round(endval);
 
             DAO DataAccessObject = DAO.instance(this);
 
-            DataAccessObject.insertPayment(intval, main_id, sub_id);
+            Value insert_value = new Value(-1, longvalue, (int) (new Date()).getTime(), parent, tags);
+            //TODO: get selected date (not always "today" or default)
+            DataAccessObject.insertValue(insert_value);
 
             super.onBackPressed();
             return true;

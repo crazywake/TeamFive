@@ -88,7 +88,7 @@ public class MainActivity extends ActionBarActivity {
         // Set the adapter for the list view
         mDrawerList.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, mnavDrawerContent));
         mDrawerList.setSelector(android.R.color.holo_blue_dark);
-        mDrawerList.setOnItemClickListener(new NavigationDrawerListener(this, mDrawerLayout, adapter, categoryView, main_categories));
+        mDrawerList.setOnItemClickListener(new NavigationDrawerListener(this_activity, this, mDrawerLayout, adapter, categoryView, main_categories));
 
         mDrawerList2 = (ListView) findViewById(R.id.right_drawer);
         // Set the adapter for the list view
@@ -126,8 +126,10 @@ public class MainActivity extends ActionBarActivity {
 
                     Intent my_intent = new Intent(getApplicationContext(), AddValueActivity.class);
 
-                    my_intent.putExtra("Main", current_main_category.getId());
-                    my_intent.putExtra("Sub", current_sub_category.getId());
+                    my_intent.putExtra("parent", current_sub_category.getId());
+                    my_intent.putExtra("tags", new ArrayList<String>());
+                    //TODO: pass tags to AddValueActivity (change Arraylist above)
+
                     startActivity(my_intent);
                     //cur_state = State.MAIN;
                 }
@@ -309,12 +311,12 @@ public class MainActivity extends ActionBarActivity {
     @Override
     public void onBackPressed() {
         System.out.println(cur_state);
-        System.out.println(current_main_category.getId());
+        System.out.println(current_main_category != null ? current_main_category.getId() : "0");
         System.out.println(current_sub_category != null ? current_sub_category.getId() : "0");
 
          switch(cur_state) {
             case MAIN: {
-                finish();
+                moveTaskToBack(true);
                 break;
             }
             case SUB: {
