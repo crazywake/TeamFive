@@ -14,6 +14,7 @@ import java.util.List;
  */
 public class MultiSpinner extends Spinner implements
         DialogInterface.OnMultiChoiceClickListener, DialogInterface.OnCancelListener {
+
     private List<String> items;
     private boolean[] selected;
     private String defaultText;
@@ -43,22 +44,22 @@ public class MultiSpinner extends Spinner implements
     public void onCancel(DialogInterface dialog) {
         // refresh text on spinner
         StringBuffer spinnerBuffer = new StringBuffer();
-        boolean someUnselected = false;
+        boolean allUnselected = true;
         for (int i = 0; i < items.size(); i++) {
             if (selected[i] == true) {
                 spinnerBuffer.append(items.get(i));
                 spinnerBuffer.append(", ");
-            } else {
-                someUnselected = true;
+                allUnselected = false;
             }
         }
+
         String spinnerText;
-        if (someUnselected) {
+        if (allUnselected) {
+            spinnerText = defaultText;
+        } else {
             spinnerText = spinnerBuffer.toString();
             if (spinnerText.length() > 2)
                 spinnerText = spinnerText.substring(0, spinnerText.length() - 2);
-        } else {
-            spinnerText = defaultText;
         }
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(getContext(),
                 android.R.layout.simple_spinner_item,
@@ -93,8 +94,8 @@ public class MultiSpinner extends Spinner implements
 
         // all selected by default
         selected = new boolean[items.size()];
-        for (int i = 0; i < selected.length; i++)
-            selected[i] = true;
+        //for (int i = 0; i < selected.length; i++)
+        //    selected[i] = false;
 
         // all text on the spinner
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(getContext(),
