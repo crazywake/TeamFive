@@ -352,11 +352,6 @@ public class MainActivity extends ActionBarActivity {
         if (mDrawerToggle.onOptionsItemSelected(item)) {
             return true;
         }
-        if(id == R.id.searchButton)
-        {
-            Intent my_intent = new Intent(getApplicationContext(), SearchActivity.class);
-            startActivity(my_intent);
-        }
         if(id == R.id.addEditCategory)
         {
             CategoryEditor catedit = new CategoryEditor(CategoryEditor.Type.ADD, null, this, getMain_categories(), current_main_category);
