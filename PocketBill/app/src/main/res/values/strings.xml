@@ -20,5 +20,6 @@
     <string name="about_text">PocketBill is a simple Application to manage your expenses. For further details and How-To\'s see our online Tutorial </string>
     <string name="title_activity_add_value">Add Value</string>
     <string name="addvalue">Value:</string>
+    <string name="title_activity_search">SearchActivity</string>
 
 </resources>

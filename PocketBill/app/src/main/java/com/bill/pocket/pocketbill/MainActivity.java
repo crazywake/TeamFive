@@ -49,8 +49,6 @@ public class MainActivity extends ActionBarActivity {
 
     private PopupWindow popupWindow = null;
 
-    ArrayList<Category> main_categories;
-
     private Category current_main_category = null;
     private Category current_sub_category = null;
 
@@ -107,7 +105,8 @@ public class MainActivity extends ActionBarActivity {
         // Third parameter - ID of the TextView to which the data is written
         // Fourth - the Array of data
 
-        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, android.R.id.text1, main_categories);
+        adapter = new ArrayAdapter<Category>(this, android.R.layout.simple_list_item_1, android.R.id.text1,
+                this.getMain_categories());
         // Assign adapter to ListView
         categoryView.setAdapter(adapter);
 
@@ -217,7 +216,8 @@ public class MainActivity extends ActionBarActivity {
                         // edit button clicked
                         popupWindow.dismiss();
                         Category clickedItem = (Category) categoryView.getItemAtPosition(position);
-                        CategoryEditor catedit = new CategoryEditor(CategoryEditor.Type.EDIT, clickedItem, MainActivity.this, main_categories, clickedItem.getParent());
+                        CategoryEditor catedit = new CategoryEditor(CategoryEditor.Type.EDIT, clickedItem, MainActivity.this,
+                                getMain_categories(), clickedItem.getParent());
                         popupWindow = catedit.display();
                         //TODO: EDIT IN DATABASE!!!!
                     }
@@ -232,10 +232,10 @@ public class MainActivity extends ActionBarActivity {
                         Category clickedItem = (Category) categoryView.getItemAtPosition(position);
                         Category parent = clickedItem.getParent();
                         if (parent == null) {
-                            main_categories.remove(position);
+                            getMain_categories().remove(position);
                             dataAccessObject.deleteCategory(clickedItem);
 
-                            loadAdapter(main_categories);
+                            loadAdapter(getMain_categories());
                             cur_state = State.MAIN;
                         } else {
                             parent.getSubcategories().remove(clickedItem);
@@ -256,7 +256,7 @@ public class MainActivity extends ActionBarActivity {
             }
 
             );
- 
+
         }
 
         @Override
@@ -357,11 +357,15 @@ public class MainActivity extends ActionBarActivity {
 
         if(id == R.id.addEditCategory)
         {
-            CategoryEditor catedit = new CategoryEditor(CategoryEditor.Type.ADD, null, this, main_categories, current_main_category);
+            CategoryEditor catedit = new CategoryEditor(CategoryEditor.Type.ADD, null, this,
+                    getMain_categories(), current_main_category);
             popupWindow = catedit.display();
             System.out.println("IF ADDEDIT:" + pre_popup_state);
             pre_popup_state = cur_state;
             cur_state = State.POPUP;
+        } else if(id == R.id.searchButton) {
+            Intent my_intent = new Intent(getApplicationContext(), SearchActivity.class);
+            startActivity(my_intent);
         }
         return super.onOptionsItemSelected(item);
     }
@@ -410,7 +414,7 @@ public class MainActivity extends ActionBarActivity {
                 finish();
             }
         } else {
-            loadAdapter(main_categories);
+            loadAdapter(getMain_categories());
             cur_state = State.MAIN;
             System.out.println("else:" + pre_popup_state);
             pre_popup_state = cur_state;
@@ -419,7 +423,7 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public Category getCategoryFromID(int ID) {
-        for(Category cat : main_categories) {
+        for(Category cat : getMain_categories()) {
             if(cat.getId() == ID)
                 return cat;
         }
@@ -447,11 +451,11 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public ArrayList<Category> getMain_categories() {
-        return main_categories;
+        return CategoryData.getInstance().getMainCategories();
     }
 
     public void setMain_categories(ArrayList<Category> main_categories) {
-        this.main_categories = main_categories;
+        CategoryData.getInstance().setMainCategories(main_categories);
     }
 
     public Category getCurrent_main_category() {
