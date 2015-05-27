@@ -7,6 +7,9 @@ import java.util.ArrayList;
  */
 public class Category {
 
+    public static Category ROOT_CATEGORY = null;
+    public static String DEFAULT_COLOR = "#A35F7A";
+
     public enum Type {
         MAIN,
         SUB,
@@ -18,21 +21,31 @@ public class Category {
     private ArrayList<Category> subcategories;
     private ArrayList<Value> values;
     private Type type;
+    private String color;
 
     public Category() {
     }
 
     // main category: db_id, name, null, new ArrayList<Category>(), new ArrayList<Value>(), Type.MAIN
     // sub category: db_id, name, parent, null, new ArrayList<Value>(), Type.SUB
-    public Category(int id, String name, Category parent, ArrayList<Category> subcategories, ArrayList<Value> values, Type type) {
+    public Category(int id, String name, Category parent, ArrayList<Category> subcategories, ArrayList<Value> values, Type type, String color) {
         this.id = id;
         this.name = name;
         this.parent = parent;
         this.subcategories = subcategories;
+        if(subcategories == null) this.subcategories = new ArrayList<>();
         this.values = values;
+        if(values == null) this.values = new ArrayList<>();
         this.type = type;
+        this.color = color;
     }
 
+    public int getParentId()
+    {
+        if(parent != null)
+            return parent.getId();
+        return -1;
+    }
 
     public int getId() {
         return id;
@@ -80,6 +93,14 @@ public class Category {
 
     public void setType(Type type) {
         this.type = type;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
     }
 
     @Override

@@ -1,0 +1,88 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    tools:context="com.bill.pocket.pocketbill.SearchActivity"
+    android:orientation="vertical">
+
+   <!-- <com.bill.pocket.pocketbill.MultiSpinner
+        android:layout_width="fill_parent"
+        android:id="@+id/mainCategorySpinner"
+        android:layout_height="wrap_content"
+        android:background="@drawable/abc_edit_text_material"
+        >
+
+        </com.bill.pocket.pocketbill.MultiSpinner>-->
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="5dp">
+
+        <TextView
+            android:layout_width="125dp"
+            android:layout_height="wrap_content"
+            android:text="Main Category:"
+            android:id="@+id/search_tv_maincat" />
+        <com.bill.pocket.pocketbill.MultiSpinner
+            android:layout_width="fill_parent"
+            android:id="@+id/search_maincat_spinner"
+            android:layout_height="wrap_content"
+            android:background="@drawable/abc_edit_text_material"
+            >
+
+        </com.bill.pocket.pocketbill.MultiSpinner>
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="5dp">
+
+        <TextView
+            android:layout_width="125dp"
+            android:layout_height="wrap_content"
+            android:text="Sub Category:"
+            android:id="@+id/search_tv_subcat" />
+        <com.bill.pocket.pocketbill.MultiSpinner
+            android:layout_width="fill_parent"
+            android:id="@+id/search_subcat_spinner"
+            android:layout_height="wrap_content"
+            android:background="@drawable/abc_edit_text_material"
+            >
+
+        </com.bill.pocket.pocketbill.MultiSpinner>
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right">
+
+        <TextView
+            android:layout_width="125dp"
+            android:layout_height="wrap_content"
+            android:text="Tag:"
+            android:id="@+id/search_tv_tag"/>
+        <com.bill.pocket.pocketbill.MultiSpinner
+            android:layout_width="fill_parent"
+            android:id="@+id/search_tag_spinner"
+            android:layout_height="wrap_content"
+            android:background="@drawable/abc_edit_text_material"
+            >
+
+        </com.bill.pocket.pocketbill.MultiSpinner>
+    </LinearLayout>
+
+    <ListView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/search_value_view" />
+</LinearLayout>

@@ -42,9 +42,9 @@ public class CategoryEditor {
         this.main_categories = main_categories;
         this.parent_category = parent_category;
 
-        if(main_categories.size() != 0) {
-            parent_id = main_categories.get(0).getId();
-        }
+         if(main_categories.size() != 0) {
+           parent_id = main_categories.get(0).getId();
+         }
     }
 
     public Type getType() {
@@ -73,6 +73,8 @@ public class CategoryEditor {
 
         final Spinner parentSpinner = (Spinner) addEditPopupView.findViewById(R.id.categoryParentSpinner);
 
+        if(type == Type.EDIT) main_categories.remove(category);
+
         ArrayAdapter<Category> adapter = new ArrayAdapter<>(activity.getBaseContext(), android.R.layout.simple_spinner_dropdown_item, main_categories);
         parentSpinner.setAdapter(adapter);
 
@@ -87,6 +89,10 @@ public class CategoryEditor {
         checkbox.setOnClickListener(new Button.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if(main_categories.size() == 0) {
+                    checkbox.toggle();
+                    return;
+                }
                 if(checkbox.isChecked()) {
                     parentSpinner.setEnabled(false);
                     main_sub_type = Category.Type.MAIN;
@@ -95,8 +101,6 @@ public class CategoryEditor {
                     parentSpinner.setEnabled(true);
                     main_sub_type = Category.Type.SUB;
                 }
-
-
             }
         });
 
@@ -106,7 +110,7 @@ public class CategoryEditor {
                 // ok button clicked
                     if(parseInput(catname.getText().toString())) {
                         //SET NEW DATA
-                        setData(catname.getText().toString());
+                        setData(catname.getText().toString(), Category.DEFAULT_COLOR);
                         activity.setCur_state(activity.getPre_popup_state());
                         popup.dismiss();
 
@@ -155,31 +159,38 @@ public class CategoryEditor {
         return true;
     }
 
-    private void setData(String name) {
+    private void setData(String name, String color) {
         if(type == Type.EDIT) {
-            if(category.getType() == Category.Type.MAIN) {
-                Category new_category = new Category(category.getId(), name, activity.getCategoryFromID(parent_id), new ArrayList<Category>(), null, main_sub_type);
-                activity.getDAO().updateMainCategory(category, new_category);
-                activity.updateLists(parent_id);
+            Category.Type oldType = category.getType();
+            Category.Type newType = main_sub_type;
+
+            if(newType == Category.Type.MAIN) {
+                parent_id = -1;
+            }
+            category.setName(name);
+            category.setParent(activity.getCategoryFromID(parent_id));
+
+            category.setType(main_sub_type);
+            category.setColor(color);
+
+            if(oldType == Category.Type.MAIN && newType == Category.Type.SUB) {
+                activity.getDAO().makeMain2Sub(category);
+                parent_id = -1;
             }
 
-            if(category.getType() == Category.Type.SUB) {
-                Category new_category = new Category(category.getId(), name, activity.getCategoryFromID(parent_id), new ArrayList<Category>(), null, main_sub_type);
-                activity.getDAO().updateSubCategory(category, new_category);
-                activity.updateLists(-1);
-            }
+            activity.getDAO().updateCategory(category);
+            activity.updateLists(parent_id);
         }
 
         if(type == Type.ADD) {
             if(main_sub_type == Category.Type.MAIN) {
-                activity.getDAO().insertMainCat(name);
-                activity.updateLists(-1);
+                activity.getDAO().insertCategory(new Category(-1, name, Category.ROOT_CATEGORY, null, null, Category.Type.MAIN, color));
+            }
+            if(main_sub_type == Category.Type.SUB) {
+                activity.getDAO().insertCategory(new Category(-1, name, parent_category, null, null, Category.Type.SUB, color));
             }
 
-            if(main_sub_type == Category.Type.SUB) {
-                activity.getDAO().insertSubCat(name, parent_id);
-                activity.updateLists(parent_id);
-            }
+            activity.updateLists(parent_id);
         }
     }
 

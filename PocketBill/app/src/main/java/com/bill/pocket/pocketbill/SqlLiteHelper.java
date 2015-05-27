@@ -1,65 +1,276 @@
 package com.bill.pocket.pocketbill;
 
 
+import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class SqlLiteHelper extends SQLiteOpenHelper {
 
+    private SQLiteDatabase db;
+
     private static final String SQL_NAME = "Pocket.db";
-    public static final String TBL_MAIN_CAT = "TBL_MAIN_CAT";
-    public static final String COL_ID_MAIN_CAT = "ID_MAIN";
-    public static final String COL_NAME_MAIN_CAT = "NAME";
-    public static final String TBL_PAYMENT = "TBL_PAYMENT";
-    public static final String COL_ID_PAYMENT = "COL_ID_PAYMENT";
-    public static final String COL_VALUE_PAYMENT = "VALUE";
-    public static final String COL_DATE_PAYMENT = "DATE";
-    public static final String COL_FK_MAIN_CAT_PAYMENT = "COL_FK_MAIN_CAT_ID";
-    public static final String COL_FK_SUB_CAT_PAYMENT = "SUB_CAT_ID";
-    public static final String COL_NAME_SUB_CAT = "NAME";
-    public static final String COL_ID_SUB_CAT = "ID_SUB";
-    public static final String TBL_SUB_CAT = "TBL_SUB_CAT";
-    public static final String COL_FK_MAIN_CAT_ID = "COL_FK_MAIN_CAT_ID";
+    public static final String CATEGORY_TABLE = "categories";
+    public static final String VALUE_TABLE = "vals";
+    public static final String TAG_TABLE = "tags";
+    public static final String TAG_VALUE_TABLE = "tags_values";
 
+    private static final String CREATE_CAT_TABLE = "CREATE TABLE " + CATEGORY_TABLE + " (" +
+            "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+            "parentId INTEGER," +
+            "name TEXT NOT NULL," +
+            "color TEXT NOT NULL," +
+            "UNIQUE (parentId, name)" +
+            ");";
 
-    private static final String CREATE_MAIN_CAT = "CREATE TABLE " + TBL_MAIN_CAT + " ( " +
-            COL_ID_MAIN_CAT + " integer primary key, " +
-            COL_NAME_MAIN_CAT + " text not NULL" + " );" ;
+    private static final String CREATE_VAL_TABLE = "CREATE TABLE " + VALUE_TABLE + " (" +
+            "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+            "value INTEGER NOT NULL," +
+            "date INTEGER NOT NULL," +
+            "catId INTEGER NOT NULL" +
+            ");";
 
-    private static final String CREATE_PAYMENT = "CREATE TABLE " + TBL_PAYMENT + " ( " +
-    COL_ID_PAYMENT + " integer primary key , " +
-    COL_VALUE_PAYMENT + " integer, " +
-    COL_DATE_PAYMENT + " integer, " +
-    COL_FK_MAIN_CAT_PAYMENT + " integer, " +
-    COL_FK_SUB_CAT_PAYMENT + " integer " + ");" ;
+    private static final String CREATE_TAG_TABLE = "CREATE TABLE " + TAG_TABLE + " (" +
+            "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+            "name TEXT NOT NULL UNIQUE" +
+            ");";
 
-    private static final String CREATE_SUB_CAT = "CREATE TABLE " + TBL_SUB_CAT + " ( " +
-            COL_ID_SUB_CAT + " integer primary key , " +
-            COL_NAME_SUB_CAT + " text not NULL, " +
-            COL_FK_MAIN_CAT_ID + " integer " + ");" ;
-
-
+    private static final String CREATE_TAG_VAL_TABLE = "CREATE TABLE " + TAG_VALUE_TABLE + " (" +
+            "valId INTEGER," +
+            "tagId INTEGER," +
+            "PRIMARY KEY(valId, tagId)" +
+            ");";
 
     public SqlLiteHelper(Context context)
     {
         super(context, SQL_NAME,null,1);
+        if(db == null)
+        {
+            db = getWritableDatabase();
+
+            boolean firstTime = false;
+            try {
+                Cursor c = db.rawQuery("SELECT * FROM " + CATEGORY_TABLE, null);
+                firstTime = c.getCount() < 0;
+            }
+            catch(Exception e) {
+                firstTime = true;
+            }
+
+            if(firstTime)
+            {
+                db.execSQL(CREATE_CAT_TABLE);
+                db.execSQL(CREATE_VAL_TABLE);
+                db.execSQL(CREATE_TAG_TABLE);
+                db.execSQL(CREATE_TAG_VAL_TABLE);
+            }
+        }
     }
 
     @Override
-    public void onCreate(SQLiteDatabase mySQL)
+    public void onCreate(SQLiteDatabase db)
     {
-        mySQL.execSQL(CREATE_MAIN_CAT);
-        mySQL.execSQL(CREATE_SUB_CAT);
-        mySQL.execSQL(CREATE_PAYMENT);
+        this.db = db;
     }
 
     @Override
-    public void onUpgrade(SQLiteDatabase mySQL, int oldversion, int newversion)
+    public void onUpgrade(SQLiteDatabase db, int oldversion, int newversion)
     {
         assert(false);
-        mySQL.execSQL("DROP TABLE IF EXISTS ");
-        onCreate(mySQL);
+        db.execSQL("DROP TABLE IF EXISTS ");
+        onCreate(db);
     }
 
+    public void close() {
+        db.close();
+    }
+
+    public ArrayList<Map<String, String>> query(String cmd) {
+        ArrayList<Map<String, String>> resultset = new ArrayList<Map<String, String>>();
+        Cursor cursor;
+        try {
+            cursor = db.rawQuery(cmd, null);
+            while(cursor.moveToNext()) {
+                Map<String, String> map = new HashMap<String, String>();
+                for (int i = 0; i < cursor.getColumnCount(); i++) {
+                    if(cursor.isNull(i))
+                        map.put(cursor.getColumnName(i), null);
+                    map.put(cursor.getColumnName(i), cursor.getString(i));
+                }
+                resultset.add(map);
+            }
+            cursor.close();
+        } catch(Exception e)
+        {
+            Log.w("Exception: ", e.getMessage());
+        }
+        return resultset;
+    }
+
+    public boolean exec(String cmd)
+    {
+        try {
+            db.execSQL(cmd);
+            return true;
+        } finally {
+            return false;
+        }
+    }
+
+    public int insert(String table, ContentValues vals)
+    {
+        int result = 0;
+        try {
+            result = (int) db.insertOrThrow(table, null, vals);
+        } catch(Exception e) {
+            Log.w("Exception: ", e.getMessage());
+        }
+        return result;
+    }
+
+    public String main2SubSQL(Category main, Category sub)
+    {
+        return "UPDATE " + VALUE_TABLE + " SET catId = " + main.getId() + " WHERE catId = "
+                + sub.getId();
+    }
+
+    public ContentValues insertCategorySQL(Category cat) {
+        ContentValues vals = new ContentValues();
+        vals.put("name", cat.getName());
+        vals.put("parentId", cat.getParentId());
+        vals.put("color", cat.getColor());
+        return vals;/*
+        String ins = "INSERT INTO " + CATEGORY_TABLE + " (parentId, name, color) VALUES (" + cat.getParentId()
+                + ", '" + cat.getName() + "', '" + cat.getColor() + "');";
+        Log.w("query: ", ins);
+        return ins;*/
+    }
+
+    public ContentValues insertValueSQL(Value val) {
+        ContentValues vals = new ContentValues();
+        vals.put("value", val.getValue());
+        vals.put("date", val.getDate().getTime()/1000);
+        vals.put("catId", val.getParent().getId());
+
+        /*String ins =  "INSERT INTO " + VALUE_TABLE + " (value, date, catId) VALUES (" + val.getValue()
+                + ", " + val.getDate().getTime()/1000 + ", " + val.getParent().getId() + ");";
+
+        Log.w("", ins);*/
+
+        return vals;
+
+
+    }
+
+    public ContentValues insertTagSQL(String name) {
+        ContentValues vals = new ContentValues();
+        vals.put("name", name);
+        return vals;
+        /*return "INSERT INTO " + TAG_TABLE + " (name) VALUES ('" + name + "');";*/
+    }
+
+    public String insertTagValueSQL(Value val, String name) {
+        return "INSERT INTO " + TAG_VALUE_TABLE + " (valId, tagId) VALUES ("+ val.getId()
+                + ", (SELECT id FROM " + TAG_TABLE + " WHERE name = '" + name + "');";
+    }
+
+    public String deleteCategorySQL(Category cat) {
+        return "DELETE FROM " + CATEGORY_TABLE + " WHERE id = " + cat.getId();
+    }
+
+    public String deleteValueSQL(Value val) {
+        return "DELETE FROM " + TAG_VALUE_TABLE + " WHERE valId = " + val.getId() + ";"
+                + "DELETE FROM " + VALUE_TABLE + " WHERE id = " + val.getId() + ";";
+    }
+
+    public String deleteTagSQL(String name) {
+        return "DELETE FROM " + TAG_VALUE_TABLE + " WHERE tagId = "
+                + "(SELECT id FROM " + TAG_TABLE + " WHERE name = '" + name + "');"
+                + "DELETE FROM " + TAG_TABLE + " WHERE name = '" + name + "';";
+    }
+
+    public String deleteTagValueSQL(Value val, String name) {
+        return "DELETE FROM " + TAG_VALUE_TABLE + " WHERE tagId = "
+                + "(SELECT id FROM " + TAG_TABLE + " WHERE name = '" + name + "') AND valId = "
+                + val.getId() + ";";
+    }
+
+    public String updateCategorySQL(Category cat) {
+        return "UPDATE " + CATEGORY_TABLE + " SET name = '" + cat.getName() + "', parentId = "
+                + cat.getParentId() + ", color = '" + cat.getColor() + "' WHERE id = " + cat.getId();
+    }
+
+    public String updateValueSQL(Value val) {
+        return "UPDATE " + VALUE_TABLE + " SET value = " + val.getValue() + ", date = "
+                + val.getDate().getTime()/1000 + ", catId = " + val.getParent().getId()
+                + " WHERE id = " + val.getId();
+    }
+
+    public String selectAllValuesSQL() {
+        return "SELECT * FROM " + VALUE_TABLE;
+    }
+
+    public String filterValues(ArrayList<Integer> mainCategories, ArrayList<Integer> subCategories) {
+        String query = "select * from " + VALUE_TABLE;
+
+        List<Integer> categories = new ArrayList<>();
+        categories.addAll(mainCategories);
+        categories.addAll(subCategories);
+
+        if (categories.size() > 0) {
+            query += " where catId in (";
+            for (Integer id : categories) {
+                query += id + ",";
+            }
+            query = query.substring(0, query.length() - 1) + ")";
+
+        }
+
+        return query;
+    }
+
+    public Category getCategoryById(int catId) {
+        Cursor c = db.rawQuery("select * from " + CATEGORY_TABLE + " where id = " + catId, null);
+        if (c.getCount() < 1) return null;
+
+        c.moveToFirst();
+
+        Category cat = new Category(catId,
+                c.getString(c.getColumnIndex("name")),
+                null,
+                null,
+                null,
+                null,
+                null);
+
+        c.close();
+
+        return cat;
+    }
+
+    public ArrayList<Tag> getAllTags() {
+        ArrayList<Tag> tags = new ArrayList<>();
+        Cursor c = db.rawQuery("select * from " + TAG_TABLE, null);
+        if (c.getCount() < 1) return tags;
+
+        Tag t = null;
+        while (c.moveToNext()) {
+            t = new Tag();
+            t.setId(c.getInt(c.getColumnIndex("id")));
+            t.setName(c.getString(c.getColumnIndex("name")));
+            tags.add(t);
+        }
+
+        c.close();
+
+        return tags;
+    }
 }

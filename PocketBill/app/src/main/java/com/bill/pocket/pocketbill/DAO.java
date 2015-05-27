@@ -1,13 +1,10 @@
 package com.bill.pocket.pocketbill;
 
-import android.content.ContentValues;
 import android.content.Context;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
-import java.text.DateFormat;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.Map;
 
 
 public class DAO {
@@ -26,401 +23,226 @@ public class DAO {
         {
             my_dao = new DAO();
             my_helper = new SqlLiteHelper(context);
-            if (!my_dao.open())
+            /*if (!my_dao.open())
             {
                return null;
-            }
+            }*/
         }
         return my_dao;
     }
 
     public boolean open()
     {
-        my_db = my_helper.getWritableDatabase();
+        //my_db = my_helper.getWritableDatabase();
 
-        return  my_db != null;
+        return false;
     }
 
     public void close()
     {
-        my_db.close();
+        my_helper.close();
+        //my_db.close();
     }
 
-
-    public ArrayList<Category> getMainData()
+    public ArrayList<Category> getCategories(Category parent)
     {
-        ArrayList<Category> return_value = new ArrayList<>();
-        Cursor main_cat_cursor = my_db.query(
-                SqlLiteHelper.TBL_MAIN_CAT,  // Table to Query
-                null, // leaving "columns" null just returns all the columns.
-                null, // cols for "where" clause
-                null, // values for "where" clause
-                null, // columns to group by
-                null, // columns to filter by row groups
-                null
-        );
+        int rootId = -1;
+        if(parent != Category.ROOT_CATEGORY)
+            rootId = parent.getId();
 
-        main_cat_cursor.moveToFirst();
-        while(!main_cat_cursor.isAfterLast()) {
-            Category newCategory = new Category(main_cat_cursor.getInt(0),main_cat_cursor.getString(1),null,null,null, Category.Type.MAIN);
+        ArrayList<Category> categories = new ArrayList<Category>();
+        ArrayList<Map<String, String>> resultset = my_helper.query("SELECT * FROM " + SqlLiteHelper.CATEGORY_TABLE +
+            " WHERE parentId = " + rootId);
 
-            Cursor sub_cat_cursor = my_db.query(
-                    SqlLiteHelper.TBL_SUB_CAT,  // Table to Query
-                    null, // leaving "columns" null just returns all the columns.
-                    SqlLiteHelper.COL_FK_MAIN_CAT_PAYMENT + " = ?", // cols for "where" clause
-                    new String[] {Integer.toString(newCategory.getId())}, // values for "where" clause
-                    null, // columns to group by
-                    null, // columns to filter by row groups
-                    null
-            );
-            ArrayList<Category> sub_set = new ArrayList<>();
-            ArrayList<Value> value_set_main = new ArrayList<>();
-            sub_cat_cursor.moveToFirst();
-            while (!sub_cat_cursor.isAfterLast())
-            {
-                ArrayList<Value> sub_value_set = new ArrayList<>();
-                Category newSubCategory = new Category(sub_cat_cursor.getInt(0), sub_cat_cursor.getString(1),newCategory, null,null, Category.Type.SUB);
-                sub_set.add(newSubCategory);
-                sub_cat_cursor.moveToNext();
+        for(Map<String, String> map : resultset) {
+            int id = Integer.parseInt(map.get("id"));
+            String name = map.get("name");
+            Category.Type type = Category.Type.MAIN;
 
-                Cursor values_cursor = my_db.query(
-                        SqlLiteHelper.TBL_PAYMENT,  // Table to Query
-                        null, // leaving "columns" null just returns all the columns.
-                        SqlLiteHelper.COL_FK_SUB_CAT_PAYMENT + " = ?", // cols for "where" clause
-                        new String[]{Integer.toString(newSubCategory.getId())}, // values for "where" clause
-                        null, // columns to group by
-                        null, // columns to filter by row groups
-                        null
-                );
-                values_cursor.moveToFirst();
-                while (!values_cursor.isAfterLast())
-                {
-                    Value newValue = new Value(values_cursor.getInt(0), values_cursor.getInt(1),values_cursor.getInt(2), newCategory);
-                    sub_value_set.add(newValue);
-                    values_cursor.moveToNext();
-                }
-                newSubCategory.setValues(sub_value_set);
+            if(rootId != -1)
+                type = Category.Type.SUB;
+
+            Category category = new Category(id, name, parent, null, null, type, Category.DEFAULT_COLOR);
+
+            category.setSubcategories(getCategories(category));
+            category.setValues(getValues(category));
+
+            categories.add(category);
+        }
+
+        return categories;
+    }
+
+    public ArrayList<Value> getValues(Category category)
+    {
+        ArrayList<Value> values = new ArrayList<Value>();
+
+        ArrayList<Map<String, String>> resultset = my_helper.query("SELECT * FROM " + SqlLiteHelper.VALUE_TABLE +
+                " WHERE catId = " + category.getId());
+
+        for(Map<String, String> map : resultset) {
+            int id = Integer.parseInt(map.get("id"));
+            int val = Integer.parseInt(map.get("value"));
+            long date = Long.parseLong(map.get("date"));
+
+            Value value = new Value(id, val, date, category, new ArrayList<String>());
+
+            ArrayList<Map<String, String>> tagSet = my_helper.query("SELECT * FROM " + SqlLiteHelper.TAG_VALUE_TABLE +
+                    " AS tv JOIN " + SqlLiteHelper.TAG_TABLE + " AS t ON tv.tagId = t.id WHERE tv.valId = " + id);
+
+            for(Map<String, String> tagmap : tagSet) {
+                value.getTags().add(tagmap.get("name"));
             }
-            Cursor values_cursor = my_db.query(
-                    SqlLiteHelper.TBL_PAYMENT,  // Table to Query
-                    null, // leaving "columns" null just returns all the columns.
-                    SqlLiteHelper.COL_FK_MAIN_CAT_PAYMENT + " = ?", // cols for "where" clause
-                    new String[]{Integer.toString(newCategory.getId())}, // values for "where" clause
-                    null, // columns to group by
-                    null, // columns to filter by row groups
-                    null
-            );
-            values_cursor.moveToFirst();
-            while (!values_cursor.isAfterLast())
-            {
-                Value newValue = new Value(values_cursor.getInt(0), values_cursor.getInt(1),values_cursor.getInt(2) * 1000, newCategory);
-                value_set_main.add(newValue);
-                values_cursor.moveToNext();
+            values.add(value);
+        }
+
+        return values;
+    }
+
+    public ArrayList<Value> getFilteredValues(ArrayList<Integer> mainCategories, ArrayList<Integer> subCategories) {
+        ArrayList<Map<String, String>> resultset = my_helper.query(my_helper.filterValues(mainCategories, subCategories));
+        ArrayList<Value> values = new ArrayList<Value>();
+
+        for(Map<String, String> map : resultset) {
+            int id = Integer.parseInt(map.get("id"));
+            int val = Integer.parseInt(map.get("value"));
+            int date = Integer.parseInt(map.get("date"));
+            int catId = Integer.parseInt(map.get("catId"));
+
+            Value value = new Value(id, val, date, my_helper.getCategoryById(catId), new ArrayList<String>());
+
+            ArrayList<Map<String, String>> tagSet = my_helper.query("SELECT * FROM " + SqlLiteHelper.TAG_VALUE_TABLE +
+                    " AS tv JOIN " + SqlLiteHelper.TAG_TABLE + " AS t ON tv.tagId = t.id WHERE tv.valId = " + id);
+
+            for(Map<String, String> tagmap : tagSet) {
+                value.getTags().add(tagmap.get("name"));
             }
-            newCategory.setSubcategories(sub_set);
-            newCategory.setValues(value_set_main);
-            return_value.add(newCategory);
-            main_cat_cursor.moveToNext();
-
+            values.add(value);
         }
 
-        return return_value;
+        return values;
     }
 
-    public boolean deleteValue(Value value) {
-        return (my_db.delete(SqlLiteHelper.TBL_PAYMENT, SqlLiteHelper.COL_ID_PAYMENT + " = " + value.getId(), null) > 0);
-    }
-
-    public boolean deleteCategory(Category category, boolean recursive) {
-        if(recursive) {
-            //delete values
-            ArrayList<Value> values = new ArrayList<>();
-            for(Category cat : category.getSubcategories()) {
-                values.addAll(cat.getValues());
-            }
-            for(Value val : values) {
-                deleteValue(val);
-            }
-
-            //delete subcategories
-            for(Category cat : category.getSubcategories()) {
-                deleteCategory(cat, false);
-            }
-        }
-
-        for(Value val : category.getValues()) {
-            deleteValue(val);
-        }
-
-        if(category.getType() == Category.Type.SUB) {
-            return (my_db.delete(SqlLiteHelper.TBL_SUB_CAT, SqlLiteHelper.COL_ID_SUB_CAT + " = " + category.getId(), null) > 0);
-        }
-        else {
-            return (my_db.delete(SqlLiteHelper.TBL_MAIN_CAT, SqlLiteHelper.COL_ID_MAIN_CAT + " = " + category.getId(), null) > 0);
-        }
-    }
-
-    public boolean deleteSubCat(String name){ //depricated!
-
-        return (my_db.delete(SqlLiteHelper.TBL_SUB_CAT, SqlLiteHelper.COL_NAME_SUB_CAT + " = '" + name + "'", null) > 0);
-    }
-
-    public ArrayList<String> getSubCats()
+    public void makeMain2Sub(Category category)
     {
-        ArrayList<String> sub_cats = new ArrayList<String>();
-
-        Cursor get_subs = my_db.query(
-                SqlLiteHelper.TBL_SUB_CAT,  // Table to Query
-                new String[] { SqlLiteHelper.COL_NAME_SUB_CAT}, // leaving "columns" null just returns all the columns.
-                null, // cols for "where" clause
-                null, // values for "where" clause
-                null, // columns to group by
-                null, // columns to filter by row groups
-                null
-        );
-
-
-        get_subs.moveToFirst();
-
-        while (!get_subs.isAfterLast())
+        for(Category sub : category.getSubcategories())
         {
-            sub_cats.add(get_subs.getString(0));
-            get_subs.moveToNext();
+            my_helper.exec(my_helper.main2SubSQL(category, sub));
+            my_helper.exec(my_helper.deleteCategorySQL(sub));
         }
-
-
-        return sub_cats;
     }
 
-    public ArrayList<String> getPayments()
-    {
-        ArrayList<String> payments = new ArrayList<String>();
+    public boolean insertCategory(Category category) {
+        /*my_helper.exec(my_helper.insertCategorySQL(category));
 
-        Cursor get_payments = my_db.query(
-                SqlLiteHelper.TBL_PAYMENT,  // Table to Query
-                new String[] { SqlLiteHelper.COL_VALUE_PAYMENT, SqlLiteHelper.COL_DATE_PAYMENT }, // leaving "columns" null just returns all the columns.
-                null, // cols for "where" clause
-                null, // values for "where" clause
-                SqlLiteHelper.COL_DATE_PAYMENT, // columns to group by
-                null, // columns to filter by row groups
-                null
-        );
+        ArrayList<Map<String, String>> t = my_helper.query("SELECT id FROM " + my_helper.CATEGORY_TABLE + " WHERE parentId = " + category.getParentId() + " AND name = '"
+            + category.getName() + "';");
+        //Log.w("möp = ", möp);
 
-
-        get_payments.moveToFirst();
-
-        while (!get_payments.isAfterLast())
-        {
-            DateFormat formats = DateFormat.getDateInstance();
-            long time = Long.parseLong(get_payments.getString(1));
-            Date my_date = new Date(time);
-
-            payments.add(formats.format(my_date)  + "                   " + get_payments.getString(0) + " Euro");
-            get_payments.moveToNext();
-        }
-
-        if(payments.size() == 0)
-        {
-            payments.add("No Payment found");
-        }
-
-        return payments;
-    }
-
-    public long insertMainCat(String newCat)
-    {
-        Cursor checkNameCursor = my_db.query(
-                SqlLiteHelper.TBL_MAIN_CAT,  // Table to Query
-                new String[] { SqlLiteHelper.COL_NAME_MAIN_CAT}, // leaving "columns" null just returns all the columns.
-                null, // cols for "where" clause
-                null, // values for "where" clause
-                null, // columns to group by
-                null, // columns to filter by row groups
-                null
-        );
-        checkNameCursor.moveToFirst();
-        while (!checkNameCursor.isAfterLast())
-        {
-            checkNameCursor.moveToNext();
-        }
-
-        ContentValues new_cont = new ContentValues();
-        new_cont.put(SqlLiteHelper.COL_NAME_MAIN_CAT,newCat);
-
-        return my_db.insert(SqlLiteHelper.TBL_MAIN_CAT,null,new_cont);
-    }
-
-    public long insertSubCat(String newSubCat,int MainCatId)
-    {
-        Cursor checkNameCursor = my_db.query(
-                SqlLiteHelper.TBL_SUB_CAT,  // Table to Query
-                new String[] { SqlLiteHelper.COL_NAME_SUB_CAT}, // leaving "columns" null just returns all the columns.
-                null, // cols for "where" clause
-                null, // values for "where" clause
-                null, // columns to group by
-                null, // columns to filter by row groups
-                null
-        );
-
-        checkNameCursor.moveToFirst();
-        while(!checkNameCursor.isAfterLast())
-        {
-            checkNameCursor.moveToNext();
-        }
-
-        ContentValues new_name = new  ContentValues();
-        new_name.put(SqlLiteHelper.COL_NAME_SUB_CAT,newSubCat);
-        new_name.put(SqlLiteHelper.COL_FK_MAIN_CAT_ID,MainCatId);
-
-        return my_db.insert(SqlLiteHelper.TBL_SUB_CAT,null,new_name);
-    }
-
-    public boolean insertPayment(int new_value, int main_cat, int sub_cat)
-    {
-        return insertPayment(new_value, main_cat,sub_cat, new Date());
-    }
-
-    public boolean insertPayment(int new_value, int main_cat, int sub_cat, Date currentDate)
-    {
-        long unixTime = currentDate.getTime();
-
-        ContentValues new_cont = new ContentValues();
-        new_cont.put(SqlLiteHelper.COL_VALUE_PAYMENT,new_value);
-        new_cont.put(SqlLiteHelper.COL_DATE_PAYMENT,unixTime);
-        new_cont.put(SqlLiteHelper.COL_FK_MAIN_CAT_PAYMENT,main_cat);
-        new_cont.put(SqlLiteHelper.COL_FK_SUB_CAT_PAYMENT,sub_cat);
-
-        my_db.insert(SqlLiteHelper.TBL_PAYMENT,null,new_cont);
+        return true;*/
+        int id = my_helper.insert(my_helper.CATEGORY_TABLE, my_helper.insertCategorySQL(category));
+        if(id == 0)
+            return false;
+        category.setId(id);
         return true;
     }
 
-    public void deleteMainCategory(int main_cat_id) {
-        String query = String.format(
-            "delete from " +
-            SqlLiteHelper.TBL_MAIN_CAT + " where " +
-            SqlLiteHelper.COL_ID_MAIN_CAT + " = '%d'",
-                main_cat_id);
-
-        my_db.execSQL(query);
-    }
-
-    public void deleteSubCategory(int sub_cat_id) {
-        String query = String.format(
-                "delete from " +
-                SqlLiteHelper.TBL_SUB_CAT + " where " +
-                SqlLiteHelper.COL_ID_SUB_CAT + " = '%d'",
-                sub_cat_id);
-
-        my_db.execSQL(query);
-
-    }
-
-    public boolean updatePayment(Integer new_value, Integer id)
-    {
-        ContentValues new_cont = new ContentValues();
-        new_cont.put(SqlLiteHelper.COL_VALUE_PAYMENT, new_value);
-
-        return (my_db.update(SqlLiteHelper.TBL_PAYMENT, new_cont, "id =" + id, null) > 0);
-    }
-
-    public boolean changePaymentCategory(Integer main_cat, Integer sub_cat, Integer id)
-    {
-        ContentValues new_cont = new ContentValues();
-        new_cont.put(SqlLiteHelper.COL_FK_MAIN_CAT_PAYMENT, main_cat);
-        new_cont.put(SqlLiteHelper.COL_FK_SUB_CAT_PAYMENT, sub_cat);
-
-        return (my_db.update(SqlLiteHelper.TBL_PAYMENT, new_cont, "id =" + id, null) > 0);
-    }
-
-
-
-    public boolean updateTime(Date new_value,Integer id)
-    {
-        long unixTime = new_value.getTime();
-
-        ContentValues new_cont = new ContentValues();
-        new_cont.put(SqlLiteHelper.COL_DATE_PAYMENT, unixTime);
-
-        return (my_db.update(SqlLiteHelper.TBL_PAYMENT, new_cont, "id =" + id, null) > 0);
-    }
-
-    public void updateMainCategory(Category old_category, Category new_category)
-    {
-        if(old_category.getType() == new_category.getType()) {
-            //category stays the same type
-
-            String new_value = new_category.getName();
-            Integer main_cat_id = new_category.getId();
-
-            ContentValues new_cont = new ContentValues();
-            new_cont.put(SqlLiteHelper.COL_NAME_MAIN_CAT, new_value);
-
-            my_db.update(SqlLiteHelper.COL_ID_MAIN_CAT, new_cont, "id = " + main_cat_id, null);
-        } else {
-            //main category changed to sub_category
-
-            //step 1: get all values in main category and all subcategories:
-            ArrayList<Value> values = new ArrayList<>();
-            values.addAll(old_category.getValues());
-            for(Category cat : old_category.getSubcategories()) {
-                values.addAll(cat.getValues());
+    public boolean insertValue(Value value) {
+            value.setId(my_helper.insert(my_helper.VALUE_TABLE, my_helper.insertValueSQL(value)));
+            for(String tag : value.getTags()) {
+                insertTagValue(value, tag);
             }
-            //step 2: create new subcategory
-            int new_id = (int) insertSubCat(new_category.getName(), new_category.getParent().getId());
+            return true;
+    }
 
-            //step 3: change value categories
-            for(Value val : values) {
-                changePaymentCategory(null, new_id, val.getId());
-            }
-
-            //step 4: delete subcategories non-recursively (keep values)
-            for(Category subcat : old_category.getSubcategories()) {
-                deleteCategory(subcat, false);
-            }
-
-            //step 5: delete main category non-recursively (because of reasons)
-            deleteCategory(old_category, false);
+    public int insertTag(String tag) {
+        try {
+            return my_helper.insert(my_helper.TAG_TABLE, my_helper.insertTagSQL(tag));
+        }  catch (Exception e) {
+            e.printStackTrace();
+            return 0;
         }
     }
 
-    public void updateSubCategory(Category old_category, Category new_category)
-    {
-        if(old_category.getType() == new_category.getType()) {
-            //category stays the same type
-            String new_value = new_category.getName();
-            Integer sub_cat_id = new_category.getId();
-
-            ContentValues new_cont = new ContentValues();
-            new_cont.put(SqlLiteHelper.COL_NAME_SUB_CAT, new_value);
-            new_cont.put(SqlLiteHelper.COL_FK_MAIN_CAT_ID, new_category.getParent().getId());
-
-            my_db.update(SqlLiteHelper.COL_ID_SUB_CAT, new_cont, "id = " + sub_cat_id, null);
-        } else {
-
-            //sub category changed to main_category
-
-            //step 1: get all values in sub category:
-            ArrayList<Value> values = new ArrayList<>();
-            values.addAll(old_category.getValues());
-
-            //step 2: create new main category
-            int new_id = (int) insertMainCat(new_category.getName());
-
-            //step 3: change value categories
-            for(Value val : values) {
-                changePaymentCategory(new_id, null, val.getId());
-            }
-
-            //step 4: delete sub category non-recursively (because of reasons)
-            deleteCategory(old_category, false);
+    public boolean insertTagValue(Value value, String tag) {
+        try {
+            my_helper.exec(my_helper.insertTagValueSQL(value, tag));
+            return true;
+        }  catch (Exception e) {
+            e.printStackTrace();
+            return false;
         }
     }
 
-    public boolean updateSubCategory(String new_value, Integer sub_cat_id)
-    {
-        ContentValues new_cont = new ContentValues();
-        new_cont.put(SqlLiteHelper.COL_NAME_SUB_CAT, new_value);
+    public boolean deleteCategory(Category category) {
+        try {
+            my_helper.exec(my_helper.deleteCategorySQL(category));
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 
-        return (my_db.update(SqlLiteHelper.TBL_SUB_CAT, new_cont, "id =" + sub_cat_id, null) > 0);
+    public boolean deleteValue(Value value) {
+        try {
+            my_helper.exec(my_helper.deleteValueSQL(value));
+
+            for(String tag : value.getTags()) {
+                if(my_helper.query("SELECT * FROM " + my_helper.TAG_VALUE_TABLE
+                        + " WHERE tagId = (SELECT id FROM " + my_helper.TAG_TABLE + " WHERE name = '" + tag + "')").size() == 0) {
+                    my_helper.exec(my_helper.deleteTagSQL(tag));
+                }
+            }
+
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean deleteTag(String tag) {
+        try {
+            my_helper.exec(my_helper.deleteTagSQL(tag));
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean deleteTagValue(Value val, String tag) {
+        try {
+            my_helper.exec(my_helper.deleteTagValueSQL(val, tag));
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean updateCategory(Category cat) {
+        try {
+            my_helper.exec(my_helper.updateCategorySQL(cat));
+            return true;
+        }  catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean updateValue(Value val) {
+        try {
+            my_helper.exec(my_helper.updateValueSQL(val));
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public ArrayList<Tag> getAllTags() {
+        return my_helper.getAllTags();
     }
 }
