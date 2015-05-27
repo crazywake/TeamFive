@@ -105,8 +105,7 @@ public class MainActivity extends ActionBarActivity {
         // Third parameter - ID of the TextView to which the data is written
         // Fourth - the Array of data
 
-        adapter = new ArrayAdapter<Category>(this, android.R.layout.simple_list_item_1, android.R.id.text1,
-                this.getMain_categories());
+        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, android.R.id.text1, getMain_categories());
         // Assign adapter to ListView
         categoryView.setAdapter(adapter);
 
@@ -216,8 +215,7 @@ public class MainActivity extends ActionBarActivity {
                         // edit button clicked
                         popupWindow.dismiss();
                         Category clickedItem = (Category) categoryView.getItemAtPosition(position);
-                        CategoryEditor catedit = new CategoryEditor(CategoryEditor.Type.EDIT, clickedItem, MainActivity.this,
-                                getMain_categories(), clickedItem.getParent());
+                        CategoryEditor catedit = new CategoryEditor(CategoryEditor.Type.EDIT, clickedItem, MainActivity.this, getMain_categories(), clickedItem.getParent());
                         popupWindow = catedit.display();
                         //TODO: EDIT IN DATABASE!!!!
                     }
@@ -262,7 +260,7 @@ public class MainActivity extends ActionBarActivity {
         @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
-        mDrawerToggle.syncState();
+            mDrawerToggle.syncState();
     }
 
     @Override
@@ -314,7 +312,7 @@ public class MainActivity extends ActionBarActivity {
         System.out.println("cur main cat:" + (current_main_category != null ? current_main_category.getId() : "0"));
         System.out.println("cur sub cat:" + (current_sub_category != null ? current_sub_category.getId() : "0"));
 
-         switch(cur_state) {
+        switch(cur_state) {
             case MAIN: {
                 moveTaskToBack(true);
                 break;
@@ -357,8 +355,7 @@ public class MainActivity extends ActionBarActivity {
 
         if(id == R.id.addEditCategory)
         {
-            CategoryEditor catedit = new CategoryEditor(CategoryEditor.Type.ADD, null, this,
-                    getMain_categories(), current_main_category);
+            CategoryEditor catedit = new CategoryEditor(CategoryEditor.Type.ADD, null, this, getMain_categories(), current_main_category);
             popupWindow = catedit.display();
             System.out.println("IF ADDEDIT:" + pre_popup_state);
             pre_popup_state = cur_state;
