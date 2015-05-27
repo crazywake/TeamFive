@@ -175,22 +175,22 @@ public class SqlLiteHelper extends SQLiteOpenHelper {
     }
 
     public String deleteCategorySQL(Category cat) {
-        return "DELETE " + CATEGORY_TABLE + " WHERE id = " + cat.getId();
+        return "DELETE FROM " + CATEGORY_TABLE + " WHERE id = " + cat.getId();
     }
 
     public String deleteValueSQL(Value val) {
-        return "DELETE " + TAG_VALUE_TABLE + " WHERE valId = " + val.getId() + ";"
-                + "DELETE " + VALUE_TABLE + " WHERE id = " + val.getId() + ";";
+        return "DELETE FROM " + TAG_VALUE_TABLE + " WHERE valId = " + val.getId() + ";"
+                + "DELETE FROM " + VALUE_TABLE + " WHERE id = " + val.getId() + ";";
     }
 
     public String deleteTagSQL(String name) {
-        return "DELETE " + TAG_VALUE_TABLE + " WHERE tagId = "
+        return "DELETE FROM " + TAG_VALUE_TABLE + " WHERE tagId = "
                 + "(SELECT id FROM " + TAG_TABLE + " WHERE name = '" + name + "');"
-                + "DELETE " + TAG_TABLE + " WHERE name = '" + name + "';";
+                + "DELETE FROM " + TAG_TABLE + " WHERE name = '" + name + "';";
     }
 
     public String deleteTagValueSQL(Value val, String name) {
-        return "DELETE " + TAG_VALUE_TABLE + " WHERE tagId = "
+        return "DELETE FROM " + TAG_VALUE_TABLE + " WHERE tagId = "
                 + "(SELECT id FROM " + TAG_TABLE + " WHERE name = '" + name + "') AND valId = "
                 + val.getId() + ";";
     }
