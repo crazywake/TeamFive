@@ -111,7 +111,7 @@ public class AddValueActivity extends ActionBarActivity {
             int category_id = my_intent.getIntExtra("parent", -2);
             //TODO: handle -2 error!
             Category parent = new Category(category_id, null, null, null, null, null, null);
-            ArrayList<String> tags = my_intent.getStringArrayListExtra("tags");
+            //ArrayList<String> tags = my_intent.getStringArrayListExtra("tags");
 
             //String value = (String) getString(R.id.addValue);
             EditText value = (EditText) findViewById(R.id.editTextAddValue);
@@ -128,7 +128,7 @@ public class AddValueActivity extends ActionBarActivity {
 
             DAO DataAccessObject = DAO.instance(this);
 
-            Value insert_value = new Value(-1, longvalue, (int) (new Date()).getTime(), parent, tags);
+            Value insert_value = new Value(-1, longvalue, (int) (new Date()).getTime(), parent, my_tags);
             //TODO: get selected date (not always "today" or default)
             DataAccessObject.insertValue(insert_value);
 
