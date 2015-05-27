@@ -76,14 +76,18 @@ public class DAO {
     public ArrayList<Value> getValues(Category category)
     {
         ArrayList<Value> values = new ArrayList<Value>();
+
         ArrayList<Map<String, String>> resultset = my_helper.query("SELECT * FROM " + SqlLiteHelper.VALUE_TABLE +
-                " WHERE catId = " + category.getId());
+                    " WHERE catId = " + category.getId());
 
         for(Map<String, String> map : resultset) {
             int id = Integer.parseInt(map.get("id"));
             int val = Integer.parseInt(map.get("value"));
-            int date = Integer.parseInt(map.get("date"));
+            long date = Long.parseLong(map.get("date"));
+
             Value value = new Value(id, val, date, category, new ArrayList<String>());
+
+            System.out.println("getValues:: value = " + value.getId() + " | " + value.getValue() + " | " + value.getParent().getId() );
 
             ArrayList<Map<String, String>> tagSet = my_helper.query("SELECT * FROM " + SqlLiteHelper.TAG_VALUE_TABLE +
                     " AS tv JOIN " + SqlLiteHelper.TAG_TABLE + " AS t ON tv.tagId = t.id WHERE tv.valId = " + id);
@@ -91,6 +95,7 @@ public class DAO {
             for(Map<String, String> tagmap : tagSet) {
                 value.getTags().add(tagmap.get("name"));
             }
+            values.add(value);
         }
 
         return values;

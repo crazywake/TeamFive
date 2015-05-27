@@ -42,9 +42,9 @@ public class CategoryEditor {
         this.main_categories = main_categories;
         this.parent_category = parent_category;
 
-        if(main_categories.size() != 0) {
-            parent_id = main_categories.get(0).getId();
-        }
+         if(main_categories.size() != 0) {
+           parent_id = main_categories.get(0).getId();
+         }
     }
 
     public Type getType() {

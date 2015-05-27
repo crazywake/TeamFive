@@ -15,7 +15,7 @@ public class Value {
     private Category parent;
     private List<String> tags;
 
-    public Value(int id, long value, int date, Category parent, List<String> tags) {
+    public Value(int id, long value, long date, Category parent, List<String> tags) {
         this.id = id;
         this.value = value;
         this.date = new Date(date);

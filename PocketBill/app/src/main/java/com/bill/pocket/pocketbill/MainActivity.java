@@ -21,7 +21,10 @@ import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.Toast;
 
+import java.lang.reflect.Array;
+import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 
 @SuppressWarnings("deprecation")
@@ -124,7 +127,7 @@ public class MainActivity extends ActionBarActivity {
 
                     Intent my_intent = new Intent(getApplicationContext(), AddValueActivity.class);
 
-                    my_intent.putExtra("parent", current_sub_category.getId());
+                    my_intent.putExtra("cat", current_sub_category.getId());
                     my_intent.putExtra("tags", new ArrayList<String>());
                     //TODO: pass tags to AddValueActivity (change Arraylist above)
 
@@ -281,12 +284,36 @@ public class MainActivity extends ActionBarActivity {
                     getSupportActionBar().setTitle("Navigation");
 
                 if (drawerView.getTag().toString().equals("right_drawer")) {
-                    getSupportActionBar().setTitle("MAIN_CATEGORY");
 
-                    //ArrayList<String> mnavDrawerContent2 = dataAccessObject.getValues();
-                    // TODO: Get Values from DB
+                    ArrayList<Value> mnavDrawerContent2 = null;
 
-                    //mDrawerList2.setAdapter(new ArrayAdapter<>(cnt2, android.R.layout.simple_list_item_1, mnavDrawerContent2));
+                    if(cur_state == State.MAIN) {
+                        getSupportActionBar().setTitle("All Receipts");
+                      //  mnavDrawerContent2 = dataAccessObject.getPayments();
+                        mnavDrawerContent2 = getValuesFromCategory(Category.ROOT_CATEGORY);
+                    }
+                    else {
+                        getSupportActionBar().setTitle(current_main_category.getName());
+
+                        System.out.println("ID of main category :" + current_main_category.getId());
+                        mnavDrawerContent2 = getValuesFromCategory(current_main_category);
+                    }
+
+                    ArrayList<String> drawerContent = new ArrayList<String>();
+
+                    DateFormat formats = DateFormat.getDateInstance();
+
+                    for(Value value: mnavDrawerContent2)
+                    {
+                        drawerContent.add(value.getValue() + formats.format(value.getDate()) + value.getTags());
+                    }
+
+                    if(drawerContent.size() == 0)
+                    {
+                       drawerContent.add("No Payments found !");
+                    }
+
+                    mDrawerList2.setAdapter(new ArrayAdapter<>(cnt2, android.R.layout.simple_list_item_1, drawerContent));
 
                 }
                 invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
@@ -412,7 +439,8 @@ public class MainActivity extends ActionBarActivity {
             else {
                 Toast.makeText(this, "Fatal Error is fatal! Database refused to cooperate and was executed! " +
                         "Restart the app or contact support. Good Luck.", Toast.LENGTH_LONG).show();
-                finish();
+              System.out.println("Just a test");
+              finish();
             }
         } else {
             loadAdapter(getMain_categories());
@@ -467,13 +495,16 @@ public class MainActivity extends ActionBarActivity {
         this.current_main_category = current_main_category;
     }
 
-    public ArrayList<Value> getAllValues() {
+    public ArrayList<Value> getValuesFromCategory(Category cat) {
         ArrayList<Value> values = new ArrayList<>();
+        ArrayList<Category> categories = getMain_categories();
+        if(cat != Category.ROOT_CATEGORY) {
+            categories = cat.getSubcategories();
+        }
+        for(Category category : categories) {
+            values.addAll(category.getValues());
 
-        for(Category cat : getMain_categories()) {
-            values.addAll(cat.getValues());
-
-            for(Category subcat : cat.getSubcategories()) {
+            for(Category subcat : category.getSubcategories()) {
                 values.addAll(subcat.getValues());
             }
         }

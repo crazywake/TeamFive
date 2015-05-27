@@ -108,7 +108,8 @@ public class AddValueActivity extends ActionBarActivity {
         if (id == R.id.addValue) {
             Intent my_intent = getIntent();
 
-            int category_id = my_intent.getIntExtra("parent", -2);
+            int category_id = my_intent.getIntExtra("cat", -2);
+
             //TODO: handle -2 error!
             Category parent = new Category(category_id, null, null, null, null, null, null);
             ArrayList<String> tags = my_intent.getStringArrayListExtra("tags");
