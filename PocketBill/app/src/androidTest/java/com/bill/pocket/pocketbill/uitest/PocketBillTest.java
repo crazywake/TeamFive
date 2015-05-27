@@ -1,11 +1,7 @@
 package com.bill.pocket.pocketbill.uitest;
 
-import android.graphics.Point;
 import android.test.ActivityInstrumentationTestCase2;
 import android.widget.ListView;
-
-import android.view.Display;
-import android.view.MotionEvent;
 
 import com.bill.pocket.pocketbill.MainActivity;
 import com.bill.pocket.pocketbill.R;
@@ -111,4 +107,28 @@ public class PocketBillTest extends ActivityInstrumentationTestCase2<MainActivit
         assertEquals(myList.getAdapter().getCount() + 1, count);
     }
 
+<<<<<<< HEAD
+    public void testSearchButton() {
+        mySolo.clickOnActionBarItem(R.id.searchButton);
+        mySolo.sleep(5999);
+    }
+=======
+    public void testAddTags()
+    {
+        ListView myList = (ListView) mySolo.getView(R.id.CategoryView);
+        if (myList.getAdapter().getCount() < 1) return;
+
+        mySolo.clickInList(0);
+        mySolo.sleep(500);
+
+        int count = myList.getAdapter().getCount();
+        if (count < 1) return;
+        mySolo.clickInList(0);
+
+        mySolo.enterText(0, "Family");
+
+        assertEquals(true,true);
+    }
+
+>>>>>>> [FNWR] Added Tags in the Activity
 }
