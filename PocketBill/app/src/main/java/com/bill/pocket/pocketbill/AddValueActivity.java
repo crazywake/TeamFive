@@ -1,14 +1,20 @@
 package com.bill.pocket.pocketbill;
 
-import android.app.Activity;
 import android.content.Intent;
+
 import android.graphics.Color;
+import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.text.InputType;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.EditText;
+import android.widget.Toast;
+
+import static java.lang.Math.*;
+
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
