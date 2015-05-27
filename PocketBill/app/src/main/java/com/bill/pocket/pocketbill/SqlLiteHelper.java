@@ -125,11 +125,13 @@ public class SqlLiteHelper extends SQLiteOpenHelper {
 
     public int insert(String table, ContentValues vals)
     {
+        int result = 0;
         try {
-            return (int) db.insertOrThrow(table, null, vals);
-        } finally {
-            return 0;
+            result = (int) db.insertOrThrow(table, null, vals);
+        } catch(Exception e) {
+            Log.w("Exception: ", e.getMessage());
         }
+        return result;
     }
 
     public String main2SubSQL(Category main, Category sub)

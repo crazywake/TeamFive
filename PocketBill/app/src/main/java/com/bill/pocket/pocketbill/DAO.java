@@ -114,12 +114,10 @@ public class DAO {
 
         return true;*/
         int id = my_helper.insert(my_helper.CATEGORY_TABLE, my_helper.insertCategorySQL(category));
-        try {
-            category.setId(id);
-            return true;
-        } finally {
+        if(id == 0)
             return false;
-        }
+        category.setId(id);
+        return true;
     }
 
     public boolean insertValue(Value value) {

@@ -160,12 +160,19 @@ public class CategoryEditor {
             Category.Type oldType = category.getType();
             Category.Type newType = main_sub_type;
 
-            category.setParent(parent_category);
+            if(newType == Category.Type.MAIN) {
+                parent_id = -1;
+            }
+
+            category.setParent(activity.getCategoryFromID(parent_id));
+
+
             category.setType(main_sub_type);
             category.setColor(color);
 
             if(oldType == Category.Type.MAIN && newType == Category.Type.SUB) {
                 activity.getDAO().makeMain2Sub(category);
+                parent_id = -1;
             }
 
             activity.getDAO().updateCategory(category);

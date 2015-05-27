@@ -344,7 +344,8 @@ public class MainActivity extends ActionBarActivity {
         dataAccessObject.insertCategory(dummy3main);
 
         dataAccessObject.insertCategory(new Category(-1, "Shell", dummy1main, null, null, Category.Type.SUB, Category.DEFAULT_COLOR));
-        dataAccessObject.insertCategory(new Category(-1, "BP", dummy1main, null, null, Category.Type.SUB, Category.DEFAULT_COLOR));
+        Category hans = new Category(-1, "BP", dummy1main, null, null, Category.Type.SUB, Category.DEFAULT_COLOR);
+        boolean igzud = dataAccessObject.insertCategory(hans);
         dataAccessObject.insertCategory(new Category(-1, "Jet", dummy1main, null, null, Category.Type.SUB, Category.DEFAULT_COLOR));
         dataAccessObject.insertCategory(new Category(-1, "Spar", dummy2main, null, null, Category.Type.SUB, Category.DEFAULT_COLOR));
         dataAccessObject.insertCategory(new Category(-1, "Billa", dummy2main, null, null, Category.Type.SUB, Category.DEFAULT_COLOR));
@@ -375,7 +376,6 @@ public class MainActivity extends ActionBarActivity {
                         "Restart the app or contact support. Good Luck.", Toast.LENGTH_LONG).show();
                 finish();
             }
-
         } else {
             loadAdapter(main_categories);
             cur_state = State.MAIN;
