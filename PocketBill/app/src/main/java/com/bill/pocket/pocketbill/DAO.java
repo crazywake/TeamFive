@@ -91,6 +91,31 @@ public class DAO {
             for(Map<String, String> tagmap : tagSet) {
                 value.getTags().add(tagmap.get("name"));
             }
+            values.add(value);
+        }
+
+        return values;
+    }
+
+    public ArrayList<Value> getFilteredValues(ArrayList<Integer> mainCategories, ArrayList<Integer> subCategories) {
+        ArrayList<Map<String, String>> resultset = my_helper.query(my_helper.filterValues(mainCategories, subCategories));
+        ArrayList<Value> values = new ArrayList<Value>();
+
+        for(Map<String, String> map : resultset) {
+            int id = Integer.parseInt(map.get("id"));
+            int val = Integer.parseInt(map.get("value"));
+            int date = Integer.parseInt(map.get("date"));
+            int catId = Integer.parseInt(map.get("catId"));
+
+            Value value = new Value(id, val, date, my_helper.getCategoryById(catId), new ArrayList<String>());
+
+            ArrayList<Map<String, String>> tagSet = my_helper.query("SELECT * FROM " + SqlLiteHelper.TAG_VALUE_TABLE +
+                    " AS tv JOIN " + SqlLiteHelper.TAG_TABLE + " AS t ON tv.tagId = t.id WHERE tv.valId = " + id);
+
+            for(Map<String, String> tagmap : tagSet) {
+                value.getTags().add(tagmap.get("name"));
+            }
+            values.add(value);
         }
 
         return values;
@@ -121,21 +146,18 @@ public class DAO {
     }
 
     public boolean insertValue(Value value) {
-        try {
             value.setId(my_helper.insert(my_helper.VALUE_TABLE, my_helper.insertValueSQL(value)));
             for(String tag : value.getTags()) {
                 insertTagValue(value, tag);
             }
             return true;
-        }  finally {
-            return false;
-        }
     }
 
     public int insertTag(String tag) {
         try {
             return my_helper.insert(my_helper.TAG_TABLE, my_helper.insertTagSQL(tag));
-        }  finally {
+        }  catch (Exception e) {
+            e.printStackTrace();
             return 0;
         }
     }
@@ -144,7 +166,8 @@ public class DAO {
         try {
             my_helper.exec(my_helper.insertTagValueSQL(value, tag));
             return true;
-        }  finally {
+        }  catch (Exception e) {
+            e.printStackTrace();
             return false;
         }
     }
@@ -153,7 +176,8 @@ public class DAO {
         try {
             my_helper.exec(my_helper.deleteCategorySQL(category));
             return true;
-        } finally {
+        } catch (Exception e) {
+            e.printStackTrace();
             return false;
         }
     }
@@ -170,7 +194,8 @@ public class DAO {
             }
 
             return true;
-        } finally {
+        } catch (Exception e) {
+            e.printStackTrace();
             return false;
         }
     }
@@ -179,7 +204,8 @@ public class DAO {
         try {
             my_helper.exec(my_helper.deleteTagSQL(tag));
             return true;
-        } finally {
+        } catch (Exception e) {
+            e.printStackTrace();
             return false;
         }
     }
@@ -188,7 +214,8 @@ public class DAO {
         try {
             my_helper.exec(my_helper.deleteTagValueSQL(val, tag));
             return true;
-        } finally {
+        } catch (Exception e) {
+            e.printStackTrace();
             return false;
         }
     }
@@ -197,7 +224,8 @@ public class DAO {
         try {
             my_helper.exec(my_helper.updateCategorySQL(cat));
             return true;
-        }  finally {
+        }  catch (Exception e) {
+            e.printStackTrace();
             return false;
         }
     }
@@ -206,8 +234,13 @@ public class DAO {
         try {
             my_helper.exec(my_helper.updateValueSQL(val));
             return true;
-        } finally {
+        } catch (Exception e) {
+            e.printStackTrace();
             return false;
         }
+    }
+
+    public ArrayList<Tag> getAllTags() {
+        return my_helper.getAllTags();
     }
 }

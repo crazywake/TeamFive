@@ -7,6 +7,7 @@ import android.util.AttributeSet;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -16,9 +17,11 @@ public class MultiSpinner extends Spinner implements
         DialogInterface.OnMultiChoiceClickListener, DialogInterface.OnCancelListener {
 
     private List<String> items;
+    private List<Integer> itemIds;
     private boolean[] selected;
     private String defaultText;
     private MultiSpinnerListener listener;
+    private SpinnerType type;
 
     public MultiSpinner(Context context) {
         super(context);
@@ -65,7 +68,14 @@ public class MultiSpinner extends Spinner implements
                 android.R.layout.simple_spinner_item,
                 new String[] { spinnerText });
         setAdapter(adapter);
-        listener.onItemsSelected(selected);
+
+        ArrayList<Integer> selItemIds = new ArrayList<Integer>();
+        int i = 0;
+        for (boolean b : selected) {
+            if (b) selItemIds.add(itemIds.get(i));
+            ++i;
+        }
+        listener.onItemsSelected(selItemIds, type);
     }
 
     @Override
@@ -86,11 +96,13 @@ public class MultiSpinner extends Spinner implements
         return true;
     }
 
-    public void setItems(List<String> items, String allText,
+    public void setItems(List<String> items, List<Integer> itemIds, String allText, SpinnerType type,
                          MultiSpinnerListener listener) {
         this.items = items;
         this.defaultText = allText;
         this.listener = listener;
+        this.type = type;
+        this.itemIds = itemIds;
 
         // all selected by default
         selected = new boolean[items.size()];
@@ -104,6 +116,12 @@ public class MultiSpinner extends Spinner implements
     }
 
     public interface MultiSpinnerListener {
-        public void onItemsSelected(boolean[] selected);
+        public void onItemsSelected(ArrayList<Integer> itemIds, SpinnerType type);
+    }
+
+    public enum SpinnerType {
+        MAIN_CATEGORY,
+        SUB_CATEGORY,
+        TAGS
     }
 }
