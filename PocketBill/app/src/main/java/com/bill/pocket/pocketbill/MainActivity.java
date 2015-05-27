@@ -219,8 +219,6 @@ public class MainActivity extends ActionBarActivity {
                         Category clickedItem = (Category) categoryView.getItemAtPosition(position);
                         CategoryEditor catedit = new CategoryEditor(CategoryEditor.Type.EDIT, clickedItem, MainActivity.this, main_categories, clickedItem.getParent());
                         popupWindow = catedit.display();
-                        pre_popup_state = cur_state;
-                        cur_state = State.POPUP;
                         //TODO: EDIT IN DATABASE!!!!
                     }
                 });
@@ -310,9 +308,11 @@ public class MainActivity extends ActionBarActivity {
 
     @Override
     public void onBackPressed() {
-        System.out.println(cur_state);
-        System.out.println(current_main_category != null ? current_main_category.getId() : "0");
-        System.out.println(current_sub_category != null ? current_sub_category.getId() : "0");
+        System.out.println("BACK PRESSED");
+        System.out.println("cur state:" + cur_state);
+        System.out.println("pre p state:" + pre_popup_state);
+        System.out.println("cur main cat:" + (current_main_category != null ? current_main_category.getId() : "0"));
+        System.out.println("cur sub cat:" + (current_sub_category != null ? current_sub_category.getId() : "0"));
 
          switch(cur_state) {
             case MAIN: {
@@ -359,6 +359,7 @@ public class MainActivity extends ActionBarActivity {
         {
             CategoryEditor catedit = new CategoryEditor(CategoryEditor.Type.ADD, null, this, main_categories, current_main_category);
             popupWindow = catedit.display();
+            System.out.println("IF ADDEDIT:" + pre_popup_state);
             pre_popup_state = cur_state;
             cur_state = State.POPUP;
         }
@@ -400,6 +401,7 @@ public class MainActivity extends ActionBarActivity {
             if(parent != null) {
                 loadAdapter(parent.getSubcategories());
                 cur_state = State.SUB;
+                System.out.println("pid = -1:" + pre_popup_state);
                 pre_popup_state = cur_state;
             }
             else {
@@ -410,6 +412,7 @@ public class MainActivity extends ActionBarActivity {
         } else {
             loadAdapter(main_categories);
             cur_state = State.MAIN;
+            System.out.println("else:" + pre_popup_state);
             pre_popup_state = cur_state;
         }
 
@@ -431,6 +434,7 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public void setPre_popup_state(State pre_popup_state) {
+        System.out.println("In setter:" + pre_popup_state);
         this.pre_popup_state = pre_popup_state;
     }
 
