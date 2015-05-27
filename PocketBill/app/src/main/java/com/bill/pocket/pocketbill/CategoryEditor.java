@@ -166,7 +166,6 @@ public class CategoryEditor {
 
             category.setParent(activity.getCategoryFromID(parent_id));
 
-
             category.setType(main_sub_type);
             category.setColor(color);
 
