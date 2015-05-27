@@ -10,6 +10,7 @@ import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class SqlLiteHelper extends SQLiteOpenHelper {
@@ -106,6 +107,7 @@ public class SqlLiteHelper extends SQLiteOpenHelper {
                 }
                 resultset.add(map);
             }
+            cursor.close();
         } catch(Exception e)
         {
             Log.w("Exception: ", e.getMessage());
@@ -157,9 +159,15 @@ public class SqlLiteHelper extends SQLiteOpenHelper {
         vals.put("value", val.getValue());
         vals.put("date", val.getDate().getTime()/1000);
         vals.put("catId", val.getParent().getId());
+
+        /*String ins =  "INSERT INTO " + VALUE_TABLE + " (value, date, catId) VALUES (" + val.getValue()
+                + ", " + val.getDate().getTime()/1000 + ", " + val.getParent().getId() + ");";
+
+        Log.w("", ins);*/
+
         return vals;
-        /* return "INSERT INTO " + VALUE_TABLE + " (value, date, catId) VALUES (" + val.getValue()
-                + ", " + val.getDate().getTime()/1000 + ", " + val.getParent().getId() + ");";*/
+
+
     }
 
     public ContentValues insertTagSQL(String name) {
@@ -175,22 +183,22 @@ public class SqlLiteHelper extends SQLiteOpenHelper {
     }
 
     public String deleteCategorySQL(Category cat) {
-        return "DELETE " + CATEGORY_TABLE + " WHERE id = " + cat.getId();
+        return "DELETE FROM " + CATEGORY_TABLE + " WHERE id = " + cat.getId();
     }
 
     public String deleteValueSQL(Value val) {
-        return "DELETE " + TAG_VALUE_TABLE + " WHERE valId = " + val.getId() + ";"
-                + "DELETE " + VALUE_TABLE + " WHERE id = " + val.getId() + ";";
+        return "DELETE FROM " + TAG_VALUE_TABLE + " WHERE valId = " + val.getId() + ";"
+                + "DELETE FROM " + VALUE_TABLE + " WHERE id = " + val.getId() + ";";
     }
 
     public String deleteTagSQL(String name) {
-        return "DELETE " + TAG_VALUE_TABLE + " WHERE tagId = "
+        return "DELETE FROM " + TAG_VALUE_TABLE + " WHERE tagId = "
                 + "(SELECT id FROM " + TAG_TABLE + " WHERE name = '" + name + "');"
-                + "DELETE " + TAG_TABLE + " WHERE name = '" + name + "';";
+                + "DELETE FROM " + TAG_TABLE + " WHERE name = '" + name + "';";
     }
 
     public String deleteTagValueSQL(Value val, String name) {
-        return "DELETE " + TAG_VALUE_TABLE + " WHERE tagId = "
+        return "DELETE FROM " + TAG_VALUE_TABLE + " WHERE tagId = "
                 + "(SELECT id FROM " + TAG_TABLE + " WHERE name = '" + name + "') AND valId = "
                 + val.getId() + ";";
     }
@@ -208,5 +216,61 @@ public class SqlLiteHelper extends SQLiteOpenHelper {
 
     public String selectAllValuesSQL() {
         return "SELECT * FROM " + VALUE_TABLE;
+    }
+
+    public String filterValues(ArrayList<Integer> mainCategories, ArrayList<Integer> subCategories) {
+        String query = "select * from " + VALUE_TABLE;
+
+        List<Integer> categories = new ArrayList<>();
+        categories.addAll(mainCategories);
+        categories.addAll(subCategories);
+
+        if (categories.size() > 0) {
+            query += " where catId in (";
+            for (Integer id : categories) {
+                query += id + ",";
+            }
+            query = query.substring(0, query.length() - 1) + ")";
+
+        }
+
+        return query;
+    }
+
+    public Category getCategoryById(int catId) {
+        Cursor c = db.rawQuery("select * from " + CATEGORY_TABLE + " where id = " + catId, null);
+        if (c.getCount() < 1) return null;
+
+        c.moveToFirst();
+
+        Category cat = new Category(catId,
+                c.getString(c.getColumnIndex("name")),
+                null,
+                null,
+                null,
+                null,
+                null);
+
+        c.close();
+
+        return cat;
+    }
+
+    public ArrayList<Tag> getAllTags() {
+        ArrayList<Tag> tags = new ArrayList<>();
+        Cursor c = db.rawQuery("select * from " + TAG_TABLE, null);
+        if (c.getCount() < 1) return tags;
+
+        Tag t = null;
+        while (c.moveToNext()) {
+            t = new Tag();
+            t.setId(c.getInt(c.getColumnIndex("id")));
+            t.setName(c.getString(c.getColumnIndex("name")));
+            tags.add(t);
+        }
+
+        c.close();
+
+        return tags;
     }
 }
