@@ -76,8 +76,8 @@ public class MainActivity extends ActionBarActivity {
         categoryView.setLongClickable(true);
         //fill hashmap with subcategories
         dataAccessObject = DAO.instance(this);
-        insertDummyData();
-        main_categories = dataAccessObject.getCategories(Category.ROOT_CATEGORY);
+        //insertDummyData();
+        setMain_categories(dataAccessObject.getCategories(Category.ROOT_CATEGORY));
 
         //Navigation Drawer
         mnavDrawerContent = getResources().getStringArray(R.array.navigationDrawerContent);
@@ -86,7 +86,7 @@ public class MainActivity extends ActionBarActivity {
         // Set the adapter for the list view
         mDrawerList.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, mnavDrawerContent));
         mDrawerList.setSelector(android.R.color.holo_blue_dark);
-        mDrawerList.setOnItemClickListener(new NavigationDrawerListener(this_activity, this, mDrawerLayout, adapter, categoryView, main_categories));
+        mDrawerList.setOnItemClickListener(new NavigationDrawerListener(this_activity, this, mDrawerLayout, adapter, categoryView, getMain_categories()));
 
         mDrawerList2 = (ListView) findViewById(R.id.right_drawer);
         // Set the adapter for the list view
@@ -321,7 +321,7 @@ public class MainActivity extends ActionBarActivity {
             }
             case SUB: {
                 //switch to main
-                loadAdapter(main_categories);
+                loadAdapter(getMain_categories());
                 current_sub_category = null;
                 cur_state = State.MAIN;
                 break;
@@ -398,7 +398,7 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public void updateLists(int parent_id) { //parent id = -1 if no parent (man category view)
-        main_categories = dataAccessObject.getCategories(Category.ROOT_CATEGORY);
+        setMain_categories(dataAccessObject.getCategories(Category.ROOT_CATEGORY));
 
         if(parent_id != -1) {
             Category parent = getCategoryFromID(parent_id);
@@ -469,7 +469,7 @@ public class MainActivity extends ActionBarActivity {
     public ArrayList<Value> getAllValues() {
         ArrayList<Value> values = new ArrayList<>();
 
-        for(Category cat : main_categories) {
+        for(Category cat : getMain_categories()) {
             values.addAll(cat.getValues());
 
             for(Category subcat : cat.getSubcategories()) {
