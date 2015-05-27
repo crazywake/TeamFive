@@ -73,6 +73,8 @@ public class CategoryEditor {
 
         final Spinner parentSpinner = (Spinner) addEditPopupView.findViewById(R.id.categoryParentSpinner);
 
+        if(type == Type.EDIT) main_categories.remove(category);
+
         ArrayAdapter<Category> adapter = new ArrayAdapter<>(activity.getBaseContext(), android.R.layout.simple_spinner_dropdown_item, main_categories);
         parentSpinner.setAdapter(adapter);
 
@@ -87,6 +89,10 @@ public class CategoryEditor {
         checkbox.setOnClickListener(new Button.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if(main_categories.size() == 0) {
+                    checkbox.toggle();
+                    return;
+                }
                 if(checkbox.isChecked()) {
                     parentSpinner.setEnabled(false);
                     main_sub_type = Category.Type.MAIN;
@@ -95,8 +101,6 @@ public class CategoryEditor {
                     parentSpinner.setEnabled(true);
                     main_sub_type = Category.Type.SUB;
                 }
-
-
             }
         });
 
@@ -163,7 +167,7 @@ public class CategoryEditor {
             if(newType == Category.Type.MAIN) {
                 parent_id = -1;
             }
-
+            category.setName(name);
             category.setParent(activity.getCategoryFromID(parent_id));
 
             category.setType(main_sub_type);
