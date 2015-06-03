@@ -20,7 +20,8 @@
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:orientation="vertical"
-            android:background="#cccccc">
+            android:background="#cccccc"
+            android:padding="10dp">
 
             <LinearLayout
                 android:layout_width="fill_parent"
@@ -32,7 +33,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight=".17"
-                    android:text="name:"
+                    android:text="Name:"
                     android:textColor="#555555"
                     android:textStyle="normal"
                     android:textSize="16dp" />
@@ -40,7 +41,7 @@
                     android:id="@+id/categoryEditName"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight=".5"
+                    android:layout_weight="0.44"
                     android:textSize="16dp"
                     android:lines="1"
                     android:singleLine="true"
@@ -48,57 +49,33 @@
                     android:maxLength="20" />
             </LinearLayout> <!-- first row, category name -->
 
-            <LinearLayout
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="4dp"
-                android:layout_marginLeft="4dp"
-                android:orientation="horizontal">
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight=".17"
-                    android:text="category:"
-                    android:textSize="16dp"
-                    android:textColor="#555555"
-                    android:textStyle="normal"
-                    android:singleLine="true"
-                    android:editable="false" />
-                <Spinner
-                    android:id="@+id/categoryParentSpinner"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight=".5"
-                    android:textSize="16dp"
-                    android:spinnerMode="dialog"
-                    android:clickable="true" />
-            </LinearLayout> <!-- second row, category spinner -->
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginRight="4dp"
-                android:layout_marginLeft="4dp"
-                android:background="#666666" /> <!-- divider -->
+            <!-- divider -->
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginRight="4dp"
                 android:layout_marginLeft="4dp"
-                android:layout_gravity="center"
+                android:layout_gravity="left"
                 android:orientation="horizontal">
 
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight=".17"
+                    android:text="Hauptkategorie:"
+                    android:textColor="#555555"
+                    android:textStyle="normal"
+                    android:textSize="16dp" />
                 <CheckBox
                     android:id="@+id/categoryCheckbox"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:textSize="16dp"
                     android:textColor="#555555"
                     android:textStyle="normal"
-                    android:text="main category:"
                     android:button="@null"
-                    android:drawableRight="?android:attr/listChoiceIndicatorMultiple"/>
+                    android:drawableRight="?android:attr/listChoiceIndicatorMultiple" />
 
             </LinearLayout>
 
@@ -112,32 +89,27 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight=".17"
-                    android:text="color:"
+                    android:text="Kategorie:"
                     android:textSize="16dp"
                     android:textColor="#555555"
                     android:textStyle="normal"
                     android:singleLine="true"
                     android:editable="false" />
-                <Button
-                    android:id="@+id/categoryColorButton"
+                <Spinner
+                    android:id="@+id/categoryParentSpinner"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight=".5"
-                    android:text="rainbow inc" />
+                    android:layout_weight="0.38"
+                    android:textSize="16dp"
+                    android:spinnerMode="dialog"
+                    android:clickable="true" />
             </LinearLayout> <!-- second row, category spinner -->
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginRight="4dp"
-                android:layout_marginLeft="4dp"
-                android:background="#666666" /> <!-- divider -->
+            <!-- divider -->
 
             <RelativeLayout
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="4dp"
-                android:layout_marginLeft="4dp"
                 android:orientation="horizontal">
                 <Button
                     android:id="@+id/categoryEditorCancel"
