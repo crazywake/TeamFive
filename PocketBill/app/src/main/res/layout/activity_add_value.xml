@@ -43,4 +43,13 @@
         android:imeOptions="actionDone"
         android:background="@drawable/abc_edit_text_material"/>
 
+    <Button
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="OK"
+        android:id="@+id/ok_button"
+        android:layout_alignParentTop="true"
+        android:layout_alignEnd="@+id/autocomplete_text" />
+
 </RelativeLayout>

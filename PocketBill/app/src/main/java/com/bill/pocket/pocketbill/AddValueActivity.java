@@ -10,6 +10,7 @@ import android.text.InputType;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -53,6 +54,46 @@ public class AddValueActivity extends ActionBarActivity {
         my_base_text_view.setAdapter(my_adapter);
         my_base_text_view.setHintTextColor(Color.LTGRAY);
 
+        Button btn = (Button) findViewById(R.id.ok_button);
+        btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent my_intent = getIntent();
+
+                int category_id = my_intent.getIntExtra("cat", -2);
+
+                //TODO: handle -2 error!
+                Category parent = new Category(category_id, null, null, null, null, null, null);
+                //ArrayList<String> tags = my_intent.getStringArrayListExtra("tags");
+
+                //String value = (String) getString(R.id.addValue);
+                EditText value = (EditText) findViewById(R.id.editTextAddValue);
+
+                if(value.getText().toString().equals(null) || value.getText().toString().equals("") ||
+                        value.getText().toString().length() == 0) {
+                    Toast.makeText(getApplicationContext(), "No value added", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                String val = value.getText().toString();
+                double endval = Double.parseDouble(val)*100;
+                long longvalue = (long) Math.round(endval);
+
+                DAO DataAccessObject = DAO.instance(AddValueActivity.this);
+
+                ArrayList<String> tagList = new ArrayList<>();
+                for(String tag : tags.values())
+                {
+                    tagList.add(tag);
+                }
+                Value insert_value = new Value(-1, longvalue, new Date().getTime(), parent, tagList);
+                //TODO: get selected date (not always "today" or default)
+                DataAccessObject.insertValue(insert_value);
+
+                AddValueActivity.super.onBackPressed();
+            }
+        });
         
          my_base_text_view.setOnEditorActionListener(new TextView.OnEditorActionListener() {
            @Override
@@ -95,56 +136,6 @@ public class AddValueActivity extends ActionBarActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_add_value, menu);
         return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.addValue) {
-            Intent my_intent = getIntent();
-
-            int category_id = my_intent.getIntExtra("cat", -2);
-
-            //TODO: handle -2 error!
-            Category parent = new Category(category_id, null, null, null, null, null, null);
-            //ArrayList<String> tags = my_intent.getStringArrayListExtra("tags");
-
-            //String value = (String) getString(R.id.addValue);
-            EditText value = (EditText) findViewById(R.id.editTextAddValue);
-
-            if(value.getText().toString().equals(null) || value.getText().toString().equals("") ||
-                    value.getText().toString().length() == 0) {
-                Toast.makeText(getApplicationContext(), "No value added", Toast.LENGTH_SHORT).show();
-                return false;
-            }
-
-            String val = value.getText().toString();
-            double endval = Double.parseDouble(val)*100;
-            long longvalue = (long) Math.round(endval);
-
-            DAO DataAccessObject = DAO.instance(this);
-
-            ArrayList<String> tagList = new ArrayList<>();
-            for(String tag : tags.values())
-            {
-                tagList.add(tag);
-            }
-            Value insert_value = new Value(-1, longvalue, new Date().getTime(), parent, tagList);
-            //TODO: get selected date (not always "today" or default)
-            DataAccessObject.insertValue(insert_value);
-
-            super.onBackPressed();
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 }
