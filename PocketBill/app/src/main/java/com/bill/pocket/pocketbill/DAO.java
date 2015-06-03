@@ -82,7 +82,7 @@ public class DAO {
 
         for(Map<String, String> map : resultset) {
             int id = Integer.parseInt(map.get("id"));
-            int val = Integer.parseInt(map.get("value"));
+            long val = Long.parseLong(map.get("value"));
             long date = Long.parseLong(map.get("date"));
 
             Value value = new Value(id, val, date, category, new ArrayList<String>());
@@ -99,13 +99,15 @@ public class DAO {
         return values;
     }
 
-    public ArrayList<Value> getFilteredValues(ArrayList<Integer> mainCategories, ArrayList<Integer> subCategories) {
-        ArrayList<Map<String, String>> resultset = my_helper.query(my_helper.filterValues(mainCategories, subCategories));
+    public ArrayList<Value> getFilteredValues(ArrayList<Integer> mainCategories,
+                                              ArrayList<Integer> subCategories,
+                                              ArrayList<Integer> tagIds) {
+        ArrayList<Map<String, String>> resultset = my_helper.query(my_helper.filterValues(mainCategories, subCategories, tagIds));
         ArrayList<Value> values = new ArrayList<Value>(); 
 
         for(Map<String, String> map : resultset) {
             int id = Integer.parseInt(map.get("id"));
-            int val = Integer.parseInt(map.get("value"));
+            long val = Long.parseLong(map.get("value"));
             long date = Long.parseLong(map.get("date"));
             int catId = Integer.parseInt(map.get("catId"));
 

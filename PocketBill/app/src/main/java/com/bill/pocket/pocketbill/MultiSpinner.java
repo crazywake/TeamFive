@@ -46,35 +46,13 @@ public class MultiSpinner extends Spinner implements
     @Override
     public void onCancel(DialogInterface dialog) {
         // refresh text on spinner
-        StringBuffer spinnerBuffer = new StringBuffer();
-        boolean allUnselected = true;
-        for (int i = 0; i < items.size(); i++) {
-            if (selected[i] == true) {
-                spinnerBuffer.append(items.get(i));
-                spinnerBuffer.append(", ");
-                allUnselected = false;
-            }
-        }
 
-        String spinnerText;
-        if (allUnselected) {
-            spinnerText = defaultText;
-        } else {
-            spinnerText = spinnerBuffer.toString();
-            if (spinnerText.length() > 2)
-                spinnerText = spinnerText.substring(0, spinnerText.length() - 2);
-        }
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(getContext(),
                 android.R.layout.simple_spinner_item,
-                new String[] { spinnerText });
+                new String[] { getSpinnerText() });
         setAdapter(adapter);
 
-        ArrayList<Integer> selItemIds = new ArrayList<Integer>();
-        int i = 0;
-        for (boolean b : selected) {
-            if (b) selItemIds.add(itemIds.get(i));
-            ++i;
-        }
+        ArrayList<Integer> selItemIds = this.getSelectedIds();
         listener.onItemsSelected(selItemIds, type);
     }
 
@@ -98,20 +76,35 @@ public class MultiSpinner extends Spinner implements
 
     public void setItems(List<String> items, List<Integer> itemIds, String allText, SpinnerType type,
                          MultiSpinnerListener listener) {
+
+        ArrayList<Integer> preselectedIds = null;
+        if (selected != null)
+            preselectedIds = this.getSelectedIds();
+
         this.items = items;
         this.defaultText = allText;
         this.listener = listener;
         this.type = type;
         this.itemIds = itemIds;
 
-        // all selected by default
+        // all unselected by default
         selected = new boolean[items.size()];
         //for (int i = 0; i < selected.length; i++)
         //    selected[i] = false;
 
+        if (preselectedIds != null) {
+            int i = 0;
+            for (Integer id : this.itemIds) {
+                if (preselectedIds.contains(id))
+                    selected[i] = true;
+
+                ++i;
+            }
+        }
+
         // all text on the spinner
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(getContext(),
-                android.R.layout.simple_spinner_item, new String[] { allText });
+                android.R.layout.simple_spinner_item, new String[] { getSpinnerText() });
         setAdapter(adapter);
     }
 
@@ -123,5 +116,38 @@ public class MultiSpinner extends Spinner implements
         MAIN_CATEGORY,
         SUB_CATEGORY,
         TAGS
+    }
+
+    private ArrayList<Integer> getSelectedIds() {
+        ArrayList<Integer> selItemIds = new ArrayList<Integer>();
+        int i = 0;
+        for (boolean b : selected) {
+            if (b) selItemIds.add(itemIds.get(i));
+            ++i;
+        }
+        return selItemIds;
+    }
+
+    private String getSpinnerText() {
+        StringBuffer spinnerBuffer = new StringBuffer();
+        boolean allUnselected = true;
+        for (int i = 0; i < items.size(); i++) {
+            if (selected[i] == true) {
+                spinnerBuffer.append(items.get(i));
+                spinnerBuffer.append(", ");
+                allUnselected = false;
+            }
+        }
+
+        String spinnerText;
+        if (allUnselected) {
+            spinnerText = defaultText;
+        } else {
+            spinnerText = spinnerBuffer.toString();
+            if (spinnerText.length() > 2)
+                spinnerText = spinnerText.substring(0, spinnerText.length() - 2);
+        }
+
+        return spinnerText;
     }
 }

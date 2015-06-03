@@ -4,9 +4,6 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -20,6 +17,7 @@ public class SearchActivity extends ActionBarActivity implements MultiSpinnerLis
     private ArrayList<Integer> mainCatFilter = new ArrayList<>();
     private ArrayList<Integer> subCatFilter = new ArrayList<>();
     private ArrayList<Integer> tagsFilter = new ArrayList<>();
+    private MultiSpinner subCatSpinner = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,7 +25,7 @@ public class SearchActivity extends ActionBarActivity implements MultiSpinnerLis
         setContentView(R.layout.activity_search);
 
         MultiSpinner mainCatSpinner = (MultiSpinner) findViewById(R.id.search_maincat_spinner);
-        MultiSpinner subCatSpinner = (MultiSpinner) findViewById(R.id.search_subcat_spinner);
+        subCatSpinner = (MultiSpinner) findViewById(R.id.search_subcat_spinner);
         MultiSpinner tagSpinner = (MultiSpinner) findViewById(R.id.search_tag_spinner);
 
         ArrayList<String> mainCats = new ArrayList<>();
@@ -42,11 +40,6 @@ public class SearchActivity extends ActionBarActivity implements MultiSpinnerLis
             mainCats.add(c.getName());
             mainCatIds.add(c.getId());
             values.addAll(DAO.instance(this).getValues(c));
-
-            for (Category sub : c.getSubcategories()) {
-                subCats.add(sub.getName());
-                subCatIds.add(sub.getId());
-            }
         }
 
         for (Tag t : DAO.instance(this).getAllTags()) {
@@ -56,6 +49,7 @@ public class SearchActivity extends ActionBarActivity implements MultiSpinnerLis
 
         mainCatSpinner.setItems(mainCats, mainCatIds, "Main categories", MultiSpinner.SpinnerType.MAIN_CATEGORY, this);
         subCatSpinner.setItems(subCats, subCatIds, "Sub categories", MultiSpinner.SpinnerType.SUB_CATEGORY, this);
+        subCatSpinner.setEnabled(false);
         tagSpinner.setItems(tags, tagIds, "Tags", MultiSpinner.SpinnerType.TAGS, this);
 
         final ListView valuesView = (ListView) findViewById(R.id.search_value_view);
@@ -64,18 +58,6 @@ public class SearchActivity extends ActionBarActivity implements MultiSpinnerLis
         ArrayAdapter adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, android.R.id.text1, values);
         valuesView.setAdapter(adapter);
 
-
-        valuesView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view,
-                                    final int position, long id) {
-
-                Value clickedItem = (Value) valuesView.getItemAtPosition(position);
-                // TODO show Value
-                //Intent my_intent = new Intent(getApplicationContext(), AddValueActivity.class);
-                //startActivity(my_intent);
-            }
-        });
     }
 
 
@@ -86,20 +68,7 @@ public class SearchActivity extends ActionBarActivity implements MultiSpinnerLis
         return true;
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
 
     @Override
     public void onItemsSelected(ArrayList<Integer> itemIds, MultiSpinner.SpinnerType type) {
@@ -114,6 +83,22 @@ public class SearchActivity extends ActionBarActivity implements MultiSpinnerLis
         switch (type) {
             case MAIN_CATEGORY:
                 this.mainCatFilter = filterIds;
+
+                ArrayList<String> subCats = new ArrayList<>();
+                ArrayList<Integer> subCatIds = new ArrayList<>();
+
+                for(Category c : CategoryData.getInstance().getMainCategories()) {
+                    if (filterIds.contains(new Integer(c.getId()))) {
+                        for (Category subCat : c.getSubcategories()) {
+                            subCats.add(subCat.getName());
+                            subCatIds.add(subCat.getId());
+                        }
+                    }
+                }
+
+                subCatSpinner.setItems(subCats, subCatIds, "Sub categories", MultiSpinner.SpinnerType.SUB_CATEGORY, this);
+                subCatSpinner.setEnabled(subCatIds.size() > 0);
+
                 break;
             case SUB_CATEGORY:
                 this.subCatFilter = filterIds;
@@ -122,8 +107,13 @@ public class SearchActivity extends ActionBarActivity implements MultiSpinnerLis
                 this.tagsFilter = filterIds;
         }
 
-        ArrayList<Value> filteredVals = DAO.instance(this).getFilteredValues(mainCatFilter, subCatFilter);
+        ArrayList<Value> filteredVals = DAO.instance(this).getFilteredValues(mainCatFilter, subCatFilter, tagsFilter);
         final ListView valuesView = (ListView) findViewById(R.id.search_value_view);
+
+        if (filteredVals.size() < 1) {
+            filteredVals.add(new ValueDummy("No entries found! - Refine your search, bastard."));
+        }
+
         ArrayAdapter adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, android.R.id.text1, filteredVals);
         valuesView.setAdapter(adapter);
     }
