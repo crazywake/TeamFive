@@ -101,7 +101,7 @@ public class DAO {
 
     public ArrayList<Value> getFilteredValues(ArrayList<Integer> mainCategories, ArrayList<Integer> subCategories) {
         ArrayList<Map<String, String>> resultset = my_helper.query(my_helper.filterValues(mainCategories, subCategories));
-        ArrayList<Value> values = new ArrayList<Value>();
+        ArrayList<Value> values = new ArrayList<Value>(); 
 
         for(Map<String, String> map : resultset) {
             int id = Integer.parseInt(map.get("id"));
