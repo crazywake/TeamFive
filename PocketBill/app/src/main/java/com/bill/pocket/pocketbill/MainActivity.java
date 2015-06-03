@@ -42,7 +42,7 @@ public class MainActivity extends ActionBarActivity {
     //Navigation Drawer
     private ActionBarDrawerToggle mDrawerToggle;
     private DrawerLayout mDrawerLayout, mDrawerLayout2;
-    private String mActivityTitle = "PocketBill";
+    private String mActivityTitle = "Pocket Bill";
 
     //Database
     private DAO dataAccessObject;
@@ -328,7 +328,7 @@ public class MainActivity extends ActionBarActivity {
             /** Called when a drawer has settled in a completely closed state. */
             public void onDrawerClosed(View view) {
                 super.onDrawerClosed(view);
-                if (current_main_category != null)
+                if (current_main_category != null && getCur_state() != State.MAIN)
                     getSupportActionBar().setTitle(current_main_category.getName());
                 else
                 getSupportActionBar().setTitle(mActivityTitle);
