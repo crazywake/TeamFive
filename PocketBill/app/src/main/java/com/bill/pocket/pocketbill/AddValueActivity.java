@@ -39,12 +39,13 @@ public class AddValueActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_value);
+        DAO dao = DAO.instance(this);
 
         Toast.makeText(getApplicationContext(), "AddValue Activity opened", Toast.LENGTH_SHORT).show();
 
         final AutoCompleteTextView my_base_text_view = (AutoCompleteTextView) findViewById(R.id.autocomplete_text);
         last_text = my_base_text_view;
-        my_adapter = new ArrayAdapter<String>(this,android.R.layout.simple_dropdown_item_1line,new String[] {"Fun", "Family", "Uni"} );
+        my_adapter = new ArrayAdapter<String>(this,android.R.layout.simple_dropdown_item_1line, dao.getAllTagsArray());
         my_tags = new ArrayList<String>();
         my_base_text_view.setAdapter(my_adapter);
         my_base_text_view.setHintTextColor(Color.LTGRAY);

@@ -246,4 +246,17 @@ public class DAO {
     public ArrayList<Tag> getAllTags() {
         return my_helper.getAllTags();
     }
+
+    public String[] getAllTagsArray()
+    {
+        ArrayList<Tag> tags = getAllTags();
+        String[] result = new String[tags.size()];
+
+        for(int i = 0; i < tags.size(); i++)
+        {
+            result[i] = tags.get(i).getName();
+        }
+
+        return result;
+    }
 }
