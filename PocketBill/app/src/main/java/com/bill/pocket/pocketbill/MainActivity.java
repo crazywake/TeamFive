@@ -132,6 +132,7 @@ public class MainActivity extends ActionBarActivity {
                     //TODO: pass tags to AddValueActivity (change Arraylist above)
 
                     startActivity(my_intent);
+                    
                     //cur_state = State.MAIN;
                 }
 
