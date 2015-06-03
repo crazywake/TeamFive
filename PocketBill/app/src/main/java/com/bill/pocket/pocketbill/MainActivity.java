@@ -132,7 +132,7 @@ public class MainActivity extends ActionBarActivity {
                     //TODO: pass tags to AddValueActivity (change Arraylist above)
 
                     startActivity(my_intent);
-                    
+
                     //cur_state = State.MAIN;
                 }
 
@@ -286,7 +286,7 @@ public class MainActivity extends ActionBarActivity {
 
                 if (drawerView.getTag().toString().equals("right_drawer")) {
 
-                    ArrayList<Value> mnavDrawerContent2 = null;
+                    ArrayList<Value> mnavDrawerContent2;
 
                     if(cur_state == State.MAIN) {
                         getSupportActionBar().setTitle("All Receipts");
@@ -300,13 +300,17 @@ public class MainActivity extends ActionBarActivity {
                         mnavDrawerContent2 = getValuesFromCategory(current_main_category);
                     }
 
-                    ArrayList<String> drawerContent = new ArrayList<String>();
+                    ArrayList<String> drawerContent = new ArrayList<>();
 
                     DateFormat formats = DateFormat.getDateInstance();
 
                     for(Value value: mnavDrawerContent2)
                     {
-                        drawerContent.add(value.getValue() + formats.format(value.getDate()) + value.getTags());
+                        double dval = value.getValue() / 100;
+                        if (value.getTags().size() != 0)
+                            drawerContent.add(formats.format(value.getDate()) + "    " + dval + " Eur   " + value.getTags());
+                        else
+                            drawerContent.add(formats.format(value.getDate()) + "    " + dval + " Eur ");
                     }
 
                     if(drawerContent.size() == 0)
