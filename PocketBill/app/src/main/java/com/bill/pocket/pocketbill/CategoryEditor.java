@@ -185,6 +185,7 @@ public class CategoryEditor {
         if(type == Type.ADD) {
             if(main_sub_type == Category.Type.MAIN) {
                 activity.getDAO().insertCategory(new Category(-1, name, Category.ROOT_CATEGORY, null, null, Category.Type.MAIN, color));
+                parent_id = -1;
             }
             if(main_sub_type == Category.Type.SUB) {
                 activity.getDAO().insertCategory(new Category(-1, name, parent_category, null, null, Category.Type.SUB, color));
