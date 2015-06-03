@@ -216,12 +216,37 @@ public class SqlLiteHelper extends SQLiteOpenHelper {
         return "SELECT * FROM " + VALUE_TABLE;
     }
 
-    public String filterValues(ArrayList<Integer> mainCategories, ArrayList<Integer> subCategories) {
+    public String filterValues(ArrayList<Integer> mainCategories,
+                               ArrayList<Integer> subCategories,
+                               ArrayList<Integer> tagIds) {
+
         String query = "select * from " + VALUE_TABLE;
+        String tagIdsInString = "";
 
         List<Integer> categories = new ArrayList<>();
-        categories.addAll(mainCategories);
+
+        Category tmp = null;
+        for (Integer subCat : subCategories) {
+            tmp = getCategoryById(subCat);
+            if (mainCategories.contains(tmp.getParentId()))
+                mainCategories.remove(new Integer(tmp.getParentId()));
+        }
+
+        for (Integer mainCat : mainCategories) {
+            ArrayList<Integer> newSubCategories = getAllSubCategoryIdsFromMainCategoryId(mainCat);
+            categories.addAll(newSubCategories);
+        }
+
         categories.addAll(subCategories);
+
+
+        if (tagIds.size() > 0) {
+            query += " v join " + TAG_VALUE_TABLE + " t on (v.id = t.valId)";
+            for (Integer id : tagIds) {
+                tagIdsInString += id + ",";
+            }
+            tagIdsInString = tagIdsInString.substring(0, tagIdsInString.length() - 1);
+        }
 
         if (categories.size() > 0) {
             query += " where catId in (";
@@ -230,8 +255,15 @@ public class SqlLiteHelper extends SQLiteOpenHelper {
             }
             query = query.substring(0, query.length() - 1) + ")";
 
+            if (tagIds.size() > 0) {
+                query += " and t.tagId in (" + tagIdsInString + ")";
+            }
+
+        } else if (tagIds.size() > 0) {
+            query += " where t.tagId in (" + tagIdsInString + ")";
         }
 
+        Log.w("", query);
         return query;
     }
 
@@ -243,7 +275,7 @@ public class SqlLiteHelper extends SQLiteOpenHelper {
 
         Category cat = new Category(catId,
                 c.getString(c.getColumnIndex("name")),
-                null,
+                new Category(c.getColumnIndex("parentId"), "", null, null, null, null, null),
                 null,
                 null,
                 null,
@@ -252,6 +284,23 @@ public class SqlLiteHelper extends SQLiteOpenHelper {
         c.close();
 
         return cat;
+    }
+
+    public ArrayList<Integer> getAllSubCategoryIdsFromMainCategoryId(int mainCatId) {
+        ArrayList<Integer> categories = new ArrayList<>();
+        Cursor c = db.rawQuery("select * from " + CATEGORY_TABLE
+                + " c where c.parentId = " + mainCatId, null);
+
+        if (c.getCount() < 1) return categories;
+
+        Category cat = null;
+        while (c.moveToNext()) {
+            categories.add(c.getInt(c.getColumnIndex("id")));
+        }
+
+        c.close();
+
+        return categories;
     }
 
     public ArrayList<Tag> getAllTags() {
