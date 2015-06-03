@@ -12,9 +12,6 @@ import android.widget.ListView;
 
 import java.util.ArrayList;
 
-/**
- * Created by Thomas on 06.05.2015.
- */
 public class NavigationDrawerListener implements AdapterView.OnItemClickListener {
 
     private MainActivity mact;
@@ -43,6 +40,8 @@ public class NavigationDrawerListener implements AdapterView.OnItemClickListener
 
         if(position == 0)
         {
+            mact.updateLists(-1);
+            mact.getSupportActionBar().setTitle("Pocket Bill");
             Log.d(mcont.getPackageName(),"mmain_categories Size = "+mmain_categories.size());
             madapter = new ArrayAdapter<>(mcont, android.R.layout.simple_list_item_1, android.R.id.text1, mmain_categories);
             mcategoryView.setAdapter(madapter);
