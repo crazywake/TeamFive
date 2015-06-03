@@ -157,7 +157,7 @@ public class SqlLiteHelper extends SQLiteOpenHelper {
     public ContentValues insertValueSQL(Value val) {
         ContentValues vals = new ContentValues();
         vals.put("value", val.getValue());
-        vals.put("date", val.getDate().getTime()/1000);
+        vals.put("date", val.getDate().getTime());
         vals.put("catId", val.getParent().getId());
 
         /*String ins =  "INSERT INTO " + VALUE_TABLE + " (value, date, catId) VALUES (" + val.getValue()
@@ -166,8 +166,6 @@ public class SqlLiteHelper extends SQLiteOpenHelper {
         Log.w("", ins);*/
 
         return vals;
-
-
     }
 
     public ContentValues insertTagSQL(String name) {
@@ -210,7 +208,7 @@ public class SqlLiteHelper extends SQLiteOpenHelper {
 
     public String updateValueSQL(Value val) {
         return "UPDATE " + VALUE_TABLE + " SET value = " + val.getValue() + ", date = "
-                + val.getDate().getTime()/1000 + ", catId = " + val.getParent().getId()
+                + val.getDate().getTime() + ", catId = " + val.getParent().getId()
                 + " WHERE id = " + val.getId();
     }
 

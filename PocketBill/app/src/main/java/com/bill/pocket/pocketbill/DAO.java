@@ -106,7 +106,7 @@ public class DAO {
         for(Map<String, String> map : resultset) {
             int id = Integer.parseInt(map.get("id"));
             int val = Integer.parseInt(map.get("value"));
-            int date = Integer.parseInt(map.get("date"));
+            long date = Long.parseLong(map.get("date"));
             int catId = Integer.parseInt(map.get("catId"));
 
             Value value = new Value(id, val, date, my_helper.getCategoryById(catId), new ArrayList<String>());
@@ -148,11 +148,11 @@ public class DAO {
     }
 
     public boolean insertValue(Value value) {
-            value.setId(my_helper.insert(my_helper.VALUE_TABLE, my_helper.insertValueSQL(value)));
-            for(String tag : value.getTags()) {
-                insertTagValue(value, tag);
-            }
-            return true;
+        value.setId(my_helper.insert(my_helper.VALUE_TABLE, my_helper.insertValueSQL(value)));
+        for(String tag : value.getTags()) {
+            insertTagValue(value, tag);
+        }
+        return true;
     }
 
     public int insertTag(String tag) {
@@ -166,6 +166,7 @@ public class DAO {
 
     public boolean insertTagValue(Value value, String tag) {
         try {
+            insertTag(tag);
             my_helper.exec(my_helper.insertTagValueSQL(value, tag));
             return true;
         }  catch (Exception e) {

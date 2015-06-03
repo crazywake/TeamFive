@@ -130,7 +130,7 @@ public class AddValueActivity extends ActionBarActivity {
 
             DAO DataAccessObject = DAO.instance(this);
 
-            Value insert_value = new Value(-1, longvalue, (int) (new Date()).getTime(), parent, my_tags);
+            Value insert_value = new Value(-1, longvalue, new Date().getTime(), parent, my_tags);
             //TODO: get selected date (not always "today" or default)
             DataAccessObject.insertValue(insert_value);
 
