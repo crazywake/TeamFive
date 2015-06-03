@@ -27,12 +27,13 @@
             android:layout_width="125dp"
             android:layout_height="wrap_content"
             android:text="Main Category:"
+            android:textSize="17sp"
             android:id="@+id/search_tv_maincat" />
         <com.bill.pocket.pocketbill.MultiSpinner
             android:layout_width="fill_parent"
             android:id="@+id/search_maincat_spinner"
             android:layout_height="wrap_content"
-            android:background="@drawable/abc_edit_text_material"
+            android:background="@android:drawable/btn_dropdown"
             >
 
         </com.bill.pocket.pocketbill.MultiSpinner>
@@ -49,12 +50,13 @@
             android:layout_width="125dp"
             android:layout_height="wrap_content"
             android:text="Sub Category:"
+            android:textSize="17sp"
             android:id="@+id/search_tv_subcat" />
         <com.bill.pocket.pocketbill.MultiSpinner
             android:layout_width="fill_parent"
             android:id="@+id/search_subcat_spinner"
             android:layout_height="wrap_content"
-            android:background="@drawable/abc_edit_text_material"
+            android:background="@android:drawable/btn_dropdown"
             >
 
         </com.bill.pocket.pocketbill.MultiSpinner>
@@ -70,12 +72,13 @@
             android:layout_width="125dp"
             android:layout_height="wrap_content"
             android:text="Tag:"
+            android:textSize="17sp"
             android:id="@+id/search_tv_tag"/>
         <com.bill.pocket.pocketbill.MultiSpinner
             android:layout_width="fill_parent"
             android:id="@+id/search_tag_spinner"
             android:layout_height="wrap_content"
-            android:background="@drawable/abc_edit_text_material"
+            android:background="@android:drawable/btn_dropdown"
             >
 
         </com.bill.pocket.pocketbill.MultiSpinner>

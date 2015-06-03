@@ -71,7 +71,8 @@
                     android:layout_weight=".5"
                     android:textSize="16dp"
                     android:spinnerMode="dialog"
-                    android:clickable="true" />
+                    android:clickable="true"
+                    android:background="@android:drawable/btn_dropdown"/>
             </LinearLayout> <!-- second row, category spinner -->
 
             <View
@@ -144,7 +145,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentLeft="true"
-                    android:text="kenzel washington" />
+                    android:text="kenzel washington"/>
                 <Button
                     android:id="@+id/categoryEditorOK"
                     android:layout_width="wrap_content"
