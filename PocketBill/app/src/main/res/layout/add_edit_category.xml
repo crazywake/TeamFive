@@ -3,7 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/outerContainer"
-    android:orientation="horizontal">
+    android:orientation="horizontal"
+    >
 
     <RelativeLayout
         android:layout_width="0dip"
@@ -20,7 +21,7 @@
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:orientation="vertical"
-            android:background="#cccccc"
+            android:background="#afafbb"
             android:padding="10dp">
 
             <LinearLayout
@@ -81,7 +82,7 @@
 
             <LinearLayout
                 android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="50dp"
                 android:layout_marginRight="4dp"
                 android:layout_marginLeft="4dp"
                 android:orientation="horizontal">
@@ -98,7 +99,7 @@
                 <Spinner
                     android:id="@+id/categoryParentSpinner"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_weight="0.38"
                     android:textSize="16dp"
                     android:spinnerMode="dialog"
