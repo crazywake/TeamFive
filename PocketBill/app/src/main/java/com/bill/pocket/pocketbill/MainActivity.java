@@ -220,6 +220,7 @@ public class MainActivity extends ActionBarActivity {
                         Category clickedItem = (Category) categoryView.getItemAtPosition(position);
                         CategoryEditor catedit = new CategoryEditor(CategoryEditor.Type.EDIT, clickedItem, MainActivity.this, getMain_categories(), clickedItem.getParent());
                         popupWindow = catedit.display();
+                        cur_state = pre_popup_state;
                         //TODO: EDIT IN DATABASE!!!!
                     }
                 });

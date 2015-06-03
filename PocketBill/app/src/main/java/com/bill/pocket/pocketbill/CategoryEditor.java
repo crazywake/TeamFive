@@ -73,9 +73,11 @@ public class CategoryEditor {
 
         final Spinner parentSpinner = (Spinner) addEditPopupView.findViewById(R.id.categoryParentSpinner);
 
-        if(type == Type.EDIT) main_categories.remove(category);
+        //if(type == Type.EDIT) main_categories.remove(category);
+        ArrayList<Category> copy = (ArrayList<Category>) main_categories.clone();
+        copy.remove(this.category);
+        ArrayAdapter<Category> adapter = new ArrayAdapter<>(activity.getBaseContext(), android.R.layout.simple_spinner_dropdown_item, copy);
 
-        ArrayAdapter<Category> adapter = new ArrayAdapter<>(activity.getBaseContext(), android.R.layout.simple_spinner_dropdown_item, main_categories);
         parentSpinner.setAdapter(adapter);
 
         Button btnOK = (Button) addEditPopupView.findViewById(R.id.categoryEditorOK);
@@ -125,7 +127,6 @@ public class CategoryEditor {
             @Override
             public void onClick(View v) {
                 // kenzel button clicked
-                activity.setCur_state(activity.getPre_popup_state());
                 popup.dismiss();
             }
         });
