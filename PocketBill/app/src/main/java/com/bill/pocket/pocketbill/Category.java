@@ -87,6 +87,10 @@ public class Category {
         this.values = values;
     }
 
+    public void addValues(Value value) {
+        values.add(value);
+    }
+
     public Type getType() {
         return type;
     }

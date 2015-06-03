@@ -11,39 +11,41 @@ public class PocketBillTest extends ActivityInstrumentationTestCase2<MainActivit
 
     private Solo mySolo;
 
-    public PocketBillTest(){
+    public PocketBillTest() {
         super(MainActivity.class);
     }
 
     public void setUp() throws Exception {
         super.setUp();
-        mySolo = new Solo ( getInstrumentation (), getActivity ());
+        mySolo = new Solo(getInstrumentation(), getActivity());
     }
 
     public void tearDown() throws Exception {
 
     }
-    public void testActionBar(){
+
+    public void testActionBar() {
         //mySolo.click
-       // mySolo.clickOnActionBarItem(R.id.addCategory);
+        // mySolo.clickOnActionBarItem(R.id.addCategory);
         //mySolo.sleep(2000);
-       //mySolo.clickOnButton("Cancel");
+        //mySolo.clickOnButton("Cancel");
 
     }
-    public void testCategoryListSelect(){
+
+    public void testCategoryListSelect() {
         mySolo.clickOnText("Gas");
         mySolo.clickOnText("Shell");
         mySolo.sleep(2000);
     }
 
-    public void testCategoryDelete(){
+    public void testCategoryDelete() {
         mySolo.clickOnText("Gas");
         mySolo.clickLongOnText("Shell");
         mySolo.clickOnText("Delete");
         mySolo.sleep(2000);
     }
 
-    public void testCategoryBack(){
+    public void testCategoryBack() {
         mySolo.clickOnText("Gas");
         mySolo.clickLongOnText("Shell");
         mySolo.goBack();
@@ -51,7 +53,7 @@ public class PocketBillTest extends ActivityInstrumentationTestCase2<MainActivit
         mySolo.sleep(2000);
     }
 
-    public void testAddValueGUI(){
+    public void testAddValueGUI() {
         int editTextID = 0;
         String testText = "12345";
         mySolo.clickOnText("Gas");
@@ -61,19 +63,19 @@ public class PocketBillTest extends ActivityInstrumentationTestCase2<MainActivit
         assertEquals(mySolo.getEditText(editTextID).getText().toString(), testText);
     }
 
-    public void testDisplayValues(){
+    public void testDisplayValues() {
         mySolo.clickOnText("Gas");
 
         int screenWidth = getActivity().getWindowManager().getDefaultDisplay().getWidth();
         int screenHeight = getActivity().getWindowManager().getDefaultDisplay().getHeight();
         int fromX, toX, fromY, toY = 0;
-        fromX = screenWidth -5;
+        fromX = screenWidth - 5;
         toX = 0;
-        fromY = (screenHeight/2);
-        toY = (screenHeight/2);
+        fromY = (screenHeight / 2);
+        toY = (screenHeight / 2);
 
         mySolo.sleep(2000);
-        
+
         mySolo.drag(fromX, toX, fromY, toY, 50);
 
         mySolo.sleep(2000);
@@ -107,14 +109,12 @@ public class PocketBillTest extends ActivityInstrumentationTestCase2<MainActivit
         assertEquals(myList.getAdapter().getCount() + 1, count);
     }
 
-<<<<<<< HEAD
     public void testSearchButton() {
         mySolo.clickOnActionBarItem(R.id.searchButton);
         mySolo.sleep(5999);
     }
-=======
-    public void testAddTags()
-    {
+
+    public void testAddTags() {
         ListView myList = (ListView) mySolo.getView(R.id.CategoryView);
         if (myList.getAdapter().getCount() < 1) return;
 
@@ -127,8 +127,6 @@ public class PocketBillTest extends ActivityInstrumentationTestCase2<MainActivit
 
         mySolo.enterText(0, "Family");
 
-        assertEquals(true,true);
+        assertEquals(true, true);
     }
-
->>>>>>> [FNWR] Added Tags in the Activity
 }

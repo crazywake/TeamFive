@@ -138,6 +138,7 @@ public class MainActivity extends ActionBarActivity {
                 if(cur_state == State.MAIN) {
                     System.out.println("back in main");
                     current_main_category = clickedItem;
+                    getSupportActionBar().setTitle(current_main_category.getName());
                     loadAdapter(new_category_list);
                     cur_state = State.SUB;
                 }
@@ -292,7 +293,7 @@ public class MainActivity extends ActionBarActivity {
                         mnavDrawerContent2 = getValuesFromCategory(Category.ROOT_CATEGORY);
                     }
                     else {
-                        getSupportActionBar().setTitle(current_main_category.getName());
+                        //getSupportActionBar().setTitle(current_main_category.getName());
 
                         System.out.println("ID of main category :" + current_main_category.getId());
                         mnavDrawerContent2 = getValuesFromCategory(current_main_category);
@@ -321,6 +322,9 @@ public class MainActivity extends ActionBarActivity {
             /** Called when a drawer has settled in a completely closed state. */
             public void onDrawerClosed(View view) {
                 super.onDrawerClosed(view);
+                if (current_main_category != null)
+                    getSupportActionBar().setTitle(current_main_category.getName());
+                else
                 getSupportActionBar().setTitle(mActivityTitle);
                 invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
             }
@@ -347,7 +351,9 @@ public class MainActivity extends ActionBarActivity {
                 //switch to main
                 loadAdapter(getMain_categories());
                 current_sub_category = null;
+                current_main_category = null;
                 cur_state = State.MAIN;
+                getSupportActionBar().setTitle(mActivityTitle);
                 break;
             }
             case POPUP: {
