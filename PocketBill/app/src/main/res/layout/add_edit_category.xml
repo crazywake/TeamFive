@@ -37,13 +37,13 @@
                     android:text="Name:"
                     android:textColor="#555555"
                     android:textStyle="normal"
-                    android:textSize="16dp" />
+                    android:textSize="16sp" />
                 <EditText
                     android:id="@+id/categoryEditName"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="0.44"
-                    android:textSize="16dp"
+                    android:textSize="16sp"
                     android:lines="1"
                     android:singleLine="true"
                     android:textStyle="bold"
@@ -67,12 +67,12 @@
                     android:text="Main category:"
                     android:textColor="#555555"
                     android:textStyle="normal"
-                    android:textSize="16dp" />
+                    android:textSize="16sp" />
                 <CheckBox
                     android:id="@+id/categoryCheckbox"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="16dp"
+                    android:textSize="16sp"
                     android:textColor="#555555"
                     android:textStyle="normal"
                     android:button="@null"
@@ -91,7 +91,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight=".17"
                     android:text="Category:"
-                    android:textSize="16dp"
+                    android:textSize="16sp"
                     android:textColor="#555555"
                     android:textStyle="normal"
                     android:singleLine="true"
@@ -101,7 +101,7 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="0.38"
-                    android:textSize="16dp"
+                    android:textSize="16sp"
                     android:spinnerMode="dialog"
                     android:clickable="true"
                     android:background="@android:drawable/btn_dropdown"
