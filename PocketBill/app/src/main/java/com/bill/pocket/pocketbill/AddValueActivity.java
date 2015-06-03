@@ -27,6 +27,7 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 
 
 public class AddValueActivity extends ActionBarActivity {
@@ -34,6 +35,7 @@ public class AddValueActivity extends ActionBarActivity {
     AutoCompleteTextView last_text = null;
     ArrayAdapter<String> my_adapter = null;
     ArrayList<String> my_tags = null;
+    HashMap<Integer, String> tags = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +49,7 @@ public class AddValueActivity extends ActionBarActivity {
         last_text = my_base_text_view;
         my_adapter = new ArrayAdapter<String>(this,android.R.layout.simple_dropdown_item_1line, dao.getAllTagsArray());
         my_tags = new ArrayList<String>();
+        tags = new HashMap<>();
         my_base_text_view.setAdapter(my_adapter);
         my_base_text_view.setHintTextColor(Color.LTGRAY);
 
@@ -57,35 +60,33 @@ public class AddValueActivity extends ActionBarActivity {
 
                if (actionId == EditorInfo.IME_ACTION_DONE) {
                    if (v.length() == 0) return false;
-                   String new_string = v.getEditableText().toString();
-                   for (String current_string : my_tags)
-                   {
-                       if (current_string.equals(new_string)) return false;
+                   int id = v.getId();
+                   String tag = v.getEditableText().toString();
+
+                   if(!tags.containsKey(id) && tags.size() < 2) {
+                       AutoCompleteTextView next_view = new AutoCompleteTextView(getApplicationContext());
+                       next_view.setOnEditorActionListener(this);
+                       RelativeLayout.LayoutParams myLayout = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                               ViewGroup.LayoutParams.WRAP_CONTENT);
+
+                       RelativeLayout myRelativeLayout = (RelativeLayout) findViewById(R.id.layout_add_value);
+                       myLayout.addRule(RelativeLayout.BELOW, last_text.getId());
+
+                       next_view.setBackground(getResources().getDrawable(R.drawable.abc_edit_text_material));
+                       next_view.setHint("Type Tag");
+                       next_view.setVisibility(View.VISIBLE);
+                       next_view.setImeOptions(EditorInfo.IME_ACTION_DONE);
+                       next_view.setLayoutParams(myLayout);
+                       next_view.setTextColor(Color.BLACK);
+                       next_view.setHintTextColor(Color.LTGRAY);
+                       next_view.setInputType(InputType.TYPE_TEXT_FLAG_AUTO_COMPLETE);
+                       int next_id = View.generateViewId();
+                       next_view.setId(next_id);
+                       next_view.setAdapter(my_adapter);
+                       myRelativeLayout.addView(next_view);
+                       last_text = next_view;
                    }
-                   AutoCompleteTextView next_view = new AutoCompleteTextView(getApplicationContext());
-
-                   next_view.setOnEditorActionListener(this);
-
-                   RelativeLayout.LayoutParams myLayout = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                           ViewGroup.LayoutParams.WRAP_CONTENT);
-
-                   RelativeLayout myRelativeLayout = (RelativeLayout) findViewById(R.id.layout_add_value);
-                   myLayout.addRule(RelativeLayout.BELOW, last_text.getId());
-
-                   next_view.setBackground(getResources().getDrawable(R.drawable.abc_edit_text_material));
-                   next_view.setHint("Type Tag");
-                   next_view.setVisibility(View.VISIBLE);
-                   next_view.setImeOptions(EditorInfo.IME_ACTION_DONE);
-                   next_view.setLayoutParams(myLayout);
-                   next_view.setTextColor(Color.BLACK);
-                   next_view.setHintTextColor(Color.LTGRAY);
-                   next_view.setInputType(InputType.TYPE_TEXT_FLAG_AUTO_COMPLETE);
-                   int next_id = View.generateViewId();
-                   next_view.setId(next_id);
-                   next_view.setAdapter(my_adapter);
-                   myRelativeLayout.addView(next_view);
-                   my_tags.add(new_string);
-                   last_text = next_view;
+                   tags.put(id, tag);
                }
                return false;
                }
@@ -131,7 +132,12 @@ public class AddValueActivity extends ActionBarActivity {
 
             DAO DataAccessObject = DAO.instance(this);
 
-            Value insert_value = new Value(-1, longvalue, new Date().getTime(), parent, my_tags);
+            ArrayList<String> tagList = new ArrayList<>();
+            for(String tag : tags.values())
+            {
+                tagList.add(tag);
+            }
+            Value insert_value = new Value(-1, longvalue, new Date().getTime(), parent, tagList);
             //TODO: get selected date (not always "today" or default)
             DataAccessObject.insertValue(insert_value);
 

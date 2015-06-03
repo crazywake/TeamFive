@@ -490,12 +490,10 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public ArrayList<Value> getValuesFromCategory(Category cat) {
+        DAO dao = DAO.instance(this);
+
         ArrayList<Value> values = new ArrayList<>();
-        ArrayList<Category> categories = getMain_categories();
-        if(cat != Category.ROOT_CATEGORY) {
-            categories = cat.getSubcategories();
-        }
-        for(Category category : categories) {
+        for(Category category : dao.getCategories(cat)) {
             values.addAll(category.getValues());
 
             for(Category subcat : category.getSubcategories()) {
