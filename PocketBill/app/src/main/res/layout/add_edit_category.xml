@@ -63,7 +63,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight=".17"
-                    android:text="Hauptkategorie:"
+                    android:text="Main category:"
                     android:textColor="#555555"
                     android:textStyle="normal"
                     android:textSize="16dp" />
@@ -89,7 +89,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight=".17"
-                    android:text="Kategorie:"
+                    android:text="Category:"
                     android:textSize="16dp"
                     android:textColor="#555555"
                     android:textStyle="normal"
@@ -102,7 +102,9 @@
                     android:layout_weight="0.38"
                     android:textSize="16dp"
                     android:spinnerMode="dialog"
-                    android:clickable="true" />
+                    android:clickable="true"
+                    android:background="@android:drawable/btn_dropdown"
+                    />
             </LinearLayout> <!-- second row, category spinner -->
 
             <!-- divider -->
@@ -116,7 +118,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentLeft="true"
-                    android:text="kenzel washington" />
+                    android:text="Cancel" />
                 <Button
                     android:id="@+id/categoryEditorOK"
                     android:layout_width="wrap_content"
