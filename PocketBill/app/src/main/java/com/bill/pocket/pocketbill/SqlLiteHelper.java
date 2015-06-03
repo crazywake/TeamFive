@@ -177,7 +177,7 @@ public class SqlLiteHelper extends SQLiteOpenHelper {
 
     public String insertTagValueSQL(Value val, String name) {
         return "INSERT INTO " + TAG_VALUE_TABLE + " (valId, tagId) VALUES ("+ val.getId()
-                + ", (SELECT id FROM " + TAG_TABLE + " WHERE name = '" + name + "');";
+                + ", (SELECT id FROM " + TAG_TABLE + " WHERE name = '" + name + "'));";
     }
 
     public String deleteCategorySQL(Category cat) {
