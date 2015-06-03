@@ -132,12 +132,14 @@ public class MainActivity extends ActionBarActivity {
                     //TODO: pass tags to AddValueActivity (change Arraylist above)
 
                     startActivity(my_intent);
+
                     //cur_state = State.MAIN;
                 }
 
                 if(cur_state == State.MAIN) {
                     System.out.println("back in main");
                     current_main_category = clickedItem;
+                    getSupportActionBar().setTitle(current_main_category.getName());
                     loadAdapter(new_category_list);
                     cur_state = State.SUB;
                 }
@@ -220,6 +222,7 @@ public class MainActivity extends ActionBarActivity {
                         Category clickedItem = (Category) categoryView.getItemAtPosition(position);
                         CategoryEditor catedit = new CategoryEditor(CategoryEditor.Type.EDIT, clickedItem, MainActivity.this, getMain_categories(), clickedItem.getParent());
                         popupWindow = catedit.display();
+                        cur_state = pre_popup_state;
                         //TODO: EDIT IN DATABASE!!!!
                     }
                 });
@@ -284,7 +287,7 @@ public class MainActivity extends ActionBarActivity {
 
                 if (drawerView.getTag().toString().equals("right_drawer")) {
 
-                    ArrayList<Value> mnavDrawerContent2 = null;
+                    ArrayList<Value> mnavDrawerContent2;
 
                     if(cur_state == State.MAIN) {
                         getSupportActionBar().setTitle("All Receipts");
@@ -292,19 +295,23 @@ public class MainActivity extends ActionBarActivity {
                         mnavDrawerContent2 = getValuesFromCategory(Category.ROOT_CATEGORY);
                     }
                     else {
-                        getSupportActionBar().setTitle(current_main_category.getName());
+                        //getSupportActionBar().setTitle(current_main_category.getName());
 
                         System.out.println("ID of main category :" + current_main_category.getId());
                         mnavDrawerContent2 = getValuesFromCategory(current_main_category);
                     }
 
-                    ArrayList<String> drawerContent = new ArrayList<String>();
+                    ArrayList<String> drawerContent = new ArrayList<>();
 
                     DateFormat formats = DateFormat.getDateInstance();
 
                     for(Value value: mnavDrawerContent2)
                     {
-                        drawerContent.add(value.getValue() + formats.format(value.getDate()) + value.getTags());
+                        double dval = value.getValue() / 100;
+                        if (value.getTags().size() != 0)
+                            drawerContent.add(formats.format(value.getDate()) + "    " + dval + " Eur   " + value.getTags());
+                        else
+                            drawerContent.add(formats.format(value.getDate()) + "    " + dval + " Eur ");
                     }
 
                     if(drawerContent.size() == 0)
@@ -321,6 +328,9 @@ public class MainActivity extends ActionBarActivity {
             /** Called when a drawer has settled in a completely closed state. */
             public void onDrawerClosed(View view) {
                 super.onDrawerClosed(view);
+                if (current_main_category != null)
+                    getSupportActionBar().setTitle(current_main_category.getName());
+                else
                 getSupportActionBar().setTitle(mActivityTitle);
                 invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
             }
@@ -347,7 +357,9 @@ public class MainActivity extends ActionBarActivity {
                 //switch to main
                 loadAdapter(getMain_categories());
                 current_sub_category = null;
+                current_main_category = null;
                 cur_state = State.MAIN;
+                getSupportActionBar().setTitle(mActivityTitle);
                 break;
             }
             case POPUP: {
