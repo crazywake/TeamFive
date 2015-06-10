@@ -317,14 +317,16 @@ public class MainActivity extends ActionBarActivity {
                 invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
             }
 
-            /** Called when a drawer has settled in a completely closed state. */
             public void onDrawerClosed(View view) {
                 super.onDrawerClosed(view);
+                if (getCur_state() == State.HISTORY)
+                    return;
+
                 if (current_main_category != null && getCur_state() != State.MAIN)
                     getSupportActionBar().setTitle(current_main_category.getName());
                 else
-                getSupportActionBar().setTitle(mActivityTitle);
-                invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+                    getSupportActionBar().setTitle(mActivityTitle);
+                    invalidateOptionsMenu();
             }
         };
 

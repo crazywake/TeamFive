@@ -41,6 +41,7 @@ public class NavigationDrawerListener implements AdapterView.OnItemClickListener
             ArrayList<Value> test = mact.getDAO().getAllValuesSorted();
             ArrayAdapter test2 = new ArrayAdapter<>(mcont, android.R.layout.simple_list_item_1, android.R.id.text1, test);
             mcategoryView.setAdapter(test2);
+            mact.getSupportActionBar().setTitle("History");
             mact.setCur_state(MainActivity.State.HISTORY);
         }
         else if(mcont.getResources().getStringArray(R.array.navigationDrawerContent)[position].equals("About"))
