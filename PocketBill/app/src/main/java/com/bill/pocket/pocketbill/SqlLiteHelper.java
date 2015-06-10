@@ -55,9 +55,10 @@ public class SqlLiteHelper extends SQLiteOpenHelper {
         {
             db = getWritableDatabase();
 
-            boolean firstTime = false;
+            boolean firstTime;
             try {
-                Cursor c = db.rawQuery("SELECT * FROM " + CATEGORY_TABLE, null);
+                Cursor c;
+                c = db.rawQuery("SELECT * FROM " + CATEGORY_TABLE, null);
                 firstTime = c.getCount() < 0;
             }
             catch(Exception e) {
@@ -81,11 +82,8 @@ public class SqlLiteHelper extends SQLiteOpenHelper {
     }
 
     @Override
-    public void onUpgrade(SQLiteDatabase db, int oldversion, int newversion)
-    {
-        assert(false);
-        db.execSQL("DROP TABLE IF EXISTS ");
-        onCreate(db);
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+
     }
 
     public void close() {
@@ -93,12 +91,12 @@ public class SqlLiteHelper extends SQLiteOpenHelper {
     }
 
     public ArrayList<Map<String, String>> query(String cmd) {
-        ArrayList<Map<String, String>> resultset = new ArrayList<Map<String, String>>();
+        ArrayList<Map<String, String>> resultset = new ArrayList<>();
         Cursor cursor;
         try {
             cursor = db.rawQuery(cmd, null);
             while(cursor.moveToNext()) {
-                Map<String, String> map = new HashMap<String, String>();
+                Map<String, String> map = new HashMap<>();
                 for (int i = 0; i < cursor.getColumnCount(); i++) {
                     if(cursor.isNull(i))
                         map.put(cursor.getColumnName(i), null);
@@ -119,9 +117,10 @@ public class SqlLiteHelper extends SQLiteOpenHelper {
         try {
             db.execSQL(cmd);
             return true;
-        } finally {
-            return false;
+        } catch (Exception e){
+            e.printStackTrace();
         }
+        return false;
     }
 
     public int insert(String table, ContentValues vals)
@@ -182,36 +181,9 @@ public class SqlLiteHelper extends SQLiteOpenHelper {
         return "DELETE FROM " + CATEGORY_TABLE + " WHERE id = " + cat.getId();
     }
 
-    public String deleteValueSQL(Value val) {
-        return "DELETE FROM " + TAG_VALUE_TABLE + " WHERE valId = " + val.getId() + ";"
-                + "DELETE FROM " + VALUE_TABLE + " WHERE id = " + val.getId() + ";";
-    }
-
-    public String deleteTagSQL(String name) {
-        return "DELETE FROM " + TAG_VALUE_TABLE + " WHERE tagId = "
-                + "(SELECT id FROM " + TAG_TABLE + " WHERE name = '" + name + "');"
-                + "DELETE FROM " + TAG_TABLE + " WHERE name = '" + name + "';";
-    }
-
-    public String deleteTagValueSQL(Value val, String name) {
-        return "DELETE FROM " + TAG_VALUE_TABLE + " WHERE tagId = "
-                + "(SELECT id FROM " + TAG_TABLE + " WHERE name = '" + name + "') AND valId = "
-                + val.getId() + ";";
-    }
-
     public String updateCategorySQL(Category cat) {
         return "UPDATE " + CATEGORY_TABLE + " SET name = '" + cat.getName() + "', parentId = "
                 + cat.getParentId() + " WHERE id = " + cat.getId();
-    }
-
-    public String updateValueSQL(Value val) {
-        return "UPDATE " + VALUE_TABLE + " SET value = " + val.getValue() + ", date = "
-                + val.getDate().getTime() + ", catId = " + val.getParent().getId()
-                + " WHERE id = " + val.getId();
-    }
-
-    public String selectAllValuesSQL() {
-        return "SELECT * FROM " + VALUE_TABLE;
     }
 
     public String filterValues(ArrayList<Integer> mainCategories,
@@ -223,11 +195,11 @@ public class SqlLiteHelper extends SQLiteOpenHelper {
 
         List<Integer> categories = new ArrayList<>();
 
-        Category tmp = null;
+        Category tmp;
         for (Integer subCat : subCategories) {
             tmp = getCategoryById(subCat);
             if (mainCategories.contains(tmp.getParentId()))
-                mainCategories.remove(new Integer(tmp.getParentId()));
+                mainCategories.remove(Integer.valueOf(tmp.getParentId()));
         }
 
         for (Integer mainCat : mainCategories) {
@@ -290,7 +262,6 @@ public class SqlLiteHelper extends SQLiteOpenHelper {
 
         if (c.getCount() < 1) return categories;
 
-        Category cat = null;
         while (c.moveToNext()) {
             categories.add(c.getInt(c.getColumnIndex("id")));
         }
@@ -305,7 +276,7 @@ public class SqlLiteHelper extends SQLiteOpenHelper {
         Cursor c = db.rawQuery("select * from " + TAG_TABLE, null);
         if (c.getCount() < 1) return tags;
 
-        Tag t = null;
+        Tag t;
         while (c.moveToNext()) {
             t = new Tag();
             t.setId(c.getInt(c.getColumnIndex("id")));

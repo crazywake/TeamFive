@@ -10,9 +10,6 @@ import android.widget.Spinner;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by Thomas on 20.05.2015.
- */
 public class MultiSpinner extends Spinner implements
         DialogInterface.OnMultiChoiceClickListener, DialogInterface.OnCancelListener {
 
@@ -37,17 +34,14 @@ public class MultiSpinner extends Spinner implements
 
     @Override
     public void onClick(DialogInterface dialog, int which, boolean isChecked) {
-        if (isChecked)
-            selected[which] = true;
-        else
-            selected[which] = false;
+        selected[which] = isChecked;
     }
 
     @Override
     public void onCancel(DialogInterface dialog) {
         // refresh text on spinner
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getContext(),
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(),
                 android.R.layout.simple_spinner_item,
                 new String[] { getSpinnerText() });
         setAdapter(adapter);
@@ -103,7 +97,7 @@ public class MultiSpinner extends Spinner implements
         }
 
         // all text on the spinner
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getContext(),
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(),
                 android.R.layout.simple_spinner_item, new String[] { getSpinnerText() });
         setAdapter(adapter);
     }
@@ -115,11 +109,12 @@ public class MultiSpinner extends Spinner implements
     public enum SpinnerType {
         MAIN_CATEGORY,
         SUB_CATEGORY,
-        TAGS
+        TAGS,
+        INITIAL
     }
 
     private ArrayList<Integer> getSelectedIds() {
-        ArrayList<Integer> selItemIds = new ArrayList<Integer>();
+        ArrayList<Integer> selItemIds = new ArrayList<>();
         int i = 0;
         for (boolean b : selected) {
             if (b) selItemIds.add(itemIds.get(i));
@@ -129,10 +124,10 @@ public class MultiSpinner extends Spinner implements
     }
 
     private String getSpinnerText() {
-        StringBuffer spinnerBuffer = new StringBuffer();
+        StringBuilder spinnerBuffer = new StringBuilder();
         boolean allUnselected = true;
         for (int i = 0; i < items.size(); i++) {
-            if (selected[i] == true) {
+            if (selected[i]) {
                 spinnerBuffer.append(items.get(i));
                 spinnerBuffer.append(", ");
                 allUnselected = false;

@@ -4,6 +4,7 @@
     android:layout_height="match_parent"
     android:id="@+id/outerContainer"
     android:orientation="horizontal"
+
     >
 
     <RelativeLayout
@@ -14,14 +15,14 @@
     <RelativeLayout
         android:layout_width="0dip"
         android:layout_height="fill_parent"
-        android:layout_weight="0.8">
+        android:layout_weight="0.8"
+        android:background="#ccc">
 
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:orientation="vertical"
-            android:background="#afafbb"
             android:padding="10dp">
 
             <LinearLayout

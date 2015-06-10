@@ -1,8 +1,5 @@
 package com.bill.pocket.pocketbill;
 
-/**
- * Created by Thomas on 27.05.2015.
- */
 public class Tag {
     private int id;
     private String name;

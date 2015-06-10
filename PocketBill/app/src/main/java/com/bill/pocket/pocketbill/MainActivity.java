@@ -3,7 +3,6 @@ package com.bill.pocket.pocketbill;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
@@ -21,7 +20,6 @@ import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.Toast;
 
-import java.text.DateFormat;
 import java.util.ArrayList;
 
 
@@ -35,11 +33,9 @@ public class MainActivity extends ActionBarActivity {
         POPUP
     }
 
-    private MainActivity this_activity = this;
-
     //Navigation Drawer
     private ActionBarDrawerToggle mDrawerToggle;
-    private DrawerLayout mDrawerLayout, mDrawerLayout2;
+    private DrawerLayout mDrawerLayout;
     private String mActivityTitle = "Pocket Bill";
 
     //Database
@@ -69,7 +65,7 @@ public class MainActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         String[] mnavDrawerContent;
-        this_activity = this;
+        MainActivity this_activity = this;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -207,9 +203,6 @@ public class MainActivity extends ActionBarActivity {
                         LayoutParams.WRAP_CONTENT,
                         LayoutParams.WRAP_CONTENT);
 
-                popupWindow.setBackgroundDrawable(new BitmapDrawable());
-                popupWindow.setOutsideTouchable(true);
-
                 Button btnEdit = (Button) popupView.findViewById(R.id.edit);
                 btnEdit.setOnClickListener(new Button.OnClickListener() {
 
@@ -221,7 +214,6 @@ public class MainActivity extends ActionBarActivity {
                         CategoryEditor catedit = new CategoryEditor(CategoryEditor.Type.EDIT, clickedItem, MainActivity.this, getMain_categories(), clickedItem.getParent());
                         popupWindow = catedit.display();
                         cur_state = pre_popup_state;
-                        //TODO: EDIT IN DATABASE!!!!
                     }
                 });
 
@@ -301,15 +293,13 @@ public class MainActivity extends ActionBarActivity {
 
                     ArrayList<String> drawerContent = new ArrayList<>();
 
-                    DateFormat formats = DateFormat.getDateInstance();
-
                     for(Value value: mnavDrawerContent2)
                     {
                         String dval = value.toString();
                         if (value.getTags().size() != 0)
-                            drawerContent.add(formats.format(value.getDate()) + "    " + dval + "    "  + value.getTags());
+                            drawerContent.add( dval + "    "  + value.getTags());
                         else
-                            drawerContent.add(formats.format(value.getDate()) + "    " + dval );
+                            drawerContent.add( dval );
                     }
 
                     if(drawerContent.size() == 0)
@@ -402,27 +392,6 @@ public class MainActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void insertDummyData() {
-        Category dummy1main = new Category(-1, "Gas", Category.ROOT_CATEGORY, null, null, Category.Type.MAIN);
-        Category dummy2main = new Category(-1, "Groceries", Category.ROOT_CATEGORY, null, null, Category.Type.MAIN);
-        Category dummy3main = new Category(-1, "Shopping", Category.ROOT_CATEGORY, null, null, Category.Type.MAIN);
-
-        dataAccessObject.insertCategory(dummy1main);
-        dataAccessObject.insertCategory(dummy2main);
-        dataAccessObject.insertCategory(dummy3main);
-
-        dataAccessObject.insertCategory(new Category(-1, "Shell", dummy1main, null, null, Category.Type.SUB));
-        Category hans = new Category(-1, "BP", dummy1main, null, null, Category.Type.SUB);
-        boolean igzud = dataAccessObject.insertCategory(hans);
-        dataAccessObject.insertCategory(new Category(-1, "Jet", dummy1main, null, null, Category.Type.SUB));
-        dataAccessObject.insertCategory(new Category(-1, "Spar", dummy2main, null, null, Category.Type.SUB));
-        dataAccessObject.insertCategory(new Category(-1, "Billa", dummy2main, null, null, Category.Type.SUB));
-        dataAccessObject.insertCategory(new Category(-1, "Merkur", dummy2main, null, null, Category.Type.SUB));
-        dataAccessObject.insertCategory(new Category(-1, "New Yorker", dummy3main, null, null, Category.Type.SUB));
-        dataAccessObject.insertCategory(new Category(-1, "H&M", dummy3main, null, null, Category.Type.SUB));
-        dataAccessObject.insertCategory(new Category(-1, "C&A", dummy3main, null, null, Category.Type.SUB));
-    }
-
     public void loadAdapter(ArrayList<Category> category_list) {
         //reload adapter
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, android.R.id.text1, category_list);
@@ -470,11 +439,6 @@ public class MainActivity extends ActionBarActivity {
         return pre_popup_state;
     }
 
-    public void setPre_popup_state(State pre_popup_state) {
-        System.out.println("In setter:" + pre_popup_state);
-        this.pre_popup_state = pre_popup_state;
-    }
-
     public State getCur_state() {
         return cur_state;
     }
@@ -491,14 +455,6 @@ public class MainActivity extends ActionBarActivity {
         CategoryData.getInstance().setMainCategories(main_categories);
     }
 
-    public Category getCurrent_main_category() {
-        return current_main_category;
-    }
-
-    public void setCurrent_main_category(Category current_main_category) {
-        this.current_main_category = current_main_category;
-    }
-
     public ArrayList<Value> getValuesFromCategory(Category cat) {
         DAO dao = DAO.instance(this);
 
@@ -512,13 +468,5 @@ public class MainActivity extends ActionBarActivity {
         }
 
         return values;
-    }
-
-    public ArrayAdapter<Category> getAdapter() {
-        return adapter;
-    }
-
-    public void setAdapter(ArrayAdapter<Category> adapter) {
-        this.adapter = adapter;
     }
 }
