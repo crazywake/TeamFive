@@ -67,8 +67,9 @@ public class Value {
     @Override
     public String toString() {
         //SET LOCALE CHOOSER
-        NumberFormat numfor = NumberFormat.getCurrencyInstance(Locale.GERMAN);
+        NumberFormat numfor = NumberFormat.getCurrencyInstance(Locale.GERMANY);
         String currency = numfor.format(value / 100.0);
+
         return currency;
     }
 }

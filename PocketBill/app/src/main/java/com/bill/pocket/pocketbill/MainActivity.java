@@ -21,10 +21,8 @@ import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.Toast;
 
-import java.lang.reflect.Array;
 import java.text.DateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 
 
 @SuppressWarnings("deprecation")
@@ -307,11 +305,11 @@ public class MainActivity extends ActionBarActivity {
 
                     for(Value value: mnavDrawerContent2)
                     {
-                        double dval = value.getValue() / 100;
+                        String dval = value.toString();
                         if (value.getTags().size() != 0)
-                            drawerContent.add(formats.format(value.getDate()) + "    " + dval + " Eur   " + value.getTags());
+                            drawerContent.add(formats.format(value.getDate()) + "    " + dval + "    "  + value.getTags());
                         else
-                            drawerContent.add(formats.format(value.getDate()) + "    " + dval + " Eur ");
+                            drawerContent.add(formats.format(value.getDate()) + "    " + dval );
                     }
 
                     if(drawerContent.size() == 0)
