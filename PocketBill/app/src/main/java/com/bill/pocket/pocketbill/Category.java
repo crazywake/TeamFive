@@ -21,14 +21,13 @@ public class Category {
     private ArrayList<Category> subcategories;
     private ArrayList<Value> values;
     private Type type;
-    private String color;
 
     public Category() {
     }
 
     // main category: db_id, name, null, new ArrayList<Category>(), new ArrayList<Value>(), Type.MAIN
     // sub category: db_id, name, parent, null, new ArrayList<Value>(), Type.SUB
-    public Category(int id, String name, Category parent, ArrayList<Category> subcategories, ArrayList<Value> values, Type type, String color) {
+    public Category(int id, String name, Category parent, ArrayList<Category> subcategories, ArrayList<Value> values, Type type) {
         this.id = id;
         this.name = name;
         this.parent = parent;
@@ -37,7 +36,6 @@ public class Category {
         this.values = values;
         if(values == null) this.values = new ArrayList<>();
         this.type = type;
-        this.color = color;
     }
 
     public int getParentId()
@@ -97,14 +95,6 @@ public class Category {
 
     public void setType(Type type) {
         this.type = type;
-    }
-
-    public String getColor() {
-        return color;
-    }
-
-    public void setColor(String color) {
-        this.color = color;
     }
 
     @Override

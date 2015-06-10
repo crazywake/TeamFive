@@ -405,24 +405,24 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public void insertDummyData() {
-        Category dummy1main = new Category(-1, "Gas", Category.ROOT_CATEGORY, null, null, Category.Type.MAIN, Category.DEFAULT_COLOR);
-        Category dummy2main = new Category(-1, "Groceries", Category.ROOT_CATEGORY, null, null, Category.Type.MAIN, Category.DEFAULT_COLOR);
-        Category dummy3main = new Category(-1, "Shopping", Category.ROOT_CATEGORY, null, null, Category.Type.MAIN, Category.DEFAULT_COLOR);
+        Category dummy1main = new Category(-1, "Gas", Category.ROOT_CATEGORY, null, null, Category.Type.MAIN);
+        Category dummy2main = new Category(-1, "Groceries", Category.ROOT_CATEGORY, null, null, Category.Type.MAIN);
+        Category dummy3main = new Category(-1, "Shopping", Category.ROOT_CATEGORY, null, null, Category.Type.MAIN);
 
         dataAccessObject.insertCategory(dummy1main);
         dataAccessObject.insertCategory(dummy2main);
         dataAccessObject.insertCategory(dummy3main);
 
-        dataAccessObject.insertCategory(new Category(-1, "Shell", dummy1main, null, null, Category.Type.SUB, Category.DEFAULT_COLOR));
-        Category hans = new Category(-1, "BP", dummy1main, null, null, Category.Type.SUB, Category.DEFAULT_COLOR);
+        dataAccessObject.insertCategory(new Category(-1, "Shell", dummy1main, null, null, Category.Type.SUB));
+        Category hans = new Category(-1, "BP", dummy1main, null, null, Category.Type.SUB);
         boolean igzud = dataAccessObject.insertCategory(hans);
-        dataAccessObject.insertCategory(new Category(-1, "Jet", dummy1main, null, null, Category.Type.SUB, Category.DEFAULT_COLOR));
-        dataAccessObject.insertCategory(new Category(-1, "Spar", dummy2main, null, null, Category.Type.SUB, Category.DEFAULT_COLOR));
-        dataAccessObject.insertCategory(new Category(-1, "Billa", dummy2main, null, null, Category.Type.SUB, Category.DEFAULT_COLOR));
-        dataAccessObject.insertCategory(new Category(-1, "Merkur", dummy2main, null, null, Category.Type.SUB, Category.DEFAULT_COLOR));
-        dataAccessObject.insertCategory(new Category(-1, "New Yorker", dummy3main, null, null, Category.Type.SUB, Category.DEFAULT_COLOR));
-        dataAccessObject.insertCategory(new Category(-1, "H&M", dummy3main, null, null, Category.Type.SUB, Category.DEFAULT_COLOR));
-        dataAccessObject.insertCategory(new Category(-1, "C&A", dummy3main, null, null, Category.Type.SUB, Category.DEFAULT_COLOR));
+        dataAccessObject.insertCategory(new Category(-1, "Jet", dummy1main, null, null, Category.Type.SUB));
+        dataAccessObject.insertCategory(new Category(-1, "Spar", dummy2main, null, null, Category.Type.SUB));
+        dataAccessObject.insertCategory(new Category(-1, "Billa", dummy2main, null, null, Category.Type.SUB));
+        dataAccessObject.insertCategory(new Category(-1, "Merkur", dummy2main, null, null, Category.Type.SUB));
+        dataAccessObject.insertCategory(new Category(-1, "New Yorker", dummy3main, null, null, Category.Type.SUB));
+        dataAccessObject.insertCategory(new Category(-1, "H&M", dummy3main, null, null, Category.Type.SUB));
+        dataAccessObject.insertCategory(new Category(-1, "C&A", dummy3main, null, null, Category.Type.SUB));
     }
 
     public void loadAdapter(ArrayList<Category> category_list) {
