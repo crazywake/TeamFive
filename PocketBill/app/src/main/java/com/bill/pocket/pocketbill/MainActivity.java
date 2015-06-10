@@ -113,6 +113,9 @@ public class MainActivity extends ActionBarActivity {
             public void onItemClick(AdapterView<?> parent, View view,
                                     final int position, long id) {
 
+                if (cur_state == State.HISTORY)
+                    return;
+
                 Category clickedItem = (Category) categoryView.getItemAtPosition(position);
                 ArrayList<Category> new_category_list = clickedItem.getSubcategories();
 

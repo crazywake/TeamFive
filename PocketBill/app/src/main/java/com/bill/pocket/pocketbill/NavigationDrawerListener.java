@@ -10,7 +10,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class NavigationDrawerListener implements AdapterView.OnItemClickListener {
@@ -42,6 +41,7 @@ public class NavigationDrawerListener implements AdapterView.OnItemClickListener
             ArrayList<Value> test = mact.getDAO().getAllValuesSorted();
             ArrayAdapter test2 = new ArrayAdapter<>(mcont, android.R.layout.simple_list_item_1, android.R.id.text1, test);
             mcategoryView.setAdapter(test2);
+            mact.setCur_state(MainActivity.State.HISTORY);
         }
         else if(mcont.getResources().getStringArray(R.array.navigationDrawerContent)[position].equals("About"))
         {
