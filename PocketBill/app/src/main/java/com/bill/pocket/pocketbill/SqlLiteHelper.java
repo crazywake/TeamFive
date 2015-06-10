@@ -15,7 +15,7 @@ import java.util.Map;
 
 public class SqlLiteHelper extends SQLiteOpenHelper {
 
-    private SQLiteDatabase db;
+    public SQLiteDatabase db;
 
     private static final String SQL_NAME = "Pocket.db";
     public static final String CATEGORY_TABLE = "categories";

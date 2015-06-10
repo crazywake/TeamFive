@@ -1,9 +1,11 @@
 package com.bill.pocket.pocketbill;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import java.util.ArrayList;
+import java.util.Currency;
 import java.util.Map;
 
 
@@ -12,7 +14,6 @@ public class DAO {
     private static DAO my_dao = null;
 
     private static SqlLiteHelper  my_helper;
-    private SQLiteDatabase my_db;
 
     private DAO()
     {}
@@ -71,6 +72,21 @@ public class DAO {
         }
 
         return categories;
+    }
+
+    public ArrayList<Value> getAllValuesSorted()
+    {
+        ArrayList<Value> ret_val = new ArrayList<>();
+
+        String SQL = "SELECT * FROM " + SqlLiteHelper.VALUE_TABLE + " ORDER BY (date)";
+        Cursor myValues = my_helper.db.rawQuery(SQL, null);
+        myValues.moveToFirst();
+        while (!myValues.isAfterLast())
+        {
+            ret_val.add(new Value(myValues.getInt(0),myValues.getLong(1),myValues.getLong(2),null,null));
+            myValues.moveToNext();
+        }
+        return ret_val;
     }
 
     public ArrayList<Value> getValues(Category category)
