@@ -32,13 +32,6 @@ public class DAO {
         return my_dao;
     }
 
-    public boolean open()
-    {
-        //my_db = my_helper.getWritableDatabase();
-
-        return false;
-    }
-
     public void close()
     {
         my_helper.close();
@@ -51,7 +44,7 @@ public class DAO {
         if(parent != Category.ROOT_CATEGORY)
             rootId = parent.getId();
 
-        ArrayList<Category> categories = new ArrayList<Category>();
+        ArrayList<Category> categories = new ArrayList<>();
         ArrayList<Map<String, String>> resultset = my_helper.query("SELECT * FROM " + SqlLiteHelper.CATEGORY_TABLE +
             " WHERE parentId = " + rootId);
 
@@ -91,9 +84,10 @@ public class DAO {
 
     public ArrayList<Value> getValues(Category category)
     {
-        ArrayList<Value> values = new ArrayList<Value>();
+        ArrayList<Value> values = new ArrayList<>();
 
-        ArrayList<Map<String, String>> resultset = my_helper.query("SELECT * FROM " + SqlLiteHelper.VALUE_TABLE +
+        ArrayList<Map<String, String>> resultset;
+        resultset = my_helper.query("SELECT * FROM " + SqlLiteHelper.VALUE_TABLE +
                 " WHERE catId = " + category.getId());
 
         for(Map<String, String> map : resultset) {
@@ -119,7 +113,7 @@ public class DAO {
                                               ArrayList<Integer> subCategories,
                                               ArrayList<Integer> tagIds) {
         ArrayList<Map<String, String>> resultset = my_helper.query(my_helper.filterValues(mainCategories, subCategories, tagIds));
-        ArrayList<Value> values = new ArrayList<Value>(); 
+        ArrayList<Value> values = new ArrayList<>();
 
         for(Map<String, String> map : resultset) {
             int id = Integer.parseInt(map.get("id"));
@@ -158,7 +152,7 @@ public class DAO {
         //Log.w("möp = ", möp);
 
         return true;*/
-        int id = my_helper.insert(my_helper.CATEGORY_TABLE, my_helper.insertCategorySQL(category));
+        int id = my_helper.insert(SqlLiteHelper.CATEGORY_TABLE, my_helper.insertCategorySQL(category));
         if(id == 0)
             return false;
         category.setId(id);
@@ -166,7 +160,7 @@ public class DAO {
     }
 
     public boolean insertValue(Value value) {
-        value.setId(my_helper.insert(my_helper.VALUE_TABLE, my_helper.insertValueSQL(value)));
+        value.setId(my_helper.insert(SqlLiteHelper.VALUE_TABLE, my_helper.insertValueSQL(value)));
         for(String tag : value.getTags()) {
             insertTagValue(value, tag);
         }
@@ -175,7 +169,7 @@ public class DAO {
 
     public int insertTag(String tag) {
         try {
-            return my_helper.insert(my_helper.TAG_TABLE, my_helper.insertTagSQL(tag));
+            return my_helper.insert(SqlLiteHelper.TAG_TABLE, my_helper.insertTagSQL(tag));
         }  catch (Exception e) {
             e.printStackTrace();
             return 0;
@@ -203,59 +197,11 @@ public class DAO {
         }
     }
 
-    public boolean deleteValue(Value value) {
-        try {
-            my_helper.exec(my_helper.deleteValueSQL(value));
-
-            for(String tag : value.getTags()) {
-                if(my_helper.query("SELECT * FROM " + my_helper.TAG_VALUE_TABLE
-                        + " WHERE tagId = (SELECT id FROM " + my_helper.TAG_TABLE + " WHERE name = '" + tag + "')").size() == 0) {
-                    my_helper.exec(my_helper.deleteTagSQL(tag));
-                }
-            }
-
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    public boolean deleteTag(String tag) {
-        try {
-            my_helper.exec(my_helper.deleteTagSQL(tag));
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    public boolean deleteTagValue(Value val, String tag) {
-        try {
-            my_helper.exec(my_helper.deleteTagValueSQL(val, tag));
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
     public boolean updateCategory(Category cat) {
         try {
             my_helper.exec(my_helper.updateCategorySQL(cat));
             return true;
         }  catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    public boolean updateValue(Value val) {
-        try {
-            my_helper.exec(my_helper.updateValueSQL(val));
-            return true;
-        } catch (Exception e) {
             e.printStackTrace();
             return false;
         }

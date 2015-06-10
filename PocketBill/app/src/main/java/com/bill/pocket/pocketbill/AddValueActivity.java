@@ -1,26 +1,18 @@
 package com.bill.pocket.pocketbill;
 
 import android.content.Intent;
-
 import android.graphics.Color;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.text.InputType;
 import android.view.KeyEvent;
 import android.view.Menu;
-import android.view.MenuItem;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.Toast;
-
-import static java.lang.Math.*;
-
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -29,6 +21,8 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+
+import static java.lang.Math.*;
 
 
 public class AddValueActivity extends ActionBarActivity {
@@ -48,8 +42,8 @@ public class AddValueActivity extends ActionBarActivity {
 
         final AutoCompleteTextView my_base_text_view = (AutoCompleteTextView) findViewById(R.id.autocomplete_text);
         last_text = my_base_text_view;
-        my_adapter = new ArrayAdapter<String>(this,android.R.layout.simple_dropdown_item_1line, dao.getAllTagsArray());
-        my_tags = new ArrayList<String>();
+        my_adapter = new ArrayAdapter<>(this,android.R.layout.simple_dropdown_item_1line, dao.getAllTagsArray());
+        my_tags = new ArrayList<>();
         tags = new HashMap<>();
         my_base_text_view.setAdapter(my_adapter);
         my_base_text_view.setHintTextColor(Color.LTGRAY);
@@ -65,20 +59,17 @@ public class AddValueActivity extends ActionBarActivity {
 
                 //TODO: handle -2 error!
                 Category parent = new Category(category_id, null, null, null, null, null);
-                //ArrayList<String> tags = my_intent.getStringArrayListExtra("tags");
 
-                //String value = (String) getString(R.id.addValue);
                 EditText value = (EditText) findViewById(R.id.editTextAddValue);
 
-                if(value.getText().toString().equals(null) || value.getText().toString().equals("") ||
-                        value.getText().toString().length() == 0) {
+                if((value.getText() == null) || "".equals(value.getText().toString())) {
                     Toast.makeText(getApplicationContext(), "No value added", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
                 String val = value.getText().toString();
                 double endval = Double.parseDouble(val)*100;
-                long longvalue = (long) Math.round(endval);
+                long longvalue = round(endval);
 
                 DAO DataAccessObject = DAO.instance(AddValueActivity.this);
 

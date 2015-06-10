@@ -4,8 +4,11 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.bill.pocket.pocketbill.MultiSpinner.MultiSpinnerListener;
 
@@ -18,11 +21,14 @@ public class SearchActivity extends ActionBarActivity implements MultiSpinnerLis
     private ArrayList<Integer> subCatFilter = new ArrayList<>();
     private ArrayList<Integer> tagsFilter = new ArrayList<>();
     private MultiSpinner subCatSpinner = null;
+    private ListView valuesView = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
+
+        valuesView = (ListView) findViewById(R.id.search_value_view);
 
         MultiSpinner mainCatSpinner = (MultiSpinner) findViewById(R.id.search_maincat_spinner);
         subCatSpinner = (MultiSpinner) findViewById(R.id.search_subcat_spinner);
@@ -32,14 +38,12 @@ public class SearchActivity extends ActionBarActivity implements MultiSpinnerLis
         ArrayList<Integer> mainCatIds = new ArrayList<>();
         ArrayList<String> subCats = new ArrayList<>();
         ArrayList<Integer> subCatIds = new ArrayList<>();
-        ArrayList<Value> values = new ArrayList<>();
         ArrayList<String> tags = new ArrayList<>();
         ArrayList<Integer> tagIds = new ArrayList<>();
 
         for(Category c : CategoryData.getInstance().getMainCategories()) {
             mainCats.add(c.getName());
             mainCatIds.add(c.getId());
-            values.addAll(DAO.instance(this).getValues(c));
         }
 
         for (Tag t : DAO.instance(this).getAllTags()) {
@@ -52,12 +56,7 @@ public class SearchActivity extends ActionBarActivity implements MultiSpinnerLis
         subCatSpinner.setEnabled(false);
         tagSpinner.setItems(tags, tagIds, "Tags", MultiSpinner.SpinnerType.TAGS, this);
 
-        final ListView valuesView = (ListView) findViewById(R.id.search_value_view);
-
-
-        ArrayAdapter adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, android.R.id.text1, values);
-        valuesView.setAdapter(adapter);
-
+        this.updateFilter(MultiSpinner.SpinnerType.INITIAL, null);
     }
 
 
@@ -88,7 +87,7 @@ public class SearchActivity extends ActionBarActivity implements MultiSpinnerLis
                 ArrayList<Integer> subCatIds = new ArrayList<>();
 
                 for(Category c : CategoryData.getInstance().getMainCategories()) {
-                    if (filterIds.contains(new Integer(c.getId()))) {
+                    if (filterIds.contains(Integer.valueOf(c.getId()))) {
                         for (Category subCat : c.getSubcategories()) {
                             subCats.add(subCat.getName());
                             subCatIds.add(subCat.getId());
@@ -105,16 +104,35 @@ public class SearchActivity extends ActionBarActivity implements MultiSpinnerLis
                 break;
             case TAGS:
                 this.tagsFilter = filterIds;
+                break;
+            case INITIAL:
+                mainCatFilter = new ArrayList<>();
+                subCatFilter = new ArrayList<>();
+                tagsFilter = new ArrayList<>();
         }
 
-        ArrayList<Value> filteredVals = DAO.instance(this).getFilteredValues(mainCatFilter, subCatFilter, tagsFilter);
-        final ListView valuesView = (ListView) findViewById(R.id.search_value_view);
+        final ArrayList<Value> filteredVals = DAO.instance(this).getFilteredValues(mainCatFilter, subCatFilter, tagsFilter);
 
         if (filteredVals.size() < 1) {
-            filteredVals.add(new ValueDummy("No entries found! - Refine your search, bastard."));
+            filteredVals.add(new ValueDummy("No entries found!"));
         }
 
-        ArrayAdapter adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, android.R.id.text1, filteredVals);
+        ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_2, android.R.id.text1, filteredVals) {
+            @Override
+            public View getView(int position, View convertView, ViewGroup parent) {
+                View view = super.getView(position, convertView, parent);
+                TextView text1 = (TextView) view.findViewById(android.R.id.text1);
+                TextView text2 = (TextView) view.findViewById(android.R.id.text2);
+
+                Value val = filteredVals.get(position);
+                if (val != null) {
+                    text1.setText(filteredVals.get(position).toString());
+                    if (val.getParent() != null)
+                        text2.setText(filteredVals.get(position).getParent().getName());
+                }
+                return view;
+            }
+        };
         valuesView.setAdapter(adapter);
     }
 }

@@ -2,9 +2,6 @@ package com.bill.pocket.pocketbill;
 
 import java.util.ArrayList;
 
-/**
- * Created by Thomas on 20.05.2015.
- */
 public class CategoryData {
 
     private static CategoryData categoryData;

@@ -16,9 +16,6 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
-/**
- * Created by Martin on 06.05.2015.
- */
 public class CategoryEditor {
 
     public static enum Type {
@@ -47,14 +44,6 @@ public class CategoryEditor {
          }
     }
 
-    public Type getType() {
-        return type;
-    }
-
-    public void setType(Type type) {
-        this.type = type;
-    }
-
     public Category getCategory() {
         return category;
     }
@@ -71,9 +60,10 @@ public class CategoryEditor {
                 GridLayout.LayoutParams.WRAP_CONTENT, true);
         popup.showAtLocation(addEditPopupView, Gravity.CENTER, 0, 0);
 
+
         final Spinner parentSpinner = (Spinner) addEditPopupView.findViewById(R.id.categoryParentSpinner);
 
-        //if(type == Type.EDIT) main_categories.remove(category);
+
         ArrayList<Category> copy = (ArrayList<Category>) main_categories.clone();
         copy.remove(this.category);
         ArrayAdapter<Category> adapter = new ArrayAdapter<>(activity.getBaseContext(), android.R.layout.simple_spinner_dropdown_item, copy);
@@ -109,15 +99,13 @@ public class CategoryEditor {
         btnOK.setOnClickListener(new Button.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // ok button clicked
                     if(parseInput(catname.getText().toString())) {
-                        //SET NEW DATA
-                        setData(catname.getText().toString(), Category.DEFAULT_COLOR);
+                        setData(catname.getText().toString());
                         activity.setCur_state(activity.getPre_popup_state());
                         popup.dismiss();
 
                     } else {
-                        Toast.makeText(activity, "Kenzel Washington requires a valid name sacrifice!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(activity, "Please enter a valid name!", Toast.LENGTH_SHORT).show();
                     }
                 }
         });
@@ -126,7 +114,7 @@ public class CategoryEditor {
         btnCancel.setOnClickListener(new Button.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // kenzel button clicked
+                activity.setCur_state(activity.getPre_popup_state());
                 popup.dismiss();
             }
         });
@@ -154,20 +142,17 @@ public class CategoryEditor {
     }
 
     private boolean parseInput(String text) {
-        if(text.equals(null) || text.length() == 0 || text.equals("")) {
-            return false;
-        }
-        return true;
+        return !"".equals(text);
     }
 
-    private void setData(String name, String color) {
+    private void setData(String name) {
         if(type == Type.EDIT) {
             Category.Type oldType = category.getType();
             Category.Type newType = main_sub_type;
 
-            if(newType == Category.Type.MAIN) {
+            if (newType == Category.Type.MAIN)
                 parent_id = -1;
-            }
+
             category.setName(name);
             category.setParent(activity.getCategoryFromID(parent_id));
 
@@ -197,12 +182,12 @@ public class CategoryEditor {
 
     private class SpinnerOnItemSelectedListener implements AdapterView.OnItemSelectedListener {
         public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
-            int parent_category_id = main_categories.get(pos).getId();
-            parent_id = parent_category_id;
+            parent_id = main_categories.get(pos).getId();
         }
 
         public void onNothingSelected(AdapterView parent) {
-            // Do nothing.
+
         }
     }
+
 }

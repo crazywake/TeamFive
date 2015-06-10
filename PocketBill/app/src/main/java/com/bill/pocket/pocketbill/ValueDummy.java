@@ -1,8 +1,5 @@
 package com.bill.pocket.pocketbill;
 
-/**
- * Created by Thomas on 03.06.2015.
- */
 public class ValueDummy extends Value {
     private String text;
 

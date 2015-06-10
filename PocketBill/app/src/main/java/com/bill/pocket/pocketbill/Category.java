@@ -2,13 +2,9 @@ package com.bill.pocket.pocketbill;
 
 import java.util.ArrayList;
 
-/**
- * Created by Martin on 29.04.2015.
- */
 public class Category {
 
     public static Category ROOT_CATEGORY = null;
-    public static String DEFAULT_COLOR = "#A35F7A";
 
     public enum Type {
         MAIN,
@@ -83,10 +79,6 @@ public class Category {
 
     public void setValues(ArrayList<Value> values) {
         this.values = values;
-    }
-
-    public void addValues(Value value) {
-        values.add(value);
     }
 
     public Type getType() {
