@@ -172,7 +172,6 @@ public class CategoryEditor {
             category.setParent(activity.getCategoryFromID(parent_id));
 
             category.setType(main_sub_type);
-            category.setColor(color);
 
             if(oldType == Category.Type.MAIN && newType == Category.Type.SUB) {
                 activity.getDAO().makeMain2Sub(category);
@@ -185,11 +184,11 @@ public class CategoryEditor {
 
         if(type == Type.ADD) {
             if(main_sub_type == Category.Type.MAIN) {
-                activity.getDAO().insertCategory(new Category(-1, name, Category.ROOT_CATEGORY, null, null, Category.Type.MAIN, color));
+                activity.getDAO().insertCategory(new Category(-1, name, Category.ROOT_CATEGORY, null, null, Category.Type.MAIN));
                 parent_id = -1;
             }
             if(main_sub_type == Category.Type.SUB) {
-                activity.getDAO().insertCategory(new Category(-1, name, parent_category, null, null, Category.Type.SUB, color));
+                activity.getDAO().insertCategory(new Category(-1, name, parent_category, null, null, Category.Type.SUB));
             }
 
             activity.updateLists(parent_id);

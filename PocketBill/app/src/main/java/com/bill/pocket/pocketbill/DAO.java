@@ -62,7 +62,7 @@ public class DAO {
             if(rootId != -1)
                 type = Category.Type.SUB;
 
-            Category category = new Category(id, name, parent, null, null, type, Category.DEFAULT_COLOR);
+            Category category = new Category(id, name, parent, null, null, type);
 
             category.setSubcategories(getCategories(category));
             category.setValues(getValues(category));

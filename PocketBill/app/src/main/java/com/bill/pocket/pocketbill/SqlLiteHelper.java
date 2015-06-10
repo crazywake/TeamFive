@@ -27,7 +27,6 @@ public class SqlLiteHelper extends SQLiteOpenHelper {
             "id INTEGER PRIMARY KEY AUTOINCREMENT," +
             "parentId INTEGER," +
             "name TEXT NOT NULL," +
-            "color TEXT NOT NULL," +
             "UNIQUE (parentId, name)" +
             ");";
 
@@ -146,7 +145,6 @@ public class SqlLiteHelper extends SQLiteOpenHelper {
         ContentValues vals = new ContentValues();
         vals.put("name", cat.getName());
         vals.put("parentId", cat.getParentId());
-        vals.put("color", cat.getColor());
         return vals;/*
         String ins = "INSERT INTO " + CATEGORY_TABLE + " (parentId, name, color) VALUES (" + cat.getParentId()
                 + ", '" + cat.getName() + "', '" + cat.getColor() + "');";
@@ -203,7 +201,7 @@ public class SqlLiteHelper extends SQLiteOpenHelper {
 
     public String updateCategorySQL(Category cat) {
         return "UPDATE " + CATEGORY_TABLE + " SET name = '" + cat.getName() + "', parentId = "
-                + cat.getParentId() + ", color = '" + cat.getColor() + "' WHERE id = " + cat.getId();
+                + cat.getParentId() + " WHERE id = " + cat.getId();
     }
 
     public String updateValueSQL(Value val) {
@@ -275,8 +273,7 @@ public class SqlLiteHelper extends SQLiteOpenHelper {
 
         Category cat = new Category(catId,
                 c.getString(c.getColumnIndex("name")),
-                new Category(c.getColumnIndex("parentId"), "", null, null, null, null, null),
-                null,
+                new Category(c.getColumnIndex("parentId"), "", null, null, null, null),
                 null,
                 null,
                 null);
