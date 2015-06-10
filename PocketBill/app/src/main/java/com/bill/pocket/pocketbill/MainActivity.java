@@ -34,7 +34,8 @@ public class MainActivity extends ActionBarActivity {
     public enum State {
         MAIN,
         SUB,
-        POPUP
+        POPUP,
+        HISTORY
     }
 
     private MainActivity this_activity = this;
